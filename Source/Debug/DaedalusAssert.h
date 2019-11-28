@@ -18,8 +18,6 @@
 
 */
 
-#pragma once
-
 #ifndef DEBUG_DAEDALUSASSERT_H_
 #define DEBUG_DAEDALUSASSERT_H_
 
@@ -153,9 +151,9 @@ inline void SetAssertHook( DaedalusAssertHook hook )
 
 #else // DAEDALUS_ENABLE_ASSERTS
 
-#define DAEDALUS_ASSERT( ... )		do { DAEDALUS_USE(__VA_ARGS__); } while(0)
-#define DAEDALUS_ASSERT_Q( ... )	do { DAEDALUS_USE(__VA_ARGS__); } while(0)
-#define DAEDALUS_ERROR( ... )		do { DAEDALUS_USE(__VA_ARGS__); } while(0)
+#define DAEDALUS_ASSERT( ... )		//do { DAEDALUS_USE(__VA_ARGS__); } while(0)
+#define DAEDALUS_ASSERT_Q( ... )	//do { DAEDALUS_USE(__VA_ARGS__); } while(0)
+#define DAEDALUS_ERROR( ... )		//do { DAEDALUS_USE(__VA_ARGS__); } while(0)
 
 #endif // DAEDALUS_ENABLE_ASSERTS
 

@@ -46,7 +46,7 @@ public:
 	virtual void	Free(void * ptr);
 
 private:
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 	CMemoryHeap *	mRomMemoryHeap;
 #endif
 };
@@ -83,6 +83,8 @@ IROMFileMemory::IROMFileMemory()
 	{
 		mRomMemoryHeap = CMemoryHeap::Create( 4 * 1024 * 1024 );
 	}
+#elif defined(DAEDALUS_PS2)
+	mRomMemoryHeap = CMemoryHeap::Create(4 * 1024 * 1024);
 #endif
 }
 
@@ -91,7 +93,7 @@ IROMFileMemory::IROMFileMemory()
 //*****************************************************************************
 IROMFileMemory::~IROMFileMemory()
 {
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 	delete mRomMemoryHeap;
 #endif
 }
@@ -112,7 +114,7 @@ bool IROMFileMemory::IsAvailable()
 //*****************************************************************************
 void * IROMFileMemory::Alloc( u32 size )
 {
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 	return mRomMemoryHeap->Alloc( size );
 #else
 	return malloc( size );
@@ -124,7 +126,7 @@ void * IROMFileMemory::Alloc( u32 size )
 //*****************************************************************************
 void  IROMFileMemory::Free(void * ptr)
 {
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 	mRomMemoryHeap->Free( ptr );
 #else
 	free( ptr );

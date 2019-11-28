@@ -17,8 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
-
 #ifndef UTILITY_ALIGNMENT_H_
 #define UTILITY_ALIGNMENT_H_
 
@@ -45,7 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 	#endif
 
-#elif defined( DAEDALUS_PSP ) || defined( DAEDALUS_PS3 )
+#elif defined( DAEDALUS_PSP ) || defined( DAEDALUS_PS3 ) || defined( DAEDALUS_PS2 )
 
 #define ALIGNED_TYPE(type, type_name, alignval) type __attribute__((aligned(alignval))) type_name
 #define ALIGNED_GLOBAL(type, var, alignval) __attribute__((aligned(alignval))) type var
@@ -77,6 +75,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 #ifdef DAEDALUS_PSP
+
+#define DATA_ALIGN	16
+#define CACHE_ALIGN	64
+#define PAGE_ALIGN	64
+
+#elif defined(DAEDALUS_PS2)
 
 #define DATA_ALIGN	16
 #define CACHE_ALIGN	64

@@ -28,6 +28,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysPSP/Graphics/intraFont/intraFont.h"
 #endif
 
+#ifdef DAEDALUS_PS2
+#include "Graphics/GraphicsContext.h"
+#include <gsKit.h>
+
+extern GSGLOBAL* gsGlobal;
+extern GSFONTM* gsFontM;
+#endif
+
 #include "Math/MathUtil.h"
 
 #include "Debug/DBGConsole.h"
@@ -65,6 +73,8 @@ namespace
 			return rom_size <= 32 * 1024 * 1024;
 		else
 			return rom_size <= 2 * 1024 * 1024;
+#elif defined(DAEDALUS_PS2)
+		return rom_size <= 2 * 1024 * 1024;
 #else
 		return true;
 #endif
@@ -210,44 +220,61 @@ bool RomBuffer::Open()
 		u32		size_aligned( AlignPow2( sRomSize, 4 ) );
 		u8 *	p_bytes( (u8*)CROMFileMemory::Get()->Alloc( size_aligned ) );
 
-#ifndef DAEDALUS_PSP
-		if( !p_rom_file->LoadData( sRomSize, p_bytes, messages ) )
+#if !defined(DAEDALUS_PSP) && !defined(DAEDALUS_PS2)
+		if (!p_rom_file->LoadData(sRomSize, p_bytes, messages))
 		{
-			#ifdef DAEDALUS_DEBUG_CONSOLE
+#ifdef DAEDALUS_DEBUG_CONSOLE
 			DBGConsole_Msg(0, "Failed to load [C%s]\n", filename);
-			#endif
-			CROMFileMemory::Get()->Free( p_bytes );
+#endif
+			CROMFileMemory::Get()->Free(p_bytes);
 			delete p_rom_file;
 			return false;
 		}
 #else
-		u32 offset( 0 );
-		u32 length_remaining( sRomSize );
-		const u32 TEMP_BUFFER_SIZE {128 * 1024};
+		u32 offset(0);
+		u32 length_remaining(sRomSize);
+		const u32 TEMP_BUFFER_SIZE = 128 * 1024;
+#ifdef DAEDALUS_PSP
+		intraFont* ltn8 = intraFontLoad("flash0:/font/ltn8.pgf", INTRAFONT_CACHE_ASCII);
+		intraFontSetStyle(ltn8, 1.5f, 0xFF000000, 0, 0.f, INTRAFONT_ALIGN_CENTER);
+#else
+		gsFontM->Align = GSKIT_FALIGN_CENTER;
+		gsFontM->Spacing = 0.7f;
+		u64 FontColour = GS_SETREG_RGBAQ(0xFF, 0xFF, 0xFF, 0x80, 0x00);
+		char str_buf[255];
+#endif
 
-		intraFont* ltn8  = intraFontLoad( "flash0:/font/ltn8.pgf", INTRAFONT_CACHE_ASCII);
-		intraFontSetStyle( ltn8, 1.5f, 0xFFFFFFFF, 0, 0.f, INTRAFONT_ALIGN_CENTER );
-
-		while( offset < sRomSize )
+		while (offset < sRomSize)
 		{
-			u32 length_to_process( Min( length_remaining, TEMP_BUFFER_SIZE ) );
+			u32 length_to_process(Min(length_remaining, TEMP_BUFFER_SIZE));
 
-			if( !p_rom_file->ReadChunk( offset, p_bytes + offset, length_to_process ) )
+			if (!p_rom_file->ReadChunk(offset, p_bytes + offset, length_to_process))
 			{
 				break;
 			}
 
 			offset += length_to_process;
 			length_remaining -= length_to_process;
-
+#ifdef DAEDALUS_PSP
 			CGraphicsContext::Get()->BeginFrame();
 			CGraphicsContext::Get()->ClearToBlack();
-			intraFontPrintf( ltn8, 480/2, (272>>1), "Buffering ROM %d%%...", offset * 100 / sRomSize );
+			intraFontPrintf(ltn8, 480 / 2, (272 >> 1), "Buffering ROM %d%%...", offset * 100 / sRomSize);
+			printf("Buffering ROM %d%%...", offset * 100 / sRomSize);
 			CGraphicsContext::Get()->EndFrame();
-			CGraphicsContext::Get()->UpdateFrame( false );
-		}
+			CGraphicsContext::Get()->UpdateFrame(false);
+	}
 
-		intraFontUnload( ltn8 );
+		intraFontUnload(ltn8);
+#else		
+			CGraphicsContext::Get()->BeginFrame();
+			CGraphicsContext::Get()->ClearToBlack();
+			sprintf(str_buf, "Buffering ROM %d%%...", offset * 100 / sRomSize);
+			gsKit_fontm_print_scaled(gsGlobal, gsFontM, gsGlobal->Width / 2, gsGlobal->Height / 2, 0, 0.75f, FontColour, str_buf);
+			printf("Buffering ROM %d%%...", offset * 100 / sRomSize);
+			CGraphicsContext::Get()->EndFrame();
+			CGraphicsContext::Get()->UpdateFrame(false);
+	}
+#endif
 #endif
 		spRomData = p_bytes;
 		sRomFixed = true;
@@ -353,9 +380,9 @@ namespace
 		// Similar algorithm to below - we don't care about byte swapping though
 		while(length > 0)
 		{
-			u8 *	p_chunk_base {};
-			u32		chunk_offset {};
-			u32		chunk_size {};
+			u8 *	p_chunk_base;
+			u32		chunk_offset = 0;
+			u32		chunk_size = 0;
 
 			if( !p_cache->GetChunk( src_offset, &p_chunk_base, &chunk_offset, &chunk_size ) )
 			{
@@ -455,9 +482,9 @@ void RomBuffer::CopyToRam( u8 * p_dst, u32 dst_offset, u32 dst_size, u32 src_off
 	{
 		while(length > 0)
 		{
-			u8 *	p_chunk_base {};
-			u32		chunk_offset {};
-			u32		chunk_size {};
+			u8 *	p_chunk_base;
+			u32		chunk_offset = 0;
+			u32		chunk_size = 0;
 
 			if( !spRomFileCache->GetChunk( src_offset, &p_chunk_base, &chunk_offset, &chunk_size ) )
 			{

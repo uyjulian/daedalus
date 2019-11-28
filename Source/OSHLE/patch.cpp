@@ -56,6 +56,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysPSP/Graphics/intraFont/intraFont.h"
 #endif
 
+#ifdef DAEDALUS_PS2
+#include "Graphics/GraphicsContext.h"
+#include <gsKit.h>
+
+extern GSGLOBAL* gsGlobal;
+extern GSFONTM* gsFontM;
+#endif
+
 #ifdef DUMPOSFUNCTIONS
 #include "Debug/Dump.h"
 #include "Utility/IO.h"
@@ -505,6 +513,11 @@ void Patch_RecurseAndFind()
 	// Load our font here, Intrafont used in UI is destroyed when emulation starts
 	intraFont* ltn8  = intraFontLoad( "flash0:/font/ltn8.pgf", INTRAFONT_CACHE_ASCII);
 	intraFontSetStyle( ltn8, 1.0f, 0xFFFFFFFF, 0, 0.f, INTRAFONT_ALIGN_CENTER );
+#elif defined(DAEDALUS_PS2)
+		gsFontM->Align = GSKIT_FALIGN_CENTER;
+		gsFontM->Spacing = 0.7f;
+		u64 FontColour = GS_SETREG_RGBAQ(0xFF, 0xFF, 0xFF, 0x80, 0x00);
+		char str_buf[255];
 #endif
 #endif
 
@@ -524,6 +537,16 @@ void Patch_RecurseAndFind()
 		//intraFontPrintf( ltn8, 480/2, (272>>1)-50, "Searching for os functions. This may take several seconds...");
 		intraFontPrintf( ltn8, 480/2, (272>>1), "OS HLE Patching: %d%%", i * 100 / (nPatchSymbols-1));
 		intraFontPrintf( ltn8, 480/2, (272>>1)-50, "Searching for %s", g_PatchSymbols[i]->Name );
+		CGraphicsContext::Get()->EndFrame();
+		CGraphicsContext::Get()->UpdateFrame( true );
+#elif defined(DAEDALUS_PS2)
+		//Update patching progress on PS2screen
+		CGraphicsContext::Get()->BeginFrame();
+		CGraphicsContext::Get()->ClearToBlack();
+		sprintf( str_buf, "OS HLE Patching: %d%%", i * 100 / (nPatchSymbols-1));
+		gsKit_fontm_print_scaled(gsGlobal, gsFontM, gsGlobal->Width / 2, gsGlobal->Height / 2, 0, 0.75f, FontColour, str_buf);
+		sprintf( str_buf, "Searching for %s", g_PatchSymbols[i]->Name );
+		gsKit_fontm_print_scaled(gsGlobal, gsFontM, gsGlobal->Width / 2, gsGlobal->Height / 2 - 50, 0, 0.75f, FontColour, str_buf);
 		CGraphicsContext::Get()->EndFrame();
 		CGraphicsContext::Get()->UpdateFrame( true );
 #endif
@@ -622,6 +645,16 @@ void Patch_RecurseAndFind()
 		intraFontPrintf( ltn8, 480/2, (272>>1)+50, "Range 0x%08x -> 0x%08x", first, last );
 		CGraphicsContext::Get()->EndFrame();
 		CGraphicsContext::Get()->UpdateFrame( true );
+#elif defined(DAEDALUS_PS2)
+		//Update patching progress on PS2screen
+		CGraphicsContext::Get()->BeginFrame();
+		CGraphicsContext::Get()->ClearToBlack();
+		sprintf( str_buf, "Symbols Identified: %d%%", 100 * nFound / (nPatchSymbols-1));
+		gsKit_fontm_print_scaled(gsGlobal, gsFontM, gsGlobal->Width / 2, gsGlobal->Height / 2, 0, 0.75f, FontColour, str_buf);
+		sprintf( str_buf, "Range 0x%08x -> 0x%08x", first, last );
+		gsKit_fontm_print_scaled(gsGlobal, gsFontM, gsGlobal->Width / 2, gsGlobal->Height / 2 + 50, 0, 0.75f, FontColour, str_buf);
+		CGraphicsContext::Get()->EndFrame();
+		CGraphicsContext::Get()->UpdateFrame( true );
 #endif
 #endif
 	}
@@ -662,6 +695,14 @@ void Patch_RecurseAndFind()
 		CGraphicsContext::Get()->BeginFrame();
 		CGraphicsContext::Get()->ClearToBlack();
 		intraFontPrintf( ltn8, 480/2, 272>>1, "Variables Identified: %d%%", 100 * nFound / (nPatchVariables-1) );
+		CGraphicsContext::Get()->EndFrame();
+		CGraphicsContext::Get()->UpdateFrame( true );
+#elif defined(DAEDALUS_PS2)
+		//Update patching progress on PSPscreen
+		CGraphicsContext::Get()->BeginFrame();
+		CGraphicsContext::Get()->ClearToBlack();
+		sprintf( str_buf, "Variables Identified: %d%%", 100 * nFound / (nPatchVariables-1) );
+		gsKit_fontm_print_scaled(gsGlobal, gsFontM, gsGlobal->Width / 2, gsGlobal->Height / 2, 0, 0.75f, FontColour, str_buf);
 		CGraphicsContext::Get()->EndFrame();
 		CGraphicsContext::Get()->UpdateFrame( true );
 #endif

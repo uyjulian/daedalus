@@ -17,8 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
-
 #ifndef UTILITY_THREAD_H_
 #define UTILITY_THREAD_H_
 
@@ -42,7 +40,7 @@ enum EThreadPriority
 //
 //	Returns a thread handle - you must check it for error status (== kInvalidThreadHandle)
 //
-ThreadHandle	CreateThread( const char * name, DaedThread function, void * argument );
+ThreadHandle	DCreateThread( const char * name, DaedThread function, void * argument );
 
 //
 //	Adjusts a thread's priority
@@ -57,7 +55,7 @@ void	ReleaseThreadHandle( ThreadHandle handle );
 //
 //	Terminates a running thread
 //
-void	TerminateThread( ThreadHandle handle );
+void	DTerminateThread( ThreadHandle handle );
 
 //
 //	Wait the specified time for the thread to finish.

@@ -17,8 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
-
 #ifndef PLUGINS_GRAPHICSPLUGIN_H_
 #define PLUGINS_GRAPHICSPLUGIN_H_
 

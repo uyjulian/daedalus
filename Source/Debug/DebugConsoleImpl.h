@@ -17,8 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
-
+#ifndef DEBUG_DEBUGCONSOLEIMPL_H_
+#define DEBUG_DEBUGCONSOLEIMPL_H_
 
 enum	ETerminalColour
 {
@@ -31,3 +31,5 @@ enum	ETerminalColour
 
 ETerminalColour GetTerminalColour(char c);
 const char * GetTerminalColourString(ETerminalColour tc);
+
+#endif // DEBUG_DEBUGCONSOLEIMPL_H_

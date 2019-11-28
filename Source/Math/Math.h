@@ -471,7 +471,7 @@ inline bool IsNaN_Double(double x)
 
 #else
 
-#ifdef DAEDALUS_W32
+#if defined(DAEDALUS_W32) || defined(DAEDALUS_PS2)
 inline f64 trunc(f64 x)				{ return (x>0) ? floor(x) : ceil(x); }
 inline f32 truncf(f32 x)			{ return (x>0) ? floorf(x) : ceilf(x); }
 inline f64 round(f64 x)				{ return floor(x + 0.5); }

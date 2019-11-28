@@ -17,8 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
-
 #ifndef UTILITY_MUTEX_H_
 #define UTILITY_MUTEX_H_
 
@@ -27,6 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_LINUX)
 #include <pthread.h>
+#endif
+#ifdef DAEDALUS_PS2
+#include <kernel.h>
 #endif
 
 #if defined(DAEDALUS_W32)
@@ -139,6 +140,54 @@ public:
 	pthread_mutex_t  mMutex;
 };
 
+
+#elif defined(DAEDALUS_PS2)
+
+class Mutex
+{
+public:
+
+	Mutex()
+	{
+		mSema.init_count = 1;
+		mSema.max_count = 1;
+		mSema.option = 0;
+		mSemaphore = CreateSema(&mSema);
+#ifdef DAEDALUS_ENABLE_ASSERTS
+		DAEDALUS_ASSERT(mSemaphore >= 0, "Unable to create semaphore");
+#endif
+	}
+
+	explicit Mutex(const char* name)
+	{
+		mSema.init_count = 1;
+		mSema.max_count = 1;
+		mSema.option = 0;
+		mSemaphore = CreateSema(&mSema);
+#ifdef DAEDALUS_ENABLE_ASSERTS
+		DAEDALUS_ASSERT(mSemaphore >= 0, "Unable to create semaphore");
+#endif
+	}
+
+	~Mutex()
+	{
+		DeleteSema(mSemaphore);
+	}
+
+	void Lock()
+	{
+		WaitSema(mSemaphore);
+	}
+
+	void Unlock()
+	{
+		SignalSema(mSemaphore);
+	}
+
+private:
+	s32	mSemaphore;
+	ee_sema_t mSema;
+};
 
 #else
 

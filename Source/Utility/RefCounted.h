@@ -106,6 +106,7 @@ public:
 	template <class U>
 	class _NoAddRefRelease : public U
 	{
+		_NoAddRefRelease() {}
 		private:
 			void	AddRef();
 			u32		Release();

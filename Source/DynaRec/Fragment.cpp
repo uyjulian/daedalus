@@ -604,7 +604,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 #ifndef DAEDALUS_SILENT
 			printf("Speedhack complex %08x\n", trace[0].Address );
 #endif
-			p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
+			p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( (void *)CPU_SkipToNextEvent ) ) );
 		}
 	}
 
@@ -615,7 +615,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 	std::vector< SBranchHandlerInfo >	branch_handler_info( branch_details.size() );
 //	bool								checked_cop1_usable( false );
 
-	for( u32 i {}; i < trace.size(); ++i )
+	for( u32 i = 0; i < trace.size(); ++i )
 	{
 		const STraceEntry & ti( trace[ i ] );
 		u32	branch_idx( ti.BranchIdx );
@@ -699,14 +699,14 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 #else
 			if(p_branch->SpeedHack == SHACK_SKIPTOEVENT)
 			{
-				p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
+				p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >((void*)CPU_SkipToNextEvent ) ) );
 			}
 #endif
 		}
 
 		CJumpLocation	branch_jump( nullptr );
  //PSP, We handle exceptions directly with _ReturnFromDynaRecIfStuffToDo
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 		p_generator->GenerateOpCode( ti, ti.BranchDelaySlot, p_branch, &branch_jump);
 #else
 		CJumpLocation	exception_handler_jump( p_generator->GenerateOpCode( ti, ti.BranchDelaySlot, p_branch, &branch_jump) );
@@ -737,7 +737,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 	//
 	//	Generate handlers for each exit branch
 	//
-	for( u32 i {}; i < branch_details.size(); ++i )
+	for( u32 i = 0; i < branch_details.size(); ++i )
 	{
 		const SBranchDetails &	details( branch_details[ i ] );
 		u32						instruction_idx( branch_handler_info[ i ].Index );
@@ -779,7 +779,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 			}
 			*/
  //PSP, We handle exceptions directly with _ReturnFromDynaRecIfStuffToDo
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 			p_generator->GenerateOpCode( ti, true, nullptr, nullptr);
 #else
 			CJumpLocation	exception_handler_jump( p_generator->GenerateOpCode( ti, true, nullptr, nullptr) );
@@ -795,8 +795,8 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 
 		if( details.Likely )
 		{
-			u32				exit_address {};
-			CJumpLocation	jump_location {};
+			u32				exit_address = 0;
+			CJumpLocation	jump_location;
 
 			if( details.ConditionalBranchTaken )
 			{
@@ -941,11 +941,11 @@ void DisassembleBuffer( const u8 * buf, int buf_size, FILE * fh )
 	}
 }
 
-#elif defined ( DAEDALUS_PSP )
+#elif defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 
 void DisassembleBuffer( const u8 * buf, int buf_size, FILE * fh )
 {
-	const int	STRBUF_LEN {1024};
+	const int	STRBUF_LEN = 1024;
 	char		strbuf[STRBUF_LEN+1];
 
 	const OpCode *	p_op( reinterpret_cast< const OpCode * >( buf ) );

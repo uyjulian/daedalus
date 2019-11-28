@@ -79,6 +79,9 @@ ROMFileCache::ROMFileCache()
 		//2MB cache(PHAT)
 		CACHE_SIZE = 256;
 	}
+#elif defined(DAEDALUS_PS2)
+	CHUNK_SIZE = 16 * 1024;
+	CACHE_SIZE = 256;
 #else
 	CHUNK_SIZE = 2 * 1024;
 	CACHE_SIZE = 1024;

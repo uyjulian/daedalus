@@ -88,8 +88,11 @@ class IIniFileProperty : public CIniFileProperty
 			}
 			return value;
 		}
-
+#ifdef DAEDALUS_PS2
+#warning problem with friend
+#else
 	private:
+#endif
 		friend class IIniFileSection;
 		std::string				mName;
 		std::string				mValue;

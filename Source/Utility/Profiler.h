@@ -1,7 +1,6 @@
 // Profiler.h: interface for the CProfiler class.
 //
 //////////////////////////////////////////////////////////////////////
-#pragma once
 
 #ifndef UTILITY_PROFILER_H_
 #define UTILITY_PROFILER_H_

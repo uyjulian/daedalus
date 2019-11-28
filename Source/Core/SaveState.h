@@ -18,8 +18,6 @@
 
 */
 
-#pragma once
-
 #ifndef CORE_SAVESTATE_H_
 #define CORE_SAVESTATE_H_
 

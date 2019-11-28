@@ -17,7 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
+#ifndef SYSTEM_SYSTEM_H_
+#define SYSTEM_SYSTEM_H_
 
 // Initialize the whole system
 bool System_Init();
@@ -31,3 +32,4 @@ void System_Close();
 // Finalize the whole system
 void System_Finalize();
 
+#endif // SYSTEM_SYSTEM_H_

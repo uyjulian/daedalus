@@ -23,7 +23,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DaedalusAssert.h"
 
 
-#if !defined(DAEDALUS_W32) || _MSC_VER >= 1600
+#if defined(DAEDALUS_PS2)
+#include <tamtypes.h>
+#include <stdint.h>
+
+typedef float					f32;
+typedef double					f64;
+
+#define nullptr NULL
+
+#elif !defined(DAEDALUS_W32) || _MSC_VER >= 1600
 #include <stdint.h>
 
 typedef uint8_t					u8;
@@ -117,7 +126,7 @@ DAEDALUS_STATIC_ASSERT( sizeof( REG32 ) == sizeof( u32 ) );
 
 #if defined(DAEDALUS_PSP)
 #define _strcmpi stricmp
-#elif defined(DAEDALUS_PS3) || defined(DAEDALUS_OSX) || defined(DAEDALUS_LINUX)
+#elif defined(DAEDALUS_PS3) || defined(DAEDALUS_OSX) || defined(DAEDALUS_LINUX) || defined(DAEDALUS_PS2)
 #define _strcmpi strcasecmp
 #endif
 

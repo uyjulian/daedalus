@@ -17,8 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
-
 #ifndef GRAPHICS_GRAPHICSCONTEXT_H_
 #define GRAPHICS_GRAPHICSCONTEXT_H_
 
@@ -47,7 +45,7 @@ public:
 
 	virtual bool IsInitialised() const = 0;
 
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 	virtual void SwitchToChosenDisplay() = 0;
 	virtual void SwitchToLcdDisplay() = 0;
 	virtual void StoreSaveScreenData() = 0;

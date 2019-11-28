@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef DAEDALUS_PSP
 #include <pspiofilemgr.h>
+#elif defined( DAEDALUS_PS2 )
+#include <fileXio.h>
 #endif
 
 #include <string.h>
@@ -35,8 +37,10 @@ namespace IO
 		bool		Move( const char * p_existing, const char * p_new );
 		bool		Delete( const char * p_file );
 		bool		Exists( const char * p_path );
-#ifdef DAEDALUS_PSP
-		int			Stat( const char *p_file, SceIoStat *stat );
+#if defined( DAEDALUS_PSP )
+		int			Stat(const char* p_file, SceIoStat* stat);
+#elif defined( DAEDALUS_PS2 )
+		int			Stat(const char* p_file, iox_stat_t* stat);
 #endif
 
 	}
@@ -65,8 +69,8 @@ namespace IO
 		bool				RemoveFileSpec( char * p_path );
 		void				RemoveExtension( char * p_path );
 		void				AddExtension( char * p_path, const char * p_ext );
-#ifdef DAEDALUS_PSP
-		int					DeleteRecursive(const char* p_path, const char * p_extension);
+#if defined( DAEDALUS_PSP ) || defined( DAEDALUS_PS2 )
+		int					DeleteRecursive(const char* p_path, const char* p_extension);
 #endif
 
 		inline void SetExtension( char * p_path, const char * p_extension)
@@ -89,6 +93,8 @@ namespace IO
 	typedef intptr_t FindHandleT;
 #elif defined( DAEDALUS_OSX ) || defined( DAEDALUS_LINUX )
 	typedef void * FindHandleT;
+#elif defined( DAEDALUS_PS2 )
+	typedef int FindHandleT;
 #else
 #error Need to define FindHandleT for this platform
 #endif

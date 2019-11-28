@@ -18,8 +18,6 @@
 
 */
 
-#pragma once
-
 #ifndef INTERFACE_ROMDB_H_
 #define INTERFACE_ROMDB_H_
 

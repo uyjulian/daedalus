@@ -183,7 +183,7 @@ void CPU_RegisterVblCallback(VblCallbackFn fn, void * arg);
 void CPU_UnregisterVblCallback(VblCallbackFn fn, void * arg);
 
 // For PSP, we just keep running forever. For other platforms we need to bail when the user quits.
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 #define CPU_KeepRunning() (1)
 #else
 #define CPU_KeepRunning() (CPU_IsRunning())

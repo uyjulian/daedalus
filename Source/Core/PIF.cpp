@@ -103,6 +103,10 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 
 #include <time.h>
 
+#ifdef DAEDALUS_PS2
+#include <libps2time.h>
+#endif
+
 #ifdef _MSC_VER
 #pragma warning(default : 4002)
 #endif
@@ -113,7 +117,7 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 	#define DPF_PIF( ... )
 #endif
 
-bool gRumblePakActive {false};
+bool gRumblePakActive = false;
 
 
 //
@@ -200,7 +204,7 @@ class	IController : public CController
 		};
 
 		// Please update the memory allocated for mempack if we change this value
-		static const u32 NUM_CONTROLLERS {4};
+		static const u32 NUM_CONTROLLERS = 4;
 
 		OSContPad		mContPads[ NUM_CONTROLLERS ];
 		bool			mContPresent[ NUM_CONTROLLERS ];
@@ -241,7 +245,7 @@ IController::IController() :
 #ifdef DAEDALUS_DEBUG_PIF
 	mDebugFile = fopen( "controller.txt", "w" );
 #endif
-	for ( u32 i {}; i < NUM_CONTROLLERS; i++ )
+	for ( u32 i = 0; i < NUM_CONTROLLERS; i++ )
 	{
 		mContPresent[ i ] = false;
 		mContMemPackPresent[ i ] = false;
@@ -304,7 +308,7 @@ bool IController::OnRomOpen()
 	}
 
 
-	for ( u32 channel {}; channel < NUM_CONTROLLERS; channel++ )
+	for ( u32 channel = 0; channel < NUM_CONTROLLERS; channel++ )
 	{
 		mMemPack[channel] = (u8*)g_pMemoryBuffers[MEM_MEMPACK] + channel * 0x400 * 32;
 	}
@@ -324,8 +328,8 @@ void IController::Process()
 	DPF_PIF("**                                         **");
 #endif
 
-	u32 count {}, channel {};
-	u32 *tmp {(u32*)mpPifRam};
+	u32 count = 0, channel = 0;
+	u32 *tmp = (u32*)mpPifRam;
 	if ((tmp[0] == 0xFFFFFFFF) &&
 		(tmp[1] == 0xFFFFFFFF) &&
 		(tmp[2] == 0xFFFFFFFF) &&
@@ -343,7 +347,7 @@ void IController::Process()
 
 	while(count < 64)
 	{
-		u8 *cmd {&mpPifRam[count]};
+		u8 *cmd = &mpPifRam[count];
 
 		// command is ready
 		if(cmd[0] == CONT_TX_SIZE_FORMAT_END)
@@ -584,10 +588,10 @@ void	IController::CommandWriteEeprom(u8* cmd)
 #if 1	//1-> Unrolled fast 0-> old way //Corn
 u8 IController::CalculateDataCrc(const u8 * pBuf)
 {
-	u32 c {};
-	for (u32 i {}; i < 32; i++)
+	u32 c = 0;
+	for (u32 i = 0; i < 32; i++)
 	{
-		u32 s {pBuf[i]};
+		u32 s = pBuf[i];
 
 		c = (((c << 1) | ((s >> 7) & 1))) ^ ((c & 0x80) ? 0x85 : 0);
 		c = (((c << 1) | ((s >> 6) & 1))) ^ ((c & 0x80) ? 0x85 : 0);
@@ -599,7 +603,7 @@ u8 IController::CalculateDataCrc(const u8 * pBuf)
 		c = (((c << 1) | ((s >> 0) & 1))) ^ ((c & 0x80) ? 0x85 : 0);
 	}
 
-	for (u32 i {8}; i != 0; i--)
+	for (u32 i = 8; i != 0; i--)
 	{
 		c = (c << 1) ^ ((c & 0x80) ? 0x85 : 0);
 	}
@@ -610,11 +614,11 @@ u8 IController::CalculateDataCrc(const u8 * pBuf)
 #else
 u8 IController::CalculateDataCrc(u8 * pBuf)
 {
-	u8 c {}, x {}, s {}, i {};
-	s8 z {};
+	u8 c = 0, x = 0, s = 0, i = 0;
+	s8 z = 0;
 
 	c = 0;
-	for (i {}; i < 33; i++)
+	for (i = 0; i < 33; i++)
 	{
 		s = pBuf[i];
 
@@ -644,8 +648,8 @@ u8 IController::CalculateDataCrc(u8 * pBuf)
 
 void	IController::CommandReadMemPack(u32 channel, u8 *cmd)
 {
-	u32 addr {((cmd[3] << 8) | (u32)cmd[4])};
-	u8* data {&cmd[5]};
+	u32 addr = ((cmd[3] << 8) | (u32)cmd[4]);
+	u8* data = &cmd[5];
 
 	if (addr == 0x8001)
 	{
@@ -674,8 +678,8 @@ void	IController::CommandReadMemPack(u32 channel, u8 *cmd)
 
 void	IController::CommandWriteMemPack(u32 channel, u8 *cmd)
 {
-	u32 addr {((cmd[3] << 8) | (u32)cmd[4])};
-	u8* data {&cmd[5]};
+	u32 addr = ((cmd[3] << 8) | (u32)cmd[4]);
+	u8* data = &cmd[5];
 
 	if (addr != 0x8001)
 	{
@@ -701,7 +705,7 @@ void	IController::CommandWriteMemPack(u32 channel, u8 *cmd)
 
 void	IController::CommandReadRumblePack(u8 *cmd)
 {
-	u32 addr {((cmd[3] << 8) | (u32)cmd[4]) & 0xFFE0};
+	u32 addr = ((cmd[3] << 8) | (u32)cmd[4]) & 0xFFE0;
 
 	memset( &cmd[5], (addr == 0x8000) ? 0x80 : 0x00, 32 );
 	cmd[37] = CalculateDataCrc(&cmd[5]);
@@ -713,7 +717,7 @@ void	IController::CommandReadRumblePack(u8 *cmd)
 
 void	IController::CommandWriteRumblePack(u8 *cmd)
 {
-	u32 addr {((cmd[3] << 8) | (u32)cmd[4]) & 0xFFE0};
+	u32 addr = ((cmd[3] << 8) | (u32)cmd[4]) & 0xFFE0;
 
 	if ( addr == 0xC000 )
 	{
@@ -742,9 +746,13 @@ void	IController::CommandReadRTC(u8 *cmd)
 	case 2:
 		time_t curtime_time;
 		struct tm curtime;
-
+#ifdef DAEDALUS_PS2
+		ps2time_time(&curtime_time);
+		memcpy(&curtime, ps2time_localtime(&curtime_time), sizeof(curtime)); // fd's fix
+#else
 		time(&curtime_time);
 		memcpy(&curtime, localtime(&curtime_time), sizeof(curtime)); // fd's fix
+#endif
 
 		cmd[4]	= Byte2Bcd(curtime.tm_sec);
 		cmd[5]	= Byte2Bcd(curtime.tm_min);
@@ -792,8 +800,8 @@ void IController::n64_cic_nus_6105()
 		0x4, 0x1, 0xA, 0x7, 0xE, 0x5, 0xE, 0x1,
 		0xC, 0x9, 0x8, 0x5, 0x6, 0x3, 0xC, 0x9
 	};
-	char challenge[30] {}, response[30] {};
-	u32 i {};
+	char challenge[30], response[30];
+	u32 i = 0;
 	switch (mpPifRam[0x3F])
 	{
 	case 0x02:
@@ -805,8 +813,8 @@ void IController::n64_cic_nus_6105()
 			challenge[i*2+1] =  mpPifRam[48+i]       & 0x0f;
 		}
 
-		char key {}, *lut {};
-		int sgn {}, mag {}, mod {};
+		char key = 0, *lut = 0;
+		int sgn = 0, mag = 0, mod = 0;
 
 		for (key = 0xB, lut = lut0, i = 0; i < (CHL_LEN - 2); i++)
 		{

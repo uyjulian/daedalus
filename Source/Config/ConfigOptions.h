@@ -18,8 +18,6 @@
 
 */
 
-#pragma once
-
 #ifndef CONFIG_CONFIGOPTIONS_H_
 #define CONFIG_CONFIGOPTIONS_H_
 

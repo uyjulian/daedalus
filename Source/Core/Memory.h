@@ -17,8 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
-
 #ifndef CORE_MEMORY_H_
 #define CORE_MEMORY_H_
 
@@ -156,8 +154,29 @@ inline void QuickWrite16Bits( u8 *p_base, u32 offset, u16 value)
 
 inline void QuickWrite64Bits( u8 *p_base, u32 offset, u64 value )
 {
+#ifdef DAEDALUS_PS2
+	if (((u32)(p_base + offset) & ~(8 - 1)) == 0) {
+		u64 data = (value >> 32) + (value << 32);
+		*(u64*)(p_base + offset) = data;
+	}
+	else 
+	{
+		//printf("Unaligned memory access: QuickRead64Bits\n");
+		u8* d = p_base + offset;
+		u8* s = (u8*)& value;
+		d[4] = s[0];
+		d[5] = s[1];
+		d[6] = s[2];
+		d[7] = s[3];
+		d[0] = s[4];
+		d[1] = s[5];
+		d[2] = s[6];
+		d[3] = s[7];
+	}
+#else
 	u64 data = (value>>32) + (value<<32);
 	*(u64 *)(p_base + offset) = data;
+#endif
 }
 
 inline void QuickWrite32Bits( u8 *p_base, u32 offset, u32 value )

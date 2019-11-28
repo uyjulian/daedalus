@@ -18,9 +18,6 @@
 
 */
 
-
-#pragma once
-
 #ifndef HLEGRAPHICS_RDP_H_
 #define HLEGRAPHICS_RDP_H_
 
@@ -38,10 +35,10 @@ inline u32 bytes2pixels( u32 bytes, u32 size )
 
 struct SImageDescriptor
 {
-	u32 Format {};		// "RGBA", "YUV", "CI", "IA", "I", "?1", "?2", "?3"
-	u32 Size {};		// "4bpp", "8bpp", "16bpp", "32bpp"
-	u32 Width {};		// Num Pixels
-	u32 Address {};	// Location
+	u32 Format;		// "RGBA", "YUV", "CI", "IA", "I", "?1", "?2", "?3"
+	u32 Size;		// "4bpp", "8bpp", "16bpp", "32bpp"
+	u32 Width;		// Num Pixels
+	u32 Address;	// Location
 
 	inline u32 GetPitch() const
 	{
@@ -177,8 +174,8 @@ struct RDP_OtherMode
 
 		struct
 		{
-			u32	L {};
-			u32	H {};
+			u32	L;
+			u32	H;
 		};
 	};
 };
@@ -216,8 +213,8 @@ struct RDP_Combine
 
 		struct
 		{
-			u32	L {};
-			u32	H {};
+			u32	L;
+			u32	H;
 		};
 	};
 };
@@ -230,10 +227,10 @@ struct RDP_TexRect
 	{
 		struct
 		{
-			u32 cmd3 {};
-			u32 cmd2 {};
-			u32 cmd1 {};
-			u32 cmd0 {};
+			u32 cmd3;
+			u32 cmd2;
+			u32 cmd1;
+			u32 cmd0;
 		};
 
 		struct
@@ -269,9 +266,9 @@ struct RDP_MemRect
 	{
 		struct
 		{
-			u32 cmd2 {};
-			u32 cmd1 {};
-			u32 cmd0 {};
+			u32 cmd2;
+			u32 cmd1;
+			u32 cmd0;
 		};
 
 		struct
@@ -309,8 +306,8 @@ struct RDP_Tile
 	{
 		struct
 		{
-			u32		cmd1 {};
-			u32		cmd0 {};
+			u32		cmd1;
+			u32		cmd0;
 		};
 
 		struct
@@ -360,8 +357,8 @@ struct RDP_TileSize
 	{
 		struct
 		{
-			u32		cmd1 {};
-			u32		cmd0 {};
+			u32		cmd1;
+			u32		cmd0;
 		};
 
 		struct

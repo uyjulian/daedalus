@@ -38,13 +38,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Paths.h"
 #include "Utility/IO.h"
 
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 #include "Utility/Translate.h"
 #endif
 
 // Audio is disabled on the PSP by default, but enabled on other platforms.
 #ifdef DAEDALUS_PSP
 static const EAudioPluginMode      kDefaultAudioPluginMode      = APM_DISABLED;
+static const ETextureHashFrequency kDefaultTextureHashFrequency = THF_DISABLED;
+#elif defined(DAEDALUS_PS2)
+static const EAudioPluginMode      kDefaultAudioPluginMode = APM_DISABLED;
+//static const EAudioPluginMode      kDefaultAudioPluginMode = APM_ENABLED_SYNC;
 static const ETextureHashFrequency kDefaultTextureHashFrequency = THF_DISABLED;
 #else
 static const EAudioPluginMode      kDefaultAudioPluginMode      = APM_ENABLED_SYNC;
@@ -157,7 +161,7 @@ bool IPreferences::OpenPreferencesFile( const char * filename )
 		FLOAT_SETTING( gGlobalPreferences, StickMinDeadzone, defaults );
 		FLOAT_SETTING( gGlobalPreferences, StickMaxDeadzone, defaults );
 //		INT_SETTING( gGlobalPreferences, Language, defaults );
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 		if( section->FindProperty( "Language", &property ) )
 		{
 			gGlobalPreferences.Language = Translate_IndexFromName( property->GetValue() );
@@ -270,7 +274,7 @@ bool IPreferences::OpenPreferencesFile( const char * filename )
 		{
 			preferences.ZoomX = (f32)atof( property->GetValue() );
 		}
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 		if( section->FindProperty( "Controller", &property ) )
 		{
 			preferences.ControllerIndex = CInputManager::Get()->GetConfigurationFromName( property->GetValue() );
@@ -317,7 +321,7 @@ void IPreferences::OutputSectionDetails( const RomID & id, const SRomPreferences
 	fprintf(fh, "ZoomX=%f\n",                      preferences.ZoomX );
 	fprintf(fh, "MemoryAccessOptimisation=%d\n",   preferences.MemoryAccessOptimisation);
 	fprintf(fh, "CheatsEnabled=%d\n",              preferences.CheatsEnabled);
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 	fprintf(fh, "Controller=%s\n",                CInputManager::Get()->GetConfigurationName( preferences.ControllerIndex ));
 #endif
 	fprintf(fh, "\n");			// Spacer
@@ -334,7 +338,7 @@ void IPreferences::Commit()
 #define OUTPUT_BOOL( b, nm, def )		fprintf( fh, "%s=%s\n", #nm, b.nm ? "yes" : "no" );
 #define OUTPUT_FLOAT( b, nm, def )		fprintf( fh, "%s=%f\n", #nm, b.nm );
 #define OUTPUT_INT( b, nm, def )		fprintf( fh, "%s=%d\n", #nm, b.nm );
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 #define OUTPUT_LANGUAGE( b, nm, def )	fprintf( fh, "%s=%s\n", #nm, Translate_NameFromIndex( b.nm ) );
 #endif
 		OUTPUT_INT( gGlobalPreferences, DisplayFramerate, defaults );
@@ -349,7 +353,7 @@ void IPreferences::Commit()
 		OUTPUT_INT( gGlobalPreferences, GuiColor, defaults )
 		OUTPUT_FLOAT( gGlobalPreferences, StickMinDeadzone, defaults );
 		OUTPUT_FLOAT( gGlobalPreferences, StickMaxDeadzone, defaults );
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 		OUTPUT_LANGUAGE( gGlobalPreferences, Language, defaults );
 #endif
 		OUTPUT_INT( gGlobalPreferences, ViewportType, defaults );
@@ -493,7 +497,7 @@ void SRomPreferences::Apply() const
 	gAudioPluginEnabled         = AudioEnabled;
 //	gAdaptFrequency             = AudioAdaptFrequency;
 	gControllerIndex            = ControllerIndex;							//Used during ROM initialization
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 	CInputManager::Get()->SetConfiguration( ControllerIndex );  //Used after initialization
 #endif
 }

@@ -18,8 +18,6 @@
 
 */
 
-#pragma once
-
 #ifndef UTILITY_SINGLETON_H_
 #define UTILITY_SINGLETON_H_
 

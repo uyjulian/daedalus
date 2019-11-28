@@ -32,6 +32,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef DAEDALUS_PSP
 #include <pspgu.h>
+#elif defined(DAEDALUS_PS2)
+#include "SysPS2/GL.h"
+#include <gsKit.h>
+extern GSGLOBAL* gsGlobal;
+extern int gsShading;
 #else
 #include "SysGL/GL.h"
 #endif
@@ -339,6 +344,9 @@ protected:
 #ifdef DAEDALUS_PSP
 	inline void			UpdateFogEnable()						{ if(gFogEnabled) mTnL.Flags.Fog ? sceGuEnable(GU_FOG) : sceGuDisable(GU_FOG); }
 	inline void			UpdateShadeModel()						{ sceGuShadeModel( mTnL.Flags.Shade ? GU_SMOOTH : GU_FLAT ); }
+#elif defined(DAEDALUS_PS2)
+	inline void			UpdateFogEnable()						{ if (gFogEnabled) gsGlobal->PrimFogEnable = mTnL.Flags.Fog; }
+	inline void			UpdateShadeModel()						{ gsShading = mTnL.Flags.Shade; }
 #else
 	inline void			UpdateFogEnable()						{ if(gFogEnabled) mTnL.Flags.Fog ? glEnable(GL_FOG) : glDisable(GL_FOG); }
 	inline void			UpdateShadeModel()						{ glShadeModel( mTnL.Flags.Shade ? GL_SMOOTH : GL_FLAT ); }

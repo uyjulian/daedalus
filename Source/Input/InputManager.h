@@ -11,7 +11,7 @@ class CInputManager : public CSingleton< CInputManager >
 	public:
 		virtual ~CInputManager() {}
 
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 		virtual u32				GetNumConfigurations() const = 0;
 		virtual const char *	GetConfigurationName( u32 configuration_idx ) const = 0;
 		virtual const char *	GetConfigurationDescription( u32 configuration_idx ) const = 0;
@@ -28,7 +28,7 @@ class CInputManager : public CSingleton< CInputManager >
 		static void Fini() { CInputManager::Get()->Finalise();}
 };
 
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 v2	ApplyDeadzone( const v2 & in, f32 min_deadzone, f32 max_deadzone );
 #endif
 

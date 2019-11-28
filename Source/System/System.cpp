@@ -48,7 +48,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Macros.h"
 #include "Utility/Profiler.h"
 #include "Utility/Preferences.h"
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 #include "Utility/Translate.h"
 #endif
 #include "Input/InputManager.h"		// CInputManager::Create/Destroy
@@ -171,7 +171,7 @@ static const SysEntityEntry gSysInitTable[] =
 	{"VideoMemory",			CVideoMemoryManager::Create, NULL},
 #endif
 	{"GraphicsContext",		CGraphicsContext::Create,	CGraphicsContext::Destroy},
-#ifdef DAEDALUS_PSP
+#if defined(DAEDALUS_PSP) || defined(DAEDALUS_PS2)
 	{"Language",			Translate_Init,				NULL},
 #endif
 	{"Preference",			CPreferences::Create,		CPreferences::Destroy},
