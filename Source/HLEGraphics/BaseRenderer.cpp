@@ -728,9 +728,9 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 
 	for(u32 i = 0; i < (mNumIndices - 2);)
 	{
-		const u32 & idx0 = mIndexBuffer[ i++ ];
-		const u32 & idx1 = mIndexBuffer[ i++ ];
-		const u32 & idx2 = mIndexBuffer[ i++ ];
+		const u32 idx0 = mIndexBuffer[ i++ ];
+		const u32 idx1 = mIndexBuffer[ i++ ];
+		const u32 idx2 = mIndexBuffer[ i++ ];
 
 		//Check if any of the vertices are outside the clipbox (NDC), if so we need to clip the triangle
 		if(mVtxProjected[idx0].ClipFlags | mVtxProjected[idx1].ClipFlags | mVtxProjected[idx2].ClipFlags)

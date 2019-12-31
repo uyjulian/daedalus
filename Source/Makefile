@@ -59,7 +59,7 @@ listen:
 strip:
 	ee-strip $(EE_BIN)
 teste:
-	ee-addr2line -e $(EE_BIN) 0014ef08
+	ee-addr2line -e $(EE_BIN) 001ce134
 clean:
 	rm -f $(EE_BIN) $(EE_OBJS) *_irx.s
 

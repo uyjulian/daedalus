@@ -515,8 +515,8 @@ void	CNativeTexture::SetData( void * data, void * palette )
 				}
 			}
 
-			SyncDCache(mTexturePs2.Clut, (u8*)mTexturePs2.Clut + kPalette8BytesRequired);
-			gsKit_texture_send_inline(gsGlobal, mTexturePs2.Clut, 16, 16, mTexturePs2.VramClut, mTexturePs2.ClutPSM, 1, GS_CLUT_PALLETE);
+			//SyncDCache(mTexturePs2.Clut, (u8*)mTexturePs2.Clut + kPalette8BytesRequired);
+			//gsKit_texture_send_inline(gsGlobal, mTexturePs2.Clut, 16, 16, mTexturePs2.VramClut, mTexturePs2.ClutPSM, 1, GS_CLUT_PALLETE);
 			//clut = GS_CLUT_TEXTURE;
 		}
 		else if (mTexturePs2.PSM == GS_PSM_T4)
@@ -527,7 +527,7 @@ void	CNativeTexture::SetData( void * data, void * palette )
 				mTexturePs2.Clut[i] = (u32)pal[i * 4 + 0] | (u32)pal[i * 4 + 1] << 8 | (u32)pal[i * 4 + 2] << 16 | ((u32)pal[i * 4 + 3] >> 1) << 24;
 			}
 
-			for (i = 0; i < 32; i++)
+			/*for (i = 0; i < 32; i++)
 			{
 				if ((i & 0x18) == 8)
 				{
@@ -535,10 +535,10 @@ void	CNativeTexture::SetData( void * data, void * palette )
 					mTexturePs2.Clut[i] = mTexturePs2.Clut[i + 8];
 					mTexturePs2.Clut[i + 8] = tmp;
 				}
-			}
+			}*/
 
-			SyncDCache(mTexturePs2.Clut, (u8*)mTexturePs2.Clut + kPalette8BytesRequired);
-			gsKit_texture_send_inline(gsGlobal, mTexturePs2.Clut, 8, 2, mTexturePs2.VramClut, mTexturePs2.ClutPSM, 1, GS_CLUT_PALLETE);
+			//SyncDCache(mTexturePs2.Clut, (u8*)mTexturePs2.Clut + kPalette8BytesRequired);
+			//gsKit_texture_send_inline(gsGlobal, mTexturePs2.Clut, 8, 2, mTexturePs2.VramClut, mTexturePs2.ClutPSM, 1, GS_CLUT_PALLETE);
 			//clut = GS_CLUT_TEXTURE;
 		}
 
@@ -608,8 +608,8 @@ void	CNativeTexture::SetData( void * data, void * palette )
 			}
 		}
 
-		SyncDCache(mTexturePs2.Mem, (u8*)mTexturePs2.Mem + data_len);
-		gsKit_texture_send_inline(gsGlobal, mTexturePs2.Mem, mTexturePs2.Width, mTexturePs2.Height, mTexturePs2.Vram, mTexturePs2.PSM, mTexturePs2.TBW, clut);
+		//SyncDCache(mTexturePs2.Mem, (u8*)mTexturePs2.Mem + data_len);
+		//gsKit_texture_send_inline(gsGlobal, mTexturePs2.Mem, mTexturePs2.Width, mTexturePs2.Height, mTexturePs2.Vram, mTexturePs2.PSM, mTexturePs2.TBW, clut);
 	}
 }
 

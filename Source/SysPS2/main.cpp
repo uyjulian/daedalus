@@ -43,6 +43,7 @@
 #include "Utility/Thread.h"
 #include "Utility/Translate.h"
 #include "Utility/Timer.h"
+#include "Plugins/AudioPlugin.h"
 
 extern u8 iomanX_irx[];
 extern int size_iomanX_irx;
@@ -207,6 +208,20 @@ static bool	Initialize()
 	Wait_Pad_Ready();
 
 	strcpy(gDaedalusExePath, DAEDALUS_PS2_PATH(""));
+	
+	struct padButtonStatus pad;
+	u32 buttons = 0;
+
+	if (padRead(0, 0, &pad))
+	{
+		buttons = pad.btns ^ 0xFFFF;
+	}
+
+
+	if (buttons & PAD_CIRCLE)
+		g32bitColorMode = true;
+	else
+		g32bitColorMode = false;
 
 	// Init the savegame directory -- We probably should create this on the fly if not as it causes issues.
 	strcpy(g_DaedalusConfig.mSaveDir, DAEDALUS_PS2_PATH("SaveGames/"));
@@ -235,20 +250,31 @@ void HandleEndOfFrame()
 	static u32 oldButtons = 0;
 	struct padButtonStatus pad;
 	bool		activate_pause_menu = false;
-	padRead(0, 0, &pad);
-	pad.btns ^= 0xFFFF;
+	u32 buttons = 0;
+
+	Wait_Pad_Ready();
+
+	if (padRead(0, 0, &pad))
+	{
+		buttons = pad.btns ^ 0xFFFF;
+	}
 
 	// If kernelbuttons.prx couldn't be loaded, allow select button to be used instead
 	//
-	if (oldButtons != pad.btns)
+	if (oldButtons != buttons)
 	{
-		if (gCheatsEnabled && (pad.btns & PAD_SELECT))
+		if (gCheatsEnabled && (buttons & PAD_SELECT))
 		{
 			CheatCodes_Activate(GS_BUTTON);
 		}
 
-		if (pad.btns & PAD_L3)
+		if (buttons & PAD_L3)
+		{
 			activate_pause_menu = true;
+
+			if (gAudioPlugin != nullptr)
+				gAudioPlugin->StopAudio();
+		}
 	}
 
 	if (activate_pause_menu)

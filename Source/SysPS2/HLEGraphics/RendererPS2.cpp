@@ -15,6 +15,7 @@
 #include "OSHLE/ultra_gbi.h"
 #include "Utility/IO.h"
 #include "Utility/Profiler.h"
+#include "Utility/DaedalusTypes.h"
 #include "SysPS2/GL.h"
 
 #include <malloc.h>
@@ -60,7 +61,7 @@ static short coord_x = 640 / 2;
 static short coord_y = 480 / 2;
 static int coord_near = 0xFFFF;
 static int coord_far = 0;
-extern int gsZMax;
+extern u32 gsZMax;
 
 int gsShading = 0;
 
@@ -118,6 +119,24 @@ void gsTexWrap(int u, int v)
 	*p_data++ = GS_CLAMP_1 + gsGlobal->PrimContext;
 }
 
+static float u_offset = 0.0f;
+static float v_offset = 0.0f;
+
+void gsTexOffset(float u, float v)
+{
+	u_offset = u;
+	v_offset = v;
+}
+
+static float u_scale = 1.0f;
+static float v_scale = 1.0f;
+
+void gsTexScale(float u, float v)
+{
+	u_scale = u;
+	v_scale = v;
+}
+
 static bool useTexEnvColor = false;
 static u64 TexEnvColor;
 
@@ -129,39 +148,13 @@ void gsTexEnvColor(int color)
 
 static VU_MATRIX proj;
 
-//FILE *ff;
-
 void sceGuSetMatrix(EGuMatrixType type, const ScePspFMatrix4* mtx)
 {
 	memcpy(&proj, mtx, sizeof(VU_MATRIX));
-
-	/*char buf[1024 * 2];
-	if (!ff)
-		ff = fopen("dumpvtx.txt", "a+t");
-
-	if (ff)
-	{
-		sprintf(buf, "mat ");
-		fwrite(buf, 1, strlen(buf), ff);
-		for (int i = 0; i < 16; i ++)
-		{
-			sprintf(buf, "%f ", mtx->m[i]);
-
-			fwrite(buf, 1, strlen(buf), ff);
-		}
-		sprintf(buf, "\n");
-		fwrite(buf, 1, strlen(buf), ff);
-
-		//fclose(fd);
-	}*/
-
-
-	VuSetProjectionMatrix(&proj);
 }
 
 void sceGuFog(float near, float far, unsigned int color)
 {
-	//printf("fog %f %f\n", near, far);
 #if 1
 	u64 * p_data = (u64*)gsKit_heap_alloc(gsGlobal, 1, 32, GIF_AD);
 
@@ -194,6 +187,11 @@ void gsTexFunc(int func, int mode)
 {
 	if (func == GS_TFX_MODULATE || func == GS_TFX_DECAL)
 		gstfunc = func;
+	else
+		gstfunc = GS_TFX_DECAL;
+
+	if (func == GS_TFX_BLEND)
+		gstfunc = GS_TFX_MODULATE;
 
 	gstcc = mode;
 }
@@ -234,6 +232,108 @@ static inline void gsKit_set_tw_th(const GSTEXTURE* Texture, int* tw, int* th)
 		(*th)++;
 }
 
+/// Textured Triangle Primitive GIFTAG
+#define GIF_TAG_TRIANGLE_TEXTURED_Q(NLOOP)   \
+		((u64)(NLOOP)		<< 0)	| \
+		((u64)(1)		<< 15)	| \
+		((u64)(0)		<< 46)	| \
+		((u64)(0)		<< 47)	| \
+		((u64)(1)		<< 58)	| \
+		((u64)(10)		<< 60);
+/// Textured Triangle Primitive REGLIST
+#define GIF_TAG_TRIANGLE_TEXTURED_Q_REGS(ctx)   \
+		((u64)(GS_TEX0_1 + ctx)	<< 0)	| \
+		((u64)(GS_PRIM)		<< 4)	| \
+		((u64)(GS_RGBAQ)	<< 8)	| \
+		((u64)(GS_ST)		<< 12)	| \
+		((u64)(GS_XYZ2)		<< 16)	| \
+		((u64)(GS_ST)		<< 20)	| \
+		((u64)(GS_XYZ2)		<< 24)	| \
+		((u64)(GS_ST)		<< 28)	| \
+		((u64)(GS_XYZ2)		<< 32)	| \
+		((u64)(GIF_NOP)		<< 36);
+// Textured Triangle Goraud Primitive
+/// Textured Triangle Goraud Primitive GIFTAG
+#define GIF_TAG_TRIANGLE_GORAUD_TEXTURED_Q(NLOOP)   \
+		((u64)(NLOOP)		<< 0)	| \
+		((u64)(1)		<< 15)	| \
+		((u64)(0)		<< 46)	| \
+		((u64)(0)		<< 47)	| \
+		((u64)(1)		<< 58)	| \
+		((u64)(12)		<< 60);
+/// Textured Triangle Goraud Primitive REGLIST
+#define GIF_TAG_TRIANGLE_GORAUD_TEXTURED_Q_REGS(ctx)   \
+		((u64)(GS_TEX0_1 + ctx)	<< 0)	| \
+		((u64)(GS_PRIM)		<< 4)	| \
+		((u64)(GS_RGBAQ)	<< 8)	| \
+		((u64)(GS_ST)		<< 12)	| \
+		((u64)(GS_XYZ2)		<< 16)	| \
+		((u64)(GS_RGBAQ)	<< 20)	| \
+		((u64)(GS_ST)		<< 24)	| \
+		((u64)(GS_XYZ2)		<< 28)	| \
+		((u64)(GS_RGBAQ)	<< 32)	| \
+		((u64)(GS_ST)		<< 36)	| \
+		((u64)(GS_XYZ2)		<< 40)	| \
+		((u64)(GIF_NOP)		<< 44);
+
+
+#define GS_SETREG_ST(s, t) ((u64)(s) | ((u64)(t) << 32))
+
+void _gsKit_prim_sprite_texture_3d(GSGLOBAL* gsGlobal, const GSTEXTURE* Texture,
+	float x1, float y1, int iz1, float u1, float v1,
+	float x2, float y2, int iz2, float u2, float v2, u64 color)
+{
+	gsKit_set_texfilter(gsGlobal, Texture->Filter);
+
+	u64* p_store;
+	u64* p_data;
+	int qsize = 4;
+	int bsize = 64;
+
+	int tw, th;
+	gsKit_set_tw_th(Texture, &tw, &th);
+
+	int ix1 = gsKit_float_to_int_x(gsGlobal, x1);
+	int ix2 = gsKit_float_to_int_x(gsGlobal, x2);
+	int iy1 = gsKit_float_to_int_y(gsGlobal, y1);
+	int iy2 = gsKit_float_to_int_y(gsGlobal, y2);
+
+	int iu1 = gsKit_float_to_int_u(Texture, u1);
+	int iu2 = gsKit_float_to_int_u(Texture, u2);
+	int iv1 = gsKit_float_to_int_v(Texture, v1);
+	int iv2 = gsKit_float_to_int_v(Texture, v2);
+
+	p_store = p_data = (u64*)gsKit_heap_alloc(gsGlobal, qsize, bsize, GSKIT_GIF_PRIM_SPRITE_TEXTURED);
+
+	*p_data++ = GIF_TAG_SPRITE_TEXTURED(0);
+	*p_data++ = GIF_TAG_SPRITE_TEXTURED_REGS(gsGlobal->PrimContext);
+
+	if (Texture->VramClut == 0)
+	{
+		*p_data++ = GS_SETREG_TEX0(Texture->Vram / 256, Texture->TBW, Texture->PSM,
+			tw, th, gstcc, gstfunc,
+			0, 0, 0, 0, GS_CLUT_STOREMODE_NOLOAD);
+	}
+	else
+	{
+		*p_data++ = GS_SETREG_TEX0(Texture->Vram / 256, Texture->TBW, Texture->PSM,
+			tw, th, gstcc, gstfunc,
+			Texture->VramClut / 256, Texture->ClutPSM, 0, 0, GS_CLUT_STOREMODE_LOAD);
+	}
+
+	*p_data++ = GS_SETREG_PRIM(GS_PRIM_PRIM_SPRITE, 0, 1, gsGlobal->PrimFogEnable,
+		gsGlobal->PrimAlphaEnable, gsGlobal->PrimAAEnable,
+		1, gsGlobal->PrimContext, 0);
+
+	*p_data++ = color;
+
+	*p_data++ = GS_SETREG_UV(iu1, iv1);
+	*p_data++ = GS_SETREG_XYZ2(ix1, iy1, iz1);
+
+	*p_data++ = GS_SETREG_UV(iu2, iv2);
+	*p_data++ = GS_SETREG_XYZ2(ix2, iy2, iz2);
+}
+
 void _gsKit_prim_triangle_texture_3d(GSGLOBAL* gsGlobal, GSTEXTURE* Texture,
 	float x1, float y1, int iz1, float u1, float v1,
 	float x2, float y2, int iz2, float u2, float v2,
@@ -255,17 +355,20 @@ void _gsKit_prim_triangle_texture_3d(GSGLOBAL* gsGlobal, GSTEXTURE* Texture,
 	int iy2 = gsKit_float_to_int_y(gsGlobal, y2);
 	int iy3 = gsKit_float_to_int_y(gsGlobal, y3);
 
-	int iu1 = gsKit_float_to_int_u(Texture, u1);
-	int iu2 = gsKit_float_to_int_u(Texture, u2);
-	int iu3 = gsKit_float_to_int_u(Texture, u3);
-	int iv1 = gsKit_float_to_int_v(Texture, v1);
-	int iv2 = gsKit_float_to_int_v(Texture, v2);
-	int iv3 = gsKit_float_to_int_v(Texture, v3);
+	REG32 s1, s2, s3, t1, t2, t3;
+
+	s1._f32 = u1 / (float)Texture->Width;
+	s2._f32 = u2 / (float)Texture->Width;
+	s3._f32 = u3 / (float)Texture->Width;
+
+	t1._f32 = v1 / (float)Texture->Height;
+	t2._f32 = v2 / (float)Texture->Height;
+	t3._f32 = v3 / (float)Texture->Height;
 
 	p_store = p_data = (u64*)gsKit_heap_alloc(gsGlobal, qsize, bsize, GSKIT_GIF_PRIM_TRIANGLE_TEXTURED);
 
-	*p_data++ = GIF_TAG_TRIANGLE_TEXTURED(0);
-	*p_data++ = GIF_TAG_TRIANGLE_TEXTURED_REGS(gsGlobal->PrimContext);
+	*p_data++ = GIF_TAG_TRIANGLE_TEXTURED_Q(0);
+	*p_data++ = GIF_TAG_TRIANGLE_TEXTURED_Q_REGS(gsGlobal->PrimContext);
 
 	if (Texture->VramClut == 0)
 	{
@@ -282,18 +385,18 @@ void _gsKit_prim_triangle_texture_3d(GSGLOBAL* gsGlobal, GSTEXTURE* Texture,
 
 	*p_data++ = GS_SETREG_PRIM(GS_PRIM_PRIM_TRIANGLE, 0, 1, gsGlobal->PrimFogEnable,
 		gsGlobal->PrimAlphaEnable, gsGlobal->PrimAAEnable,
-		1, gsGlobal->PrimContext, 0);
+		0, gsGlobal->PrimContext, 0);
 
 
 	*p_data++ = color;
 
-	*p_data++ = GS_SETREG_UV(iu1, iv1);
+	*p_data++ = GS_SETREG_ST(s1._u32, t1._u32);
 	*p_data++ = GS_SETREG_XYZ2(ix1, iy1, iz1);
 
-	*p_data++ = GS_SETREG_UV(iu2, iv2);
+	*p_data++ = GS_SETREG_ST(s2._u32, t2._u32);
 	*p_data++ = GS_SETREG_XYZ2(ix2, iy2, iz2);
 
-	*p_data++ = GS_SETREG_UV(iu3, iv3);
+	*p_data++ = GS_SETREG_ST(s3._u32, t3._u32);
 	*p_data++ = GS_SETREG_XYZ2(ix3, iy3, iz3);
 }
 
@@ -319,17 +422,20 @@ void _gsKit_prim_triangle_goraud_texture_3d(GSGLOBAL* gsGlobal, GSTEXTURE* Textu
 	int iy2 = gsKit_float_to_int_y(gsGlobal, y2);
 	int iy3 = gsKit_float_to_int_y(gsGlobal, y3);
 
-	int iu1 = gsKit_float_to_int_u(Texture, u1);
-	int iu2 = gsKit_float_to_int_u(Texture, u2);
-	int iu3 = gsKit_float_to_int_u(Texture, u3);
-	int iv1 = gsKit_float_to_int_v(Texture, v1);
-	int iv2 = gsKit_float_to_int_v(Texture, v2);
-	int iv3 = gsKit_float_to_int_v(Texture, v3);
+	REG32 s1, s2, s3, t1, t2, t3;
+
+	s1._f32 = u1 / (float)Texture->Width;
+	s2._f32 = u2 / (float)Texture->Width;
+	s3._f32 = u3 / (float)Texture->Width;
+
+	t1._f32 = v1 / (float)Texture->Height;
+	t2._f32 = v2 / (float)Texture->Height;
+	t3._f32 = v3 / (float)Texture->Height;
 
 	p_store = p_data = (u64 *)gsKit_heap_alloc(gsGlobal, qsize, bsize, GSKIT_GIF_PRIM_TRIANGLE_TEXTURED);
 
-	*p_data++ = GIF_TAG_TRIANGLE_GORAUD_TEXTURED(0);
-	*p_data++ = GIF_TAG_TRIANGLE_GORAUD_TEXTURED_REGS(gsGlobal->PrimContext);
+	*p_data++ = GIF_TAG_TRIANGLE_GORAUD_TEXTURED_Q(0);
+	*p_data++ = GIF_TAG_TRIANGLE_GORAUD_TEXTURED_Q_REGS(gsGlobal->PrimContext);
 
 	if (Texture->VramClut == 0)
 	{
@@ -346,28 +452,88 @@ void _gsKit_prim_triangle_goraud_texture_3d(GSGLOBAL* gsGlobal, GSTEXTURE* Textu
 
 	*p_data++ = GS_SETREG_PRIM(GS_PRIM_PRIM_TRIANGLE, 1, 1, gsGlobal->PrimFogEnable,
 		gsGlobal->PrimAlphaEnable, gsGlobal->PrimAAEnable,
-		1, gsGlobal->PrimContext, 0);
+		0, gsGlobal->PrimContext, 0);
 
 
 	*p_data++ = color1;
-	*p_data++ = GS_SETREG_UV(iu1, iv1);
+	*p_data++ = GS_SETREG_ST(s1._u32, t1._u32);
 	*p_data++ = GS_SETREG_XYZ2(ix1, iy1, iz1);
 
 	*p_data++ = color2;
-	*p_data++ = GS_SETREG_UV(iu2, iv2);
+	*p_data++ = GS_SETREG_ST(s2._u32, t2._u32);
 	*p_data++ = GS_SETREG_XYZ2(ix2, iy2, iz2);
 
 	*p_data++ = color3;
-	*p_data++ = GS_SETREG_UV(iu3, iv3);
+	*p_data++ = GS_SETREG_ST(s3._u32, t3._u32);
 	*p_data++ = GS_SETREG_XYZ2(ix3, iy3, iz3);
 }
 
+void _gsKit_prim_triangle_strip_texture_3d(GSGLOBAL* gsGlobal, GSTEXTURE* Texture,
+	float* TriStrip, int segments, u64 color)
+{
+	gsKit_set_texfilter(gsGlobal, Texture->Filter);
+	u64* p_store;
+	u64* p_data;
+	int qsize = 3 + (segments * 2);
+	int count;
+	int vertexdata[segments * 5];
 
-//#define GS_Z(x)		gsZMax - *reinterpret_cast<int*>(&x)
+	int tw, th;
+	gsKit_set_tw_th(Texture, &tw, &th);
+
+	for (count = 0; count < (segments * 5); count += 5)
+	{
+		vertexdata[count + 0] = gsKit_float_to_int_x(gsGlobal, *TriStrip++);
+		vertexdata[count + 1] = gsKit_float_to_int_y(gsGlobal, *TriStrip++);
+		vertexdata[count + 2] = (int)((*TriStrip++) * 16.0f); // z
+		vertexdata[count + 3] = gsKit_float_to_int_u(Texture, *TriStrip++);
+		vertexdata[count + 4] = gsKit_float_to_int_v(Texture, *TriStrip++);
+	}
+
+	p_store = p_data = (u64*)gsKit_heap_alloc(gsGlobal, qsize, (qsize * 16), GIF_AD);
+
+	*p_data++ = GIF_TAG_AD(qsize);
+	*p_data++ = GIF_AD;
+
+	if (Texture->VramClut == 0)
+	{
+		*p_data++ = GS_SETREG_TEX0(Texture->Vram / 256, Texture->TBW, Texture->PSM,
+			tw, th, gstcc, gstfunc,
+			0, 0, 0, 0, GS_CLUT_STOREMODE_NOLOAD);
+	}
+	else
+	{
+		*p_data++ = GS_SETREG_TEX0(Texture->Vram / 256, Texture->TBW, Texture->PSM,
+			tw, th, gstcc, gstfunc,
+			Texture->VramClut / 256, Texture->ClutPSM, 0, 0, GS_CLUT_STOREMODE_LOAD);
+	}
+	*p_data++ = GS_TEX0_1 + gsGlobal->PrimContext;
+
+	*p_data++ = GS_SETREG_PRIM(GS_PRIM_PRIM_TRISTRIP, 0, 1, gsGlobal->PrimFogEnable,
+		gsGlobal->PrimAlphaEnable, gsGlobal->PrimAAEnable,
+		1, gsGlobal->PrimContext, 0);
+
+	*p_data++ = GS_PRIM;
+
+	*p_data++ = color;
+	*p_data++ = GS_RGBAQ;
+
+	for (count = 0; count < (segments * 5); count += 5)
+	{
+		*p_data++ = GS_SETREG_UV(vertexdata[count + 3], vertexdata[count + 4]);
+		*p_data++ = GS_UV;
+
+		*p_data++ = GS_SETREG_XYZ2(vertexdata[count], vertexdata[count + 1], vertexdata[count + 2]);
+		*p_data++ = GS_XYZ2;
+	}
+}
 
 #define GS_X(v)		(((v.x/v.w) * coord_width) + coord_x)
 #define GS_Y(v)		(-((v.y/v.w) * coord_height) + coord_y)
-#define GS_Z(v)		(int)(-(v.z/v.w) * 0xffff)
+#define GS_Z(v)		(int)(-(v.z/v.w) * gsZMax/2)
+
+#define GS_U(u)		((u + u_offset) * u_scale)
+#define GS_V(v)		((v + v_offset) * v_scale)
 
 void DrawPrims(DaedalusVtx* p_vertices, u32 num_vertices, u32 prim_type, bool textured)
 {
@@ -375,37 +541,21 @@ void DrawPrims(DaedalusVtx* p_vertices, u32 num_vertices, u32 prim_type, bool te
 	VU_VECTOR out_vect[3];
 	u64 color[3];
 
-	VuxUpdateLocalScreenMatrix();
-
 	if (prim_type == GS_PRIM_PRIM_SPRITE)
 	{
 		for (u32 i = 0; i < num_vertices; i += 2)
 		{
-
-			in_vect[0].x = p_vertices[i + 0].Position.x;
-			in_vect[0].y = p_vertices[i + 0].Position.y;
-			in_vect[0].z = p_vertices[i + 0].Position.z;
-			in_vect[0].w = 1.0f;
-
-			in_vect[1].x = p_vertices[i + 1].Position.x;
-			in_vect[1].y = p_vertices[i + 1].Position.y;
-			in_vect[1].z = p_vertices[i + 1].Position.z;
-			in_vect[1].w = 1.0f;
-
-			VuxRotTrans(&in_vect[0], &out_vect[0]);
-			VuxRotTrans(&in_vect[1], &out_vect[1]);
-
 			if (textured)
 			{
-				gsKit_prim_sprite_texture_3d(gsGlobal, CurrTex, 
-					in_vect[0].x,
-					in_vect[0].y,
-					(int)in_vect[0].z,
+				_gsKit_prim_sprite_texture_3d(gsGlobal, CurrTex, 
+					p_vertices[i + 0].Position.x,
+					p_vertices[i + 0].Position.y,
+					(int)p_vertices[i + 0].Position.z,
 					p_vertices[i + 0].Texture.x,  // U1
 					p_vertices[i + 0].Texture.y,  // V1
-					in_vect[1].x, // X2
-					in_vect[1].y, // Y2
-					(int)in_vect[1].z,
+					p_vertices[i + 1].Position.x,
+					p_vertices[i + 1].Position.y,
+					(int)p_vertices[i + 1].Position.z,
 					p_vertices[i + 1].Texture.x, // U2
 					p_vertices[i + 1].Texture.y, // V2
 					GS_SETREG_RGBAQ(p_vertices[i + 0].Colour.GetR(), p_vertices[i + 0].Colour.GetG(), p_vertices[i + 0].Colour.GetB(), (p_vertices[i + 0].Colour.GetA()) / 2, 0x00));
@@ -413,11 +563,11 @@ void DrawPrims(DaedalusVtx* p_vertices, u32 num_vertices, u32 prim_type, bool te
 			else
 			{
 				gsKit_prim_sprite(gsGlobal, 
-					in_vect[0].x, 
-					in_vect[0].y, 
-					in_vect[1].x, 
-					in_vect[1].y, 
-					(int)in_vect[0].z, 
+					p_vertices[i + 0].Position.x,
+					p_vertices[i + 0].Position.y,
+					p_vertices[i + 1].Position.x,
+					p_vertices[i + 1].Position.y,
+					(int)p_vertices[i + 0].Position.z,
 					GS_SETREG_RGBAQ(p_vertices[i + 0].Colour.GetR(), p_vertices[i + 0].Colour.GetG(), p_vertices[i + 0].Colour.GetB(), (p_vertices[i + 0].Colour.GetA()) / 2, 0x00));
 			}
 		}
@@ -441,43 +591,59 @@ void DrawPrims(DaedalusVtx* p_vertices, u32 num_vertices, u32 prim_type, bool te
 			in_vect[2].z = p_vertices[i + 2].Position.z;
 			in_vect[2].w = 1.0f;
 
-			VuxRotTrans(&in_vect[0], &out_vect[0]);
-			VuxRotTrans(&in_vect[1], &out_vect[1]);
-			VuxRotTrans(&in_vect[2], &out_vect[2]);
+			Vu0ApplyMatrix(&proj, &in_vect[0], &out_vect[0]);
+			Vu0ApplyMatrix(&proj, &in_vect[1], &out_vect[1]);
+			Vu0ApplyMatrix(&proj, &in_vect[2], &out_vect[2]);
 
-			color[0] = GS_SETREG_RGBAQ(p_vertices[i + 0].Colour.GetR(), p_vertices[i + 0].Colour.GetG(), p_vertices[i + 0].Colour.GetB(), (p_vertices[i + 0].Colour.GetA()) / 2, 1.0f);
-			color[1] = GS_SETREG_RGBAQ(p_vertices[i + 1].Colour.GetR(), p_vertices[i + 1].Colour.GetG(), p_vertices[i + 1].Colour.GetB(), (p_vertices[i + 1].Colour.GetA()) / 2, 1.0f);
-			color[2] = GS_SETREG_RGBAQ(p_vertices[i + 2].Colour.GetR(), p_vertices[i + 2].Colour.GetG(), p_vertices[i + 2].Colour.GetB(), (p_vertices[i + 2].Colour.GetA()) / 2, 1.0f);
+			REG32 q1, q2, q3;
 
+			q1._f32 = 1.0f;
+			q2._f32 = 1.0f;
+			q3._f32 = 1.0f;
+#if 0
+			q1._f32 = 1.0f - 1.0f / out_vect[0].w;
+			q2._f32 = 1.0f - 1.0f / out_vect[1].w;
+			q3._f32 = 1.0f - 1.0f / out_vect[2].w;
+#endif
+			color[0] = GS_SETREG_RGBAQ(p_vertices[i + 0].Colour.GetR(), p_vertices[i + 0].Colour.GetG(), p_vertices[i + 0].Colour.GetB(), (p_vertices[i + 0].Colour.GetA()) / 2, q1._u32);
+			color[1] = GS_SETREG_RGBAQ(p_vertices[i + 1].Colour.GetR(), p_vertices[i + 1].Colour.GetG(), p_vertices[i + 1].Colour.GetB(), (p_vertices[i + 1].Colour.GetA()) / 2, q2._u32);
+			color[2] = GS_SETREG_RGBAQ(p_vertices[i + 2].Colour.GetR(), p_vertices[i + 2].Colour.GetG(), p_vertices[i + 2].Colour.GetB(), (p_vertices[i + 2].Colour.GetA()) / 2, q3._u32);
+#if 0
+			u64 col = GS_SETREG_RGBAQ(0xFF, 0x00, 0x00, 0x80, 1.0f);
+
+			gsKit_prim_line_3d(gsGlobal, GS_X(out_vect[0]), GS_Y(out_vect[0]), GS_Z(out_vect[0]), GS_X(out_vect[1]), GS_Y(out_vect[1]), GS_Z(out_vect[1]), col);
+			gsKit_prim_line_3d(gsGlobal, GS_X(out_vect[1]), GS_Y(out_vect[1]), GS_Z(out_vect[1]), GS_X(out_vect[2]), GS_Y(out_vect[2]), GS_Z(out_vect[2]), col);
+			gsKit_prim_line_3d(gsGlobal, GS_X(out_vect[2]), GS_Y(out_vect[2]), GS_Z(out_vect[2]), GS_X(out_vect[0]), GS_Y(out_vect[0]), GS_Z(out_vect[0]), col);
+#else
 			if (textured)
 			{
-				if (gsShading) 
+				if (gsShading)
 				{
 					_gsKit_prim_triangle_goraud_texture_3d(gsGlobal, CurrTex,
 						GS_X(out_vect[0]), GS_Y(out_vect[0]), GS_Z(out_vect[0]),
-						p_vertices[i + 0].Texture.x, p_vertices[i + 0].Texture.y,
+						GS_U(p_vertices[i + 0].Texture.x), GS_V(p_vertices[i + 0].Texture.y),
 						GS_X(out_vect[1]), GS_Y(out_vect[1]), GS_Z(out_vect[1]),
-						p_vertices[i + 1].Texture.x, p_vertices[i + 1].Texture.y,
+						GS_U(p_vertices[i + 1].Texture.x), GS_V(p_vertices[i + 1].Texture.y),
 						GS_X(out_vect[2]), GS_Y(out_vect[2]), GS_Z(out_vect[2]),
-						p_vertices[i + 2].Texture.x, p_vertices[i + 2].Texture.y,
+						GS_U(p_vertices[i + 2].Texture.x), GS_V(p_vertices[i + 2].Texture.y),
 						color[0], color[1], color[2]);
 				}
 				else
 				{
 					_gsKit_prim_triangle_texture_3d(gsGlobal, CurrTex,
 						GS_X(out_vect[0]), GS_Y(out_vect[0]), GS_Z(out_vect[0]),
-						p_vertices[i + 0].Texture.x, p_vertices[i + 0].Texture.y,
+						GS_U(p_vertices[i + 0].Texture.x), GS_V(p_vertices[i + 0].Texture.y),
 						GS_X(out_vect[1]), GS_Y(out_vect[1]), GS_Z(out_vect[1]),
-						p_vertices[i + 1].Texture.x, p_vertices[i + 1].Texture.y,
+						GS_U(p_vertices[i + 1].Texture.x), GS_V(p_vertices[i + 1].Texture.y),
 						GS_X(out_vect[2]), GS_Y(out_vect[2]), GS_Z(out_vect[2]),
-						p_vertices[i + 2].Texture.x, p_vertices[i + 2].Texture.y,
+						GS_U(p_vertices[i + 2].Texture.x), GS_V(p_vertices[i + 2].Texture.y),
 						color[0]);
 				}
 
 			}
 			else
 			{
-				if (gsShading) 
+				if (gsShading)
 				{
 					gsKit_prim_triangle_gouraud_3d(gsGlobal,
 						GS_X(out_vect[0]), GS_Y(out_vect[0]), GS_Z(out_vect[0]),
@@ -496,34 +662,156 @@ void DrawPrims(DaedalusVtx* p_vertices, u32 num_vertices, u32 prim_type, bool te
 						color[0]);
 				}
 			}
+#endif
 		}
 	}
 	else if (prim_type == GS_PRIM_PRIM_TRISTRIP)
 	{
 		float* tris = (float*)memalign(128, sizeof(float) * num_vertices * 5);
-		
-		for (u32 i = 0; i < num_vertices; i++)
+
+		if (textured)
 		{
-			in_vect[0].x = p_vertices[i].Position.x;
-			in_vect[0].y = p_vertices[i].Position.y;
-			in_vect[0].z = p_vertices[i].Position.z;
-			in_vect[0].w = 1.0f;
+			for (u32 i = 0; i < num_vertices; i++)
+			{
+				tris[i * 5 + 0] = p_vertices[i].Position.x;
+				tris[i * 5 + 1] = p_vertices[i].Position.y;
+				tris[i * 5 + 2] = p_vertices[i].Position.z;
+				tris[i * 5 + 3] = p_vertices[i].Texture.x;
+				tris[i * 5 + 4] = p_vertices[i].Texture.y;
+			}
 
-			VuxRotTrans(&in_vect[0], &out_vect[0]);
-
-			tris[i * 5 + 0] = GS_X(out_vect[0]);
-			tris[i * 5 + 1] = GS_Y(out_vect[0]);
-			tris[i * 5 + 2] = GS_Z(out_vect[0]);
-			tris[i * 5 + 3] = p_vertices[i].Texture.x;
-			tris[i * 5 + 4] = p_vertices[i].Texture.y;
+			_gsKit_prim_triangle_strip_texture_3d(gsGlobal, CurrTex,
+				tris, num_vertices, GS_SETREG_RGBAQ(p_vertices[0].Colour.GetR(), p_vertices[0].Colour.GetG(), p_vertices[0].Colour.GetB(), (p_vertices[0].Colour.GetA()) / 2, 0x00));
 		}
+		else
+		{
+			for (u32 i = 0; i < num_vertices; i++)
+			{
+				tris[i * 3 + 0] = p_vertices[i].Position.x;
+				tris[i * 3 + 1] = p_vertices[i].Position.y;
+				tris[i * 3 + 2] = p_vertices[i].Position.z;
+			}
 
-		gsKit_prim_triangle_strip_texture_3d(gsGlobal, CurrTex,
-			tris, num_vertices, GS_SETREG_RGBAQ(p_vertices[0].Colour.GetR(), p_vertices[0].Colour.GetG(), p_vertices[0].Colour.GetB(), (p_vertices[0].Colour.GetA() ) / 2, 0x00));
+			gsKit_prim_triangle_strip_3d(gsGlobal, tris, num_vertices, GS_SETREG_RGBAQ(p_vertices[0].Colour.GetR(), p_vertices[0].Colour.GetG(), p_vertices[0].Colour.GetB(), (p_vertices[0].Colour.GetA()) / 2, 0x00));
+		}
 
 		free(tris);
 	}
 }
+
+#ifdef DAEDALUS_DEBUG_DISPLAYLIST
+
+// General blender used for Blend Explorer when debuging Dlists //Corn
+DebugBlendSettings gDBlend;
+
+static const u32 kPlaceholderTextureWidth = 16;
+static const u32 kPlaceholderTextureHeight = 16;
+static const u32 kPlaceholderSize = kPlaceholderTextureWidth * kPlaceholderTextureHeight;
+
+ALIGNED_GLOBAL(u32, gWhiteTexture[kPlaceholderSize], DATA_ALIGN);
+ALIGNED_GLOBAL(u32, gPlaceholderTexture[kPlaceholderSize], DATA_ALIGN);
+ALIGNED_GLOBAL(u32, gSelectedTexture[kPlaceholderSize], DATA_ALIGN);
+
+
+#define BLEND_MODE_MAKER \
+{ \
+	const u32 PSPtxtFunc[5] = \
+	{ \
+		GS_TFX_MODULATE, \
+		GS_TFX_BLEND, \
+		GS_TFX_ADD, \
+		GS_TFX_REPLACE, \
+		GS_TFX_DECAL \
+	}; \
+	const u32 PSPtxtA[2] = \
+	{ \
+		GS_TCC_RGB, \
+		GS_TCC_RGBA \
+	}; \
+	switch( gDBlend.ForceRGB ) \
+	{ \
+		case 1: details.ColourAdjuster.SetRGB( c32::White ); break; \
+		case 2: details.ColourAdjuster.SetRGB( c32::Black ); break; \
+		case 3: details.ColourAdjuster.SetRGB( c32::Red ); break; \
+		case 4: details.ColourAdjuster.SetRGB( c32::Green ); break; \
+		case 5: details.ColourAdjuster.SetRGB( c32::Blue ); break; \
+		case 6: details.ColourAdjuster.SetRGB( c32::Magenta ); break; \
+		case 7: details.ColourAdjuster.SetRGB( c32::Gold ); break; \
+	} \
+	switch( gDBlend.SetRGB ) \
+	{ \
+		case 1: details.ColourAdjuster.SetRGB( details.PrimColour ); break; \
+		case 2: details.ColourAdjuster.SetRGB( details.PrimColour.ReplicateAlpha() ); break; \
+		case 3: details.ColourAdjuster.SetRGB( details.EnvColour ); break; \
+		case 4: details.ColourAdjuster.SetRGB( details.EnvColour.ReplicateAlpha() ); break; \
+	} \
+	switch( gDBlend.SetA ) \
+	{ \
+		case 1: details.ColourAdjuster.SetA( details.PrimColour ); break; \
+		case 2: details.ColourAdjuster.SetA( details.PrimColour.ReplicateAlpha() ); break; \
+		case 3: details.ColourAdjuster.SetA( details.EnvColour ); break; \
+		case 4: details.ColourAdjuster.SetA( details.EnvColour.ReplicateAlpha() ); break; \
+	} \
+	switch( gDBlend.SetRGBA ) \
+	{ \
+		case 1: details.ColourAdjuster.SetRGBA( details.PrimColour ); break; \
+		case 2: details.ColourAdjuster.SetRGBA( details.PrimColour.ReplicateAlpha() ); break; \
+		case 3: details.ColourAdjuster.SetRGBA( details.EnvColour ); break; \
+		case 4: details.ColourAdjuster.SetRGBA( details.EnvColour.ReplicateAlpha() ); break; \
+	} \
+	switch( gDBlend.ModRGB ) \
+	{ \
+		case 1: details.ColourAdjuster.ModulateRGB( details.PrimColour ); break; \
+		case 2: details.ColourAdjuster.ModulateRGB( details.PrimColour.ReplicateAlpha() ); break; \
+		case 3: details.ColourAdjuster.ModulateRGB( details.EnvColour ); break; \
+		case 4: details.ColourAdjuster.ModulateRGB( details.EnvColour.ReplicateAlpha() ); break; \
+	} \
+	switch( gDBlend.ModA ) \
+	{ \
+		case 1: details.ColourAdjuster.ModulateA( details.PrimColour ); break; \
+		case 2: details.ColourAdjuster.ModulateA( details.PrimColour.ReplicateAlpha() ); break; \
+		case 3: details.ColourAdjuster.ModulateA( details.EnvColour ); break; \
+		case 4: details.ColourAdjuster.ModulateA( details.EnvColour.ReplicateAlpha() ); break; \
+	} \
+	switch( gDBlend.ModRGBA ) \
+	{ \
+		case 1: details.ColourAdjuster.ModulateRGBA( details.PrimColour ); break; \
+		case 2: details.ColourAdjuster.ModulateRGBA( details.PrimColour.ReplicateAlpha() ); break; \
+		case 3: details.ColourAdjuster.ModulateRGBA( details.EnvColour ); break; \
+		case 4: details.ColourAdjuster.ModulateRGBA( details.EnvColour.ReplicateAlpha() ); break; \
+	} \
+	switch( gDBlend.SubRGB ) \
+	{ \
+		case 1: details.ColourAdjuster.SubtractRGB( details.PrimColour ); break; \
+		case 2: details.ColourAdjuster.SubtractRGB( details.PrimColour.ReplicateAlpha() ); break; \
+		case 3: details.ColourAdjuster.SubtractRGB( details.EnvColour ); break; \
+		case 4: details.ColourAdjuster.SubtractRGB( details.EnvColour.ReplicateAlpha() ); break; \
+	} \
+	switch( gDBlend.SubA ) \
+	{ \
+		case 1: details.ColourAdjuster.SubtractA( details.PrimColour ); break; \
+		case 2: details.ColourAdjuster.SubtractA( details.PrimColour.ReplicateAlpha() ); break; \
+		case 3: details.ColourAdjuster.SubtractA( details.EnvColour ); break; \
+		case 4: details.ColourAdjuster.SubtractA( details.EnvColour.ReplicateAlpha() ); break; \
+	} \
+	switch( gDBlend.SubRGBA ) \
+	{ \
+		case 1: details.ColourAdjuster.SubtractRGBA( details.PrimColour ); break; \
+		case 2: details.ColourAdjuster.SubtractRGBA( details.PrimColour.ReplicateAlpha() ); break; \
+		case 3: details.ColourAdjuster.SubtractRGBA( details.EnvColour ); break; \
+		case 4: details.ColourAdjuster.SubtractRGBA( details.EnvColour.ReplicateAlpha() ); break; \
+	} \
+	if( gDBlend.AOpaque ) details.ColourAdjuster.SetAOpaque(); \
+	switch( gDBlend.sceENV ) \
+	{ \
+		case 1: gsTexEnvColor( details.EnvColour.GetColour() ); break; \
+		case 2: gsTexEnvColor( details.PrimColour.GetColour() ); break; \
+	} \
+	details.InstallTexture = gDBlend.TexInstall; \
+	gsTexFunc( PSPtxtFunc[ (gDBlend.TXTFUNC >> 1) % 6 ], PSPtxtA[ gDBlend.TXTFUNC & 1 ] ); \
+}
+
+#endif // DAEDALUS_DEBUG_DISPLAYLIST
 
 RendererPS2::RendererPS2()
 {
@@ -606,8 +894,8 @@ void RendererPS2::RestoreRenderStates()
 	
 	gsKit_set_test(gsGlobal, GS_ZTEST_ON);
 
-	//VuSetWorldMatrix((VU_MATRIX*)& gMatrixIdentity);
-	//VuSetViewMatrix((VU_MATRIX*)& gMatrixIdentity);
+	gsTexOffset(0.0f, 0.0f);
+	gsTexScale(1.0f, 1.0f);
 }
 
 RendererPS2::SBlendStateEntry RendererPS2::LookupBlendState(u64 mux, bool two_cycles)
@@ -669,10 +957,13 @@ void RendererPS2::RenderTriangles(DaedalusVtx* p_vertices, u32 num_vertices, boo
 {
 	char buf[1024 * 2];
 	//if (!fd)
-		//fd = fopen("dumpvtx.txt", "a+t");
+	//	fd = fopen("dumpvtx.txt", "w+t");
 
 	if (fd)
 	{
+		sprintf(buf, " %f %f %f %f  %f %f %f %f  %f %f %f %f  %f %f %f %f \n", proj.m[0][0], proj.m[0][1], proj.m[0][2], proj.m[0][3], proj.m[1][0], proj.m[1][1], proj.m[1][2], proj.m[1][3], proj.m[2][0], proj.m[2][1], proj.m[2][2], proj.m[2][3], proj.m[3][0], proj.m[3][1], proj.m[3][2], proj.m[3][3]);
+		fwrite(buf, 1, strlen(buf), fd);
+
 		for (int i = 0; i < num_vertices; i += 3)
 		{
 			sprintf(buf, "   x %f y %f z %f u %f v %f r %02x g %02x b %02x a %02x    x %f y %f z %f u %f v %f r %02x g %02x b %02x a %02x    x %f y %f z %f u %f v %f r %02x g %02x b %02x a %02x \n", p_vertices[i + 0].Position.x, p_vertices[i + 0].Position.y, p_vertices[i + 0].Position.z,
@@ -690,6 +981,34 @@ void RendererPS2::RenderTriangles(DaedalusVtx* p_vertices, u32 num_vertices, boo
 
 		//fclose(fd);
 	}
+
+#if 1
+	if (mTnL.Flags.Texture)
+	{
+		UpdateTileSnapshots(mTextureTile);
+
+		// FIXME: this should be applied in SetNewVertexInfo, and use TextureScaleX/Y to set the scale
+		if (mTnL.Flags.Light && mTnL.Flags.TexGen)
+		{
+			if (CNativeTexture * texture = mBoundTexture[0])
+			{
+				// FIXME(strmnnrmn): I don't understand why the tile t/l is used here,
+				// but without it the Goldeneye Rareware logo looks off.
+				// It implies that the RSP code is checking RDP tile state, which seems wrong.
+				// gsDPSetHilite1Tile might set up some RSP state?
+				float x = (float)mTileTopLeft[0].s / 4.f;
+				float y = (float)mTileTopLeft[0].t / 4.f;
+				float w = (float)texture->GetCorrectedWidth();
+				float h = (float)texture->GetCorrectedHeight();
+				for (u32 i = 0; i < num_vertices; ++i)
+				{
+					p_vertices[i].Texture.x = (p_vertices[i].Texture.x * w) + x;
+					p_vertices[i].Texture.y = (p_vertices[i].Texture.y * h) + y;
+				}
+			}
+		}
+	}
+#else
 	if (mTnL.Flags.Texture)
 	{
 		UpdateTileSnapshots(mTextureTile);
@@ -698,24 +1017,25 @@ void RendererPS2::RenderTriangles(DaedalusVtx* p_vertices, u32 num_vertices, boo
 
 		if (texture && (mTnL.Flags._u32 & (TNL_LIGHT | TNL_TEXGEN)) != (TNL_LIGHT | TNL_TEXGEN))
 		{
-			//float scale_x = texture->GetScaleX();
-			//float scale_y = texture->GetScaleY();
+			float scale_x = texture->GetScaleX();
+			float scale_y = texture->GetScaleY();
 
 			// Hack to fix the sun in Zelda OOT/MM
 			if (g_ROM.ZELDA_HACK && (gRDPOtherMode.L == 0x0c184241))	 //&& ti.GetFormat() == G_IM_FMT_I && (ti.GetWidth() == 64)
 			{
-				//scale_x *= 0.5f;
-				//scale_y *= 0.5f;
+				scale_x *= 0.5f;
+				scale_y *= 0.5f;
 			}
-			//sceGuTexOffset(-mTileTopLeft[0].s * scale_x / 4.f, -mTileTopLeft[0].t * scale_y / 4.f);
-			//sceGuTexScale(scale_x, scale_y);
+			gsTexOffset(-mTileTopLeft[0].s * scale_x / 4.f, -mTileTopLeft[0].t * scale_y / 4.f);
+			gsTexScale(scale_x, scale_y);
 		}
 		else
 		{
-			//sceGuTexOffset(0.0f, 0.0f);
-			//sceGuTexScale(1.0f, 1.0f);
+			gsTexOffset(0.0f, 0.0f);
+			gsTexScale(1.0f, 1.0f);
 		}
 	}
+#endif
 
 	RenderUsingCurrentBlendMode(p_vertices, num_vertices, GS_PRIM_PRIM_TRIANGLE, 0, disable_zbuffer);
 	//DrawPrims(p_vertices, num_vertices, GS_PRIM_PRIM_TRIANGLE, false);
@@ -890,7 +1210,7 @@ void RendererPS2::RenderUsingCurrentBlendMode( DaedalusVtx * p_vertices, u32 num
 
 	//u32 render_flags{ GU_TEXTURE_32BITF | GU_COLOR_8888 | GU_VERTEX_32BITF | render_mode };
 
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
+#ifdef DAEDALUS_DEBUG_DISPLAYLISTx
 	// Used for Blend Explorer, or Nasty texture
 	//
 	if (DebugBlendmode(p_vertices, num_vertices, triangle_mode, render_flags, mMux))
@@ -901,7 +1221,7 @@ void RendererPS2::RenderUsingCurrentBlendMode( DaedalusVtx * p_vertices, u32 num
 	//
 	if (blend_entry.OverrideFunction != nullptr)
 	{
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
+#ifdef DAEDALUS_DEBUG_DISPLAYLISTx
 		// Used for dumping mux and highlight inexact blend
 		//
 		DebugMux(blend_entry.States, p_vertices, num_vertices, triangle_mode, render_flags, mMux);
@@ -1036,9 +1356,9 @@ void RendererPS2::RenderUsingRenderSettings( const CBlendStates * states, Daedal
 			u32	tfx = GS_TFX_MODULATE;
 			switch (out.BlendMode)
 			{
-			case PBM_MODULATE:		tfx = GS_TFX_MODULATE; break;
-			case PBM_REPLACE:		tfx = GS_TFX_REPLACE; break;
-			case PBM_BLEND:			tfx = GS_TFX_BLEND; gsTexEnvColor(out.TextureFactor.GetColour()); break;
+				case PBM_MODULATE:		tfx = GS_TFX_MODULATE; break;
+				case PBM_REPLACE:		tfx = GS_TFX_REPLACE; break;
+				case PBM_BLEND:			tfx = GS_TFX_BLEND; gsTexEnvColor(out.TextureFactor.GetColour()); break;
 			}
 
 			gsTexFunc(tfx, out.BlendAlphaMode == PBAM_RGB ? GS_TCC_RGB : GS_TCC_RGBA);
@@ -1052,11 +1372,23 @@ void RendererPS2::RenderUsingRenderSettings( const CBlendStates * states, Daedal
 
 				if (install_texture1 && texture1 && mTnL.Flags.Texture && (mTnL.Flags._u32 & (TNL_LIGHT | TNL_TEXGEN)) != (TNL_LIGHT | TNL_TEXGEN))
 				{
-					/*float scale_x = texture1->GetScaleX();
+#if 0
+					float scale_x = texture1->GetScaleX();
 					float scale_y = texture1->GetScaleY();
 
-					sceGuTexOffset(-mTileTopLeft[1].s * scale_x / 4.f, -mTileTopLeft[1].t * scale_y / 4.f);
-					sceGuTexScale(scale_x, scale_y);*/
+					gsTexOffset(-mTileTopLeft[1].s * scale_x / 4.f, -mTileTopLeft[1].t * scale_y / 4.f);
+					gsTexScale(scale_x, scale_y);*/
+#else
+					float x = (float)mTileTopLeft[1].s / 4.f;
+					float y = (float)mTileTopLeft[1].t / 4.f;
+					float w = (float)texture1->GetCorrectedWidth();
+					float h = (float)texture1->GetCorrectedHeight();
+					for (u32 i = 0; i < num_vertices; ++i)
+					{
+						p_vertices[i].Texture.x = (p_vertices[i].Texture.x * w) + x;
+						p_vertices[i].Texture.y = (p_vertices[i].Texture.y * h) + y;
+					}
+#endif
 				}
 			}
 			else
@@ -1163,7 +1495,7 @@ void RendererPS2::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoor
 #else
 	//	To be used with TRIANGLE_STRIP, which requires 40% less verts than TRIANGLE
 	//	For reference for future ports and if SPRITES( which uses %60 less verts than TRIANGLE) causes issues
-	DaedalusVtx* p_vertices = static_cast<DaedalusVtx*>(sceGuGetMemory(4 * sizeof(DaedalusVtx)));
+	DaedalusVtx* p_vertices = static_cast<DaedalusVtx*>(malloc(4 * sizeof(DaedalusVtx)));
 
 	p_vertices[0].Position.x = screen0.x;
 	p_vertices[0].Position.y = screen0.y;
@@ -1193,7 +1525,7 @@ void RendererPS2::TexRect( u32 tile_idx, const v2 & xy0, const v2 & xy1, TexCoor
 	p_vertices[3].Texture.x = uv1.x;
 	p_vertices[3].Texture.y = uv1.y;
 
-	RenderUsingCurrentBlendMode(p_vertices, 4, GS_PRIM_TRI_STRIP, GU_TRANSFORM_2D, gRDPOtherMode.depth_source ? false : true);
+	RenderUsingCurrentBlendMode(p_vertices, 4, GS_PRIM_PRIM_TRISTRIP, 0 /*GU_TRANSFORM_2D*/, gRDPOtherMode.depth_source ? false : true);
 #endif
 
 	free(p_vertices);
@@ -1319,7 +1651,9 @@ void RendererPS2::Draw2DTexture(f32 x0, f32 y0, f32 x1, f32 y1,
 								f32 u0, f32 v0, f32 u1, f32 v1,
 								const CNativeTexture * texture)
 {
-	DAEDALUS_PROFILE("RendererPSP::Draw2DTexture");
+	//DAEDALUS_PROFILE("RendererPSP::Draw2DTexture");
+
+	//printf("RendererPS2:: %s \n", __func__);
 	DaedalusVtx* p_verts = (DaedalusVtx*)malloc(4 * sizeof(DaedalusVtx));
 
 	// Enable or Disable ZBuffer test
@@ -1355,7 +1689,7 @@ void RendererPS2::Draw2DTexture(f32 x0, f32 y0, f32 x1, f32 y1,
 
 	// Handle large images (width > 512) with blitting, since the PSP HW can't handle
 	// Handling height > 512 doesn't work well? Ignore for now.
-	/*if (u1 >= 512)
+	/*if (u1 >= 1024)
 	{
 
 		Draw2DTextureBlit(x0, y0, x1, y1, u0, v0, u1, v1, texture);
@@ -1403,7 +1737,7 @@ void RendererPS2::Draw2DTextureR(f32 x0, f32 y0, f32 x1, f32 y1,
 {
 	//DAEDALUS_PROFILE("RendererPSP::Draw2DTextureR");
 
-	printf("RendererPS2::Draw2DTextureR");
+	//printf("RendererPS2::Draw2DTextureR");
 
 	DaedalusVtx* p_verts = (DaedalusVtx*)malloc(4 * sizeof(DaedalusVtx));
 

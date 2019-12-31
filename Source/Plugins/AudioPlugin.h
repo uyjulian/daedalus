@@ -43,6 +43,7 @@ public:
 	virtual EProcessResult	ProcessAList() = 0;
 #if defined(DAEDALUS_W32) || defined(DAEDALUS_PS2)
 	virtual void			Update( bool wait ) = 0;
+	virtual void			StopAudio() = 0;
 #endif
 };
 

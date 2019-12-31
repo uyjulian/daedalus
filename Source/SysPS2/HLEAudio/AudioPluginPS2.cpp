@@ -343,8 +343,10 @@ void AudioPluginPS2::StopAudio()
 	if (!mKeepRunning)
 		return;
 
-	mKeepRunning = false;
+	if (audio_open)
+		audsrv_stop_audio();
 
+	mKeepRunning = false;
 	audio_open = false;
 }
 

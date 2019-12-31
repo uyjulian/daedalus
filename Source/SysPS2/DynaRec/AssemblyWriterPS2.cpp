@@ -893,7 +893,7 @@ void	CAssemblyWriterPS2::DIV_S( EPs2FloatReg fd, EPs2FloatReg fs, EPs2FloatReg f
 
 void	CAssemblyWriterPS2::SQRT_S( EPs2FloatReg fd, EPs2FloatReg fs )
 {
-	Cop1Op( Cop1Op_SInstr, fd, fs, Cop1OpFunc_SQRT );
+	Cop1Op( Cop1Op_SInstr, fd, Ps2FloatReg_F00, Cop1OpFunc_SQRT, fs);
 }
 
 

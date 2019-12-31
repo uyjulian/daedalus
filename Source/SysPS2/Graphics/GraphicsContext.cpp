@@ -56,7 +56,7 @@ int PSP_TV_LACED = 0; // default is not interlaced
 GSGLOBAL* gsGlobal;
 GSFONTM* gsFontM;
 u32 texture_vram, clut_vram;
-int gsZMax;
+u32 gsZMax;
 
 void gsTexA()
 {
@@ -233,6 +233,9 @@ void IGraphicsContext::UpdateFrame( bool wait_for_vbl )
 	if (wait_for_vbl)
 		gsKit_vsync_wait();
 
+	gsKit_sync_flip(gsGlobal);
+	gsKit_queue_exec(gsGlobal);
+
 	if (mDumpNextScreen)
 	{
 		mDumpNextScreen--;
@@ -262,9 +265,6 @@ void IGraphicsContext::UpdateFrame( bool wait_for_vbl )
 	// Hack to semi-fix XG2, it uses setprimdepth for background and also does not clear zbuffer //Corn
 	//
 	//if (g_ROM.GameHacks == EXTREME_G2) sceGuClear(GU_DEPTH_BUFFER_BIT | GU_FAST_CLEAR_BIT);	//Clear Zbuffer
-
-	gsKit_sync_flip(gsGlobal);
-	gsKit_queue_exec(gsGlobal);
 }
 
 //*****************************************************************************
@@ -325,14 +325,7 @@ void IGraphicsContext::GetScreenSize(u32 * p_width, u32 * p_height) const
 //*****************************************************************************
 bool IGraphicsContext::Initialise()
 {
-
 	gsGlobal = gsKit_init_global();
-
-	//gsGlobal->OffsetX = (int)(2048.0f * 16.0f);
-	//gsGlobal->OffsetY = (int)(2048.0f * 16.0f);
-
-	printf("%d %d \n", gsGlobal->OffsetX, gsGlobal->OffsetY);
-
 	gsFontM = gsKit_init_fontm();
 
 
@@ -366,8 +359,6 @@ bool IGraphicsContext::Initialise()
 	// Initialize the DMAC
 	dmaKit_chan_init(DMA_CHANNEL_GIF);
 
-	printf("%d %d \n", gsGlobal->StartXOffset, (int)(2048.0f * 16.0f));
-
 	gsKit_init_screen(gsGlobal);
 
 	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
@@ -383,8 +374,6 @@ bool IGraphicsContext::Initialise()
 	gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0, 1, 0, 1, 128), 0);
 
 	gsTexA();
-
-	printf("%d %d \n", gsGlobal->StartXOffset, (int)(2048.0f * 16.0f));
 
 	// The app is ready to go
 	mInitialised = true;
