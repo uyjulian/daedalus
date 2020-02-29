@@ -27,7 +27,7 @@ PS2_UTILITY_FILES = SysPS2/Utility/IOPS2.o SysPS2/Utility/ThreadPS2.o SysPS2/Uti
 PS2_HLEAUDIO_FILES = SysPS2/HLEAudio/AudioPluginPS2.o
 PS2_DYNAREC_FILES = SysPS2/DynaRec/AssemblyUtilsPS2.o SysPS2/DynaRec/AssemblyWriterPS2.o SysPS2/DynaRec/CodeBufferManagerPS2.o SysPS2/DynaRec/CodeGeneratorPS2.o SysPS2/DynaRec/DynaRecStubs.o SysPS2/DynaRec/DynarecTargetPS2.o SysPS2/DynaRec/N64RegisterCachePS2.o 
 PS2_GRAPHICS_FILES = SysPS2/Graphics/GraphicsContext.o SysPS2/Graphics/NativeTexturePS2.o SysPS2/Graphics/DrawText.o 
-PS2_HLEGRAPHICS_FILES = SysPS2/HLEGraphics/GraphicsPluginPS2.o SysPS2/HLEGraphics/RendererPS2.o SysPS2/HLEGraphics/DisplayListDebugger.o SysPS2/HLEGraphics/Blender.o SysPS2/HLEGraphics/BlendModes.o SysPS2/HLEGraphics/ColourAdjuster.o SysPS2/HLEGraphics/Combiner/BlendConstant.o SysPS2/HLEGraphics/Combiner/CombinerExpression.o SysPS2/HLEGraphics/Combiner/CombinerTree.o SysPS2/HLEGraphics/Combiner/RenderSettings.o
+PS2_HLEGRAPHICS_FILES = SysPS2/HLEGraphics/GraphicsPluginPS2.o SysPS2/HLEGraphics/RendererPS2.o SysPS2/HLEGraphics/DisplayListDebugger.o SysPS2/HLEGraphics/Blender.o SysPS2/HLEGraphics/BlendModes.o SysPS2/HLEGraphics/ColourAdjuster.o SysPS2/HLEGraphics/Combiner/BlendConstant.o SysPS2/HLEGraphics/Combiner/CombinerExpression.o SysPS2/HLEGraphics/Combiner/CombinerTree.o SysPS2/HLEGraphics/Combiner/RenderSettings.o SysPS2/HLEGraphics/VectorClipping.o SysPS2/HLEGraphics/TnLVU0.o
 PS2_DEBUG_FILES = SysPS2/Debug/DaedalusAssertPS2.o SysPS2/Debug/DBGConsolePS2.o 
 PS2_UI_FILES = SysPS2/UI/AboutComponent.o SysPS2/UI/AdjustDeadzoneScreen.o SysPS2/UI/AdvancedOptionsScreen.o SysPS2/UI/CheatOptionsScreen.o SysPS2/UI/ColourPulser.o SysPS2/UI/Dialogs.o SysPS2/UI/GlobalSettingsComponent.o SysPS2/UI/MainMenuScreen.o SysPS2/UI/PauseOptionsComponent.o SysPS2/UI/PauseScreen.o SysPS2/UI/RomPreferencesScreen.o SysPS2/UI/RomSelectorComponent.o SysPS2/UI/SavestateSelectorComponent.o SysPS2/UI/SelectedRomComponent.o SysPS2/UI/SplashScreen.o SysPS2/UI/UICommand.o SysPS2/UI/UIComponent.o SysPS2/UI/UIContext.o SysPS2/UI/UIElement.o SysPS2/UI/UIScreen.o SysPS2/UI/UISetting.o 
 
@@ -38,7 +38,7 @@ CONFIG = Release
 
 EE_BIN 	= Daedalus.elf
 EE_INCS += -I$(PS2SDK)/ports/include -I$(PS2DEV)/gskit/include -I./SysPS2/Include -I./Config/$(CONFIG)
-EE_CXXFLAGS	= -O2 -G0 -Wall -g
+EE_CXXFLAGS	= -O2 -G0 -Wall -g -fno-rtti -fno-exceptions
 EE_LDFLAGS += -L$(PS2SDK)/ports/lib -L$(PS2DEV)/gsKit/lib
 EE_LIBS += -laudsrv -lps2time -lcdvd -lpng -lz -lfileXio -lgskit -ldmakit -lvux -lpatches -lpad -lm
 EE_OBJS = $(BUILD) $(PS2_BUILD) iomanX_irx.o fileXio_irx.o usbhdfsd_irx.o usbd_irx.o libsd_irx.o audsrv_irx.o
@@ -59,7 +59,7 @@ listen:
 strip:
 	ee-strip $(EE_BIN)
 teste:
-	ee-addr2line -e $(EE_BIN) 001ce134
+	ee-addr2line -e $(EE_BIN) 0101c14
 clean:
 	rm -f $(EE_BIN) $(EE_OBJS) *_irx.s
 

@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 
 #define MAX_THREAD 5
-#define STACK_SIZE 0x10000
+#define STACK_SIZE 0x12000
 
 extern void* _gp;
 
@@ -38,10 +38,10 @@ static bool th_inited = false;
 
 static const int	gThreadPriorities[ TP_NUM_PRIORITIES ] =
 {
-	0x19,		// TP_LOW
-	0x18,		// TP_NORMAL
-	0x17,		// TP_HIGH
-	0x16,		// TP_TIME_CRITICAL
+	63,		// TP_LOW
+	62,		// TP_NORMAL
+	61,		// TP_HIGH
+	60,		// TP_TIME_CRITICAL
 };
 
 const s32	kInvalidThreadHandle = -1;

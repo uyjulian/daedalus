@@ -291,7 +291,7 @@ inline void Write8Bits( u32 address, u8 data )		{                               
 #error No DAEDALUS_ENDIAN_MODE specified
 #endif //DAEDALUS_ENDIAN_MODE
 
-//inline void Write64Bits_NoSwizzle( u32 address, u64 data ){ MEMORY_CHECK_ALIGN( address, 8 ); *(u64 *)WriteAddress( address ) = (data>>32) + (data<<32); }
+inline void Write64Bits_NoSwizzle( u32 address, u64 data )  { MEMORY_CHECK_ALIGN( address, 8 ); *(u64 *)ReadAddress( address ) = data; }
 inline void Write32Bits_NoSwizzle( u32 address, u32 data )	{ MEMORY_CHECK_ALIGN( address, 4 ); WriteAddress(address, data); }
 inline void Write16Bits_NoSwizzle( u32 address, u16 data )	{ MEMORY_CHECK_ALIGN( address, 2 ); *(u16 *)ReadAddress(address) = data; }
 inline void Write8Bits_NoSwizzle( u32 address, u8 data )	{                                   *(u8 *)ReadAddress(address) = data;}

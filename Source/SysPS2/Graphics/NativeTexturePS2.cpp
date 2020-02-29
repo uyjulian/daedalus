@@ -34,6 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 extern GSGLOBAL* gsGlobal;
 GSTEXTURE* CurrTex;
+extern GSTEXTURE DummyTex;
 extern u32 texture_vram;
 extern u32 clut_vram;
 
@@ -53,8 +54,14 @@ u32	GetTextureBlockWidth( u32 dimension, ETextureFormat texture_format )
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT( GetNextPowerOf2( dimension ) == dimension, "This is not a power of 2" );
 	#endif
+
+	//not sure about this
+	int tbw = 16;
+	if (texture_format == TexFmt_CI4_8888 || texture_format == TexFmt_CI8_8888)
+		tbw = 8;
+
 	// Ensure that the pitch is at least 16 bytes
-	while( CalcBytesRequired( dimension, texture_format ) < 16 )
+	while( CalcBytesRequired(dimension, texture_format) < tbw )
 	{
 		dimension *= 2;
 	}
@@ -65,92 +72,13 @@ u32	GetTextureBlockWidth( u32 dimension, ETextureFormat texture_format )
 //*****************************************************************************
 //
 //*****************************************************************************
+
 u32	CorrectDimension( u32 dimension )
 {
 	static const u32 MIN_TEXTURE_DIMENSION = 1;
-	return Max( GetNextPowerOf2( dimension ), MIN_TEXTURE_DIMENSION );
+	return Max( GetNextPowerOf2(dimension), MIN_TEXTURE_DIMENSION );
 }
 
-}
-
-//*****************************************************************************
-//
-//*****************************************************************************
-inline void swizzle_fast(u8* out, const u8* in, u32 width, u32 height)
-{
-#ifdef DAEDALUS_ENABLE_ASSERTS
-	DAEDALUS_ASSERT((width & 15) == 0, "Width is not a multiple of 16 - is %d", width);
-	DAEDALUS_ASSERT((height & 7) == 0, "Height is not a multiple of 8 - is %d", height);
-#endif
-#if 1	//1->Raphaels version, 0->Original
-	u32 rowblocks = (width / 16);
-	u32 rowblocks_add = (rowblocks - 1) * 128;
-	u32 block_address = 0;
-	u32* src = (u32*)in;
-
-	for (u32 j = 0; j < height; j++, block_address += 16)
-	{
-		u32* block = (u32*)& out[block_address];
-
-		for (u32 i = 0; i < rowblocks; i++)
-		{
-			*block++ = *src++;
-			*block++ = *src++;
-			*block++ = *src++;
-			*block++ = *src++;
-			block += 28;
-		}
-
-		if ((j & 0x7) == 0x7) block_address += rowblocks_add;
-	}
-#else
-	u32 width_blocks = (width / 16);
-	u32 height_blocks = (height / 8);
-
-	u32 src_pitch = (width - 16) / 4;
-	u32 src_row = width * 8;
-
-	const u8* ysrc = in;
-	u32* dst = (u32*)out;
-
-	for (u32 blocky = 0; blocky < height_blocks; ++blocky)
-	{
-		const u8* xsrc = ysrc;
-		for (u32 blockx = 0; blockx < width_blocks; ++blockx)
-		{
-			const u32* src = (u32*)xsrc;
-			for (u32 j = 0; j < 8; ++j)
-			{
-				*(dst++) = *(src++);
-				*(dst++) = *(src++);
-				*(dst++) = *(src++);
-				*(dst++) = *(src++);
-				src += src_pitch;
-			}
-			xsrc += 16;
-		}
-		ysrc += src_row;
-	}
-#endif
-}
-
-//*****************************************************************************
-//
-//*****************************************************************************
-inline bool swizzle(u8* out, const u8* in, u32 width, u32 height)
-{
-	if (width < 16 || height < 8)
-	{
-		//swizzle_slow( out, in, width, height );
-
-		memcpy(out, in, width * height);
-		return false;
-	}
-	else
-	{
-		swizzle_fast(out, in, width, height);
-		return true;
-	}
 }
 
 //*****************************************************************************
@@ -173,18 +101,11 @@ CNativeTexture::CNativeTexture( u32 w, u32 h, ETextureFormat texture_format )
 ,	mTextureBlockWidth( GetTextureBlockWidth( mCorrectedWidth, texture_format ) )
 ,	mpPalette( nullptr )
 ,	mTextureConv( false )
-//,	mIsPaletteVidMem( false )
-//,	mIsSwizzled( true )
-#ifdef DAEDALUS_ENABLE_ASSERTS
-//,	mPaletteSet( false )
-#endif
 {
-	//mScale.x = 1.0f / mCorrectedWidth;
-	//mScale.y = 1.0f / mCorrectedHeight;
+	mScale.x = 1.0f / (f32)mCorrectedWidth;
+	mScale.y = 1.0f / (f32)mCorrectedHeight;
 
-	//printf("CNativeTexture::CNativeTexture w %d h %d p %d w %d h %d\n", mCorrectedWidth, mCorrectedHeight, texture_format, w, h);
-
-	u32		bytes_required(GetBytesRequired());
+	u32 bytes_required = GetBytesRequired();
 
 	switch (texture_format)
 	{
@@ -194,8 +115,6 @@ CNativeTexture::CNativeTexture( u32 w, u32 h, ETextureFormat texture_format )
 			break;
 		case TexFmt_CI4_8888:	mTexturePs2.PSM = GS_PSM_T4;
 			break;
-		/*case TexFmt_CI4_8888:	mTexturePs2.PSM = GS_PSM_CT32;
-			break;*/
 		case TexFmt_CI8_8888:	mTexturePs2.PSM = GS_PSM_T8;
 			break;
 		case TexFmt_4444:		mTexturePs2.PSM = GS_PSM_CT32;
@@ -207,15 +126,22 @@ CNativeTexture::CNativeTexture( u32 w, u32 h, ETextureFormat texture_format )
 			break;
 	}
 
-	mTexturePs2.Height = mCorrectedHeight;
 	mTexturePs2.Width = mCorrectedWidth;
+	mTexturePs2.Height = mCorrectedHeight;
+	mTexturePs2.Filter = GS_FILTER_LINEAR;
+
 	mpData = mTexturePs2.Mem = (u32*)memalign(128, bytes_required);
 	mTexturePs2.Vram = texture_vram;
 
 	if (!mpData)
 	{
-		printf("CNativeTexture::CNativeTexture: out of memory!\n");
-		while (1);
+		printf("CNativeTexture::CNativeTexture: out of memory for texture!\n");
+
+		/*mpData = DummyTex.Mem;
+		mCorrectedWidth = DummyTex.Width;
+		mCorrectedHeight = DummyTex.Height;
+		mTextureBlockWidth = GetTextureBlockWidth(mCorrectedWidth, texture_format);*/
+		return;
 	}
 	else
 	{
@@ -231,8 +157,8 @@ CNativeTexture::CNativeTexture( u32 w, u32 h, ETextureFormat texture_format )
 
 		if (!mpPalette)
 		{
-			printf("CNativeTexture::CNativeTexture: out of memory!\n");
-			while (1);
+			printf("CNativeTexture::CNativeTexture: out of memory for clut!\n");
+			return;
 		}
 		else
 		{
@@ -241,8 +167,6 @@ CNativeTexture::CNativeTexture( u32 w, u32 h, ETextureFormat texture_format )
 	}
 
 	gsKit_setup_tbw(&mTexturePs2);
-
-	//printf("Vram: %d size_ee %d size_gs %d\n", mTexturePs2.Vram, bytes_required, gsKit_texture_size(mTexturePs2.Width, mTexturePs2.Height, mTexturePs2.PSM));
 }
 
 //*****************************************************************************
@@ -250,8 +174,6 @@ CNativeTexture::CNativeTexture( u32 w, u32 h, ETextureFormat texture_format )
 //*****************************************************************************
 CNativeTexture::~CNativeTexture()
 {
-	//printf("CNativeTexture::~CNativeTexture\n");
-	
 	if(mpData)
 		free(mpData);
 	
@@ -272,33 +194,32 @@ bool	CNativeTexture::HasData() const
 //*****************************************************************************
 void	CNativeTexture::InstallTexture() const
 {
-	//printf("CNativeTexture::InstallTexture: w %d h %d psm %d\n", mTexturePs2.Width, mTexturePs2.Height, mTexturePs2.PSM);
-	
-	u32		bytes_required(GetBytesRequired());
-	u8 clut = GS_CLUT_NONE;
+	u32 bytes_required = GetBytesRequired();
 
-	if (HasData())
+	if (!HasData())
 	{
+		CurrTex = (GSTEXTURE*)&DummyTex;
+	}
+	else
+	{
+		CurrTex = (GSTEXTURE*)&mTexturePs2;
+
 		if (mTexturePs2.PSM == GS_PSM_CT32 && mTextureConv)
 			bytes_required *= 2;
-
-		CurrTex = (GSTEXTURE*)& mTexturePs2;
 
 		if (mTexturePs2.PSM == GS_PSM_T8)
 		{
 			SyncDCache(mTexturePs2.Clut, (u8*)mTexturePs2.Clut + kPalette8BytesRequired);
 			gsKit_texture_send_inline(gsGlobal, mTexturePs2.Clut, 16, 16, mTexturePs2.VramClut, mTexturePs2.ClutPSM, 1, GS_CLUT_PALLETE);
-			//clut = GS_CLUT_TEXTURE;
 		}
 		else if (mTexturePs2.PSM == GS_PSM_T4)
 		{
 			SyncDCache(mTexturePs2.Clut, (u8*)mTexturePs2.Clut + kPalette8BytesRequired);
 			gsKit_texture_send_inline(gsGlobal, mTexturePs2.Clut, 8, 2, mTexturePs2.VramClut, mTexturePs2.ClutPSM, 1, GS_CLUT_PALLETE);
-			//clut = GS_CLUT_TEXTURE;
 		}
 
 		SyncDCache(mTexturePs2.Mem, (u8*)mTexturePs2.Mem + bytes_required);
-		gsKit_texture_send_inline(gsGlobal, mTexturePs2.Mem, mTexturePs2.Width, mTexturePs2.Height, mTexturePs2.Vram, mTexturePs2.PSM, mTexturePs2.TBW, clut);
+		gsKit_texture_send_inline(gsGlobal, mTexturePs2.Mem, mTexturePs2.Width, mTexturePs2.Height, mTexturePs2.Vram, mTexturePs2.PSM, mTexturePs2.TBW, GS_CLUT_NONE);
 	}
 }
 
@@ -393,11 +314,11 @@ namespace
 			return nullptr;
 		}
 
-		if ( setjmp( png_jmpbuf(p_png_struct) ) != 0 )
+		/*if ( setjmp( png_jmpbuf(p_png_struct) ) != 0 )
 		{
 			png_destroy_read_struct( &p_png_struct, nullptr, nullptr );
 			return nullptr;
-		}
+		}*/
 
 		png_init_io( p_png_struct, fh );
 		png_set_sig_bytes( p_png_struct, SIGNATURE_SIZE );
@@ -482,8 +403,6 @@ void	CNativeTexture::SetData( void * data, void * palette )
 	size_t data_len = GetBytesRequired();
 	u32 i;
 
-	//printf("CNativeTexture::SetData %d w %d h %d\n", data_len, mTexturePs2.Width, mTexturePs2.Height);
-
 	if (HasData())
 	{
 		u32 r, g, b, a;
@@ -492,42 +411,24 @@ void	CNativeTexture::SetData( void * data, void * palette )
 		u32* mem32 = (u32*)mTexturePs2.Mem;
 		u8* dat = (u8*)data;
 		u8* pal = (u8*)palette;
-		u8 clut = GS_CLUT_NONE;
 
 		memcpy(mpData, data, data_len);
 		
-		if (mTexturePs2.PSM == GS_PSM_T8)
+		if (mTexturePs2.PSM == GS_PSM_T4)
 		{
-			//printf("psm8\n");
-
-			for (i = 0; i < 256; i++)
-			{
-				mTexturePs2.Clut[i] = (u32)pal[i * 4 + 0] | (u32)pal[i * 4 + 1] << 8 | (u32)pal[i * 4 + 2] << 16 | ((u32)pal[i * 4 + 3] >> 1) << 24;
-			}
-
-			for (i = 0; i < 256; i++)
-			{
-				if ((i & 0x18) == 8)
-				{
-					u32 tmp = mTexturePs2.Clut[i];
-					mTexturePs2.Clut[i] = mTexturePs2.Clut[i + 8];
-					mTexturePs2.Clut[i + 8] = tmp;
-				}
-			}
-
-			//SyncDCache(mTexturePs2.Clut, (u8*)mTexturePs2.Clut + kPalette8BytesRequired);
-			//gsKit_texture_send_inline(gsGlobal, mTexturePs2.Clut, 16, 16, mTexturePs2.VramClut, mTexturePs2.ClutPSM, 1, GS_CLUT_PALLETE);
-			//clut = GS_CLUT_TEXTURE;
-		}
-		else if (mTexturePs2.PSM == GS_PSM_T4)
-		{
-			//printf("psm4\n");
 			for (i = 0; i < 16; i++)
 			{
-				mTexturePs2.Clut[i] = (u32)pal[i * 4 + 0] | (u32)pal[i * 4 + 1] << 8 | (u32)pal[i * 4 + 2] << 16 | ((u32)pal[i * 4 + 3] >> 1) << 24;
+				mTexturePs2.Clut[i] = (u32)pal[i * 4 + 0] | (u32)pal[i * 4 + 1] << 8 | (u32)pal[i * 4 + 2] << 16 | (((u32)pal[i * 4 + 3] + 1) / 2) << 24;
+			}
+		}
+		else if (mTexturePs2.PSM == GS_PSM_T8)
+		{
+			for (i = 0; i < 256; i++)
+			{
+				mTexturePs2.Clut[i] = (u32)pal[i * 4 + 0] | (u32)pal[i * 4 + 1] << 8 | (u32)pal[i * 4 + 2] << 16 | (((u32)pal[i * 4 + 3] + 1) / 2) << 24;
 			}
 
-			/*for (i = 0; i < 32; i++)
+			for (i = 0; i < 256; i++)
 			{
 				if ((i & 0x18) == 8)
 				{
@@ -535,16 +436,11 @@ void	CNativeTexture::SetData( void * data, void * palette )
 					mTexturePs2.Clut[i] = mTexturePs2.Clut[i + 8];
 					mTexturePs2.Clut[i + 8] = tmp;
 				}
-			}*/
-
-			//SyncDCache(mTexturePs2.Clut, (u8*)mTexturePs2.Clut + kPalette8BytesRequired);
-			//gsKit_texture_send_inline(gsGlobal, mTexturePs2.Clut, 8, 2, mTexturePs2.VramClut, mTexturePs2.ClutPSM, 1, GS_CLUT_PALLETE);
-			//clut = GS_CLUT_TEXTURE;
+			}
 		}
-
-		if (mTextureConv)
+		else if (mTexturePs2.PSM == GS_PSM_CT16)
 		{
-			if (mTexturePs2.PSM == GS_PSM_CT16) //565
+			if (mTextureConv)  //565
 			{
 				for (i = 0; i < mTexturePs2.Width * mTexturePs2.Height; i++)
 				{
@@ -555,7 +451,10 @@ void	CNativeTexture::SetData( void * data, void * palette )
 					mem16[i] = r | g << 5 | b << 10 | a << 15;
 				}
 			}
-			else if (mTexturePs2.PSM == GS_PSM_CT32) //4444
+		}
+		else if (mTexturePs2.PSM == GS_PSM_CT32)
+		{
+			if (mTextureConv) //4444
 			{
 				for (i = 0; i < mTexturePs2.Width * mTexturePs2.Height; i++)
 				{
@@ -564,52 +463,19 @@ void	CNativeTexture::SetData( void * data, void * palette )
 					b = ((dat[i * 2 + 1]) & 0xF) << 4;
 					a = ((dat[i * 2 + 1] >> 4) & 0xF) << 4;
 
-					mem32[i] = r | g << 8 | b << 16 | (a >> 1) << 24;
+					mem32[i] = r | g << 8 | b << 16 | ((a + 1) / 2) << 24;
 				}
 
 				data_len *= 2;
 			}
-		}
-		else
-		{
-			/*if(mTextureFormat == TexFmt_CI4_8888)
-			{
-						// Convert palletised texture to non-palletised. This is wsteful - we should avoid generating these updated for OSX.
-						const NativePfCI44* pix_ptr = static_cast<const NativePfCI44*>(data);
-						const NativePf8888* pal_ptr = static_cast<const NativePf8888*>(palette);
-
-						NativePf8888* out = static_cast<NativePf8888*>((void *)mTexturePs2.Mem);
-						NativePf8888* out_ptr = out;
-
-						u32 pitch = GetStride();
-
-						for (u32 y = 0; y < mCorrectedHeight; ++y)
-						{
-							for (u32 x = 0; x < mCorrectedWidth; ++x)
-							{
-								NativePfCI44	colors = pix_ptr[x / 2];
-								u8				pal_idx = (x & 1) ? colors.GetIdxA() : colors.GetIdxB();
-
-								*out_ptr = pal_ptr[pal_idx];
-								out_ptr++;
-							}
-
-							pix_ptr = reinterpret_cast<const NativePfCI44*>(reinterpret_cast<const u8*>(pix_ptr) + pitch);
-						}
-			}*/
-			
-
-			if (mTexturePs2.PSM == GS_PSM_CT32)
+			else
 			{
 				for (i = 3; i < mTexturePs2.Width * mTexturePs2.Height * 4; i += 4)
 				{
-					mem8[i] = mem8[i] >> 1;
+					mem8[i] = ((u32)mem8[i] + 1) / 2;
 				}
 			}
 		}
-
-		//SyncDCache(mTexturePs2.Mem, (u8*)mTexturePs2.Mem + data_len);
-		//gsKit_texture_send_inline(gsGlobal, mTexturePs2.Mem, mTexturePs2.Width, mTexturePs2.Height, mTexturePs2.Vram, mTexturePs2.PSM, mTexturePs2.TBW, clut);
 	}
 }
 

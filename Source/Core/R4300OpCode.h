@@ -54,6 +54,7 @@ enum OpCodeValue {
 	OP_LDL			= 26,
 	OP_LDR			= 27,
 	OP_PATCH		= 28,	//hack OP
+	OP_MMI			= 28,
 	OP_SRHACK_UNOPT = 29,	//hack OP
 	OP_SRHACK_OPT   = 30,	//hack OP
 	OP_SRHACK_NOOPT = 31,	//hack OP
@@ -162,6 +163,24 @@ enum ESpecOp
 	SpecOp_DSRA32			= 63,
 
 };
+
+#ifdef DAEDALUS_PS2
+
+enum EMMIType
+{
+	MMI0					= 8,
+	MMI2					= 9,
+	MMI3					= 41,
+};
+
+enum EMMIOp
+{
+	MMI_PCPYLD				= 14 << 6 | MMI2,
+	MMI_PEXTLW				= 18 << 6 | MMI0,
+	MMI_PEXEW				= 30 << 6 | MMI2,
+	MMI_PEXCW				= 30 << 6 | MMI3,
+};
+#endif
 
 enum ERegImmOp
 {

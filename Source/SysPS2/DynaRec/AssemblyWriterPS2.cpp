@@ -95,6 +95,44 @@ void	CAssemblyWriterPS2::LoadConstant( EPs2Reg reg, s32 value )
 
 //
 
+void	CAssemblyWriterPS2::LoadConstant64( EPs2Reg reg, s64 value )
+{
+	Ps2OpCode	op1;
+	Ps2OpCode	op2;
+	REG64 tmp;
+
+	if (value >= INT_MIN && value <= INT_MAX)
+	{
+		LoadConstant( reg, value );
+	} 
+	else
+	{
+		tmp._s64 = value;
+		LoadConstant(reg, tmp._s32_1);
+
+		op1.mmi_op = MMI_PCPYLD;
+		op1.rs = reg;
+		op1.rt = Ps2Reg_R0;
+		op1.rd = reg;
+		op1.op = OP_MMI;
+
+		AppendOp( op1 );
+
+		LoadConstant(reg, tmp._s32_0);
+
+		op2._u32 = 0;
+		op2.mmi_op = MMI_PEXCW;
+		op2.rt = reg;
+		op2.rd = reg;
+		op2.op = OP_MMI;
+
+		AppendOp( op2 );
+	}
+}
+
+
+//
+
 void	CAssemblyWriterPS2::LoadRegister( EPs2Reg reg_dst, OpCodeValue load_op, EPs2Reg reg_base, s16 offset )
 {
 	Ps2OpCode		op_code;
@@ -127,11 +165,45 @@ void	CAssemblyWriterPS2::StoreRegister( EPs2Reg reg_src, OpCodeValue store_op, E
 
 //
 
+void	CAssemblyWriterPS2::Exchange64( EPs2Reg reg )
+{
+	Ps2OpCode		op_code;
+	
+	op_code._u32 = 0;
+	op_code.mmi_op = MMI_PEXTLW;
+	op_code.rs = reg;
+	op_code.rt = reg;
+	op_code.rd = reg;
+	op_code.op = OP_MMI;
+
+	AppendOp( op_code );
+
+	op_code._u32 = 0;
+	op_code.mmi_op = MMI_PEXEW;
+	op_code.rs = Ps2Reg_R0;
+	op_code.rt = reg;
+	op_code.rd = reg;
+	op_code.op = OP_MMI;
+
+	AppendOp( op_code );
+}
+
+
+//
+
 void	CAssemblyWriterPS2::NOP()
 {
 	Ps2OpCode		op_code;
 	op_code._u32 = 0;
 	AppendOp( op_code );
+}
+
+
+//
+
+void	CAssemblyWriterPS2::SD( EPs2Reg reg_src, EPs2Reg reg_base, s16 offset )
+{
+	StoreRegister( reg_src, OP_SD, reg_base, offset );
 }
 
 
@@ -198,6 +270,13 @@ void	CAssemblyWriterPS2::LW( EPs2Reg reg_dst, EPs2Reg reg_base, s16 offset )
 	LoadRegister( reg_dst, OP_LW, reg_base, offset );
 }
 
+
+//
+
+void	CAssemblyWriterPS2::LD( EPs2Reg reg_dst, EPs2Reg reg_base, s16 offset )
+{
+	LoadRegister( reg_dst, OP_LD, reg_base, offset );
+}
 
 //
 
@@ -498,37 +577,33 @@ void	CAssemblyWriterPS2::SLTIU( EPs2Reg reg_dst, EPs2Reg reg_src, s16 value )
 }
 
 
-//EXTract bit field. 0 >= pos/size <= 31  //Corn
-/*
-void	CAssemblyWriterPS2::EXT( EPs2Reg reg_dst, EPs2Reg reg_src, u32 size, u32 lsb )
+//
+
+void	CAssemblyWriterPS2::DADDI(EPs2Reg reg_dst, EPs2Reg reg_src, s16 value)
 {
 	Ps2OpCode	op_code;
 	op_code._u32 = 0;
-	op_code.op = 0x1F;
+	op_code.op = OP_DADDI;
 	op_code.rt = reg_dst;
 	op_code.rs = reg_src;
-	op_code.rd = size;	// = MSB - LSB
-	op_code.sa = lsb;	// = LSB
-	op_code.spec_op = 0;
-	AppendOp( op_code );
+	op_code.immediate = value;
+	AppendOp(op_code);
 }
 
 
-//INSert bit field. 0 >= pos/size <= 31 //Corn
+//
 
-void	CAssemblyWriterPS2::INS( EPs2Reg reg_dst, EPs2Reg reg_src, u32 msb, u32 lsb )
+void	CAssemblyWriterPS2::DADDIU(EPs2Reg reg_dst, EPs2Reg reg_src, s16 value)
 {
 	Ps2OpCode	op_code;
 	op_code._u32 = 0;
-	op_code.op = 0x1F;
+	op_code.op = OP_DADDIU;
 	op_code.rt = reg_dst;
 	op_code.rs = reg_src;
-	op_code.rd = msb;	// = MSB
-	op_code.sa = lsb;	// = LSB
-	op_code.spec_op = 4;
-	AppendOp( op_code );
+	op_code.immediate = value;
+	AppendOp(op_code);
 }
-*/
+
 
 //
 
@@ -619,6 +694,96 @@ void	CAssemblyWriterPS2::SRA( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift )
 
 //
 
+void	CAssemblyWriterPS2::DSLL( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift )
+{
+	Ps2OpCode	op_code;
+	op_code._u32 = 0;
+	op_code.op = OP_SPECOP;
+	op_code.rd = reg_dst;
+	op_code.rt = reg_src;
+	op_code.sa = shift;
+	op_code.spec_op = SpecOp_DSLL;
+	AppendOp( op_code );
+}
+
+
+//
+
+void	CAssemblyWriterPS2::DSLL32( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift )
+{
+	Ps2OpCode	op_code;
+	op_code._u32 = 0;
+	op_code.op = OP_SPECOP;
+	op_code.rd = reg_dst;
+	op_code.rt = reg_src;
+	op_code.sa = shift;
+	op_code.spec_op = SpecOp_DSLL32;
+	AppendOp( op_code );
+}
+
+
+//
+
+void	CAssemblyWriterPS2::DSRL( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift )
+{
+	Ps2OpCode	op_code;
+	op_code._u32 = 0;
+	op_code.op = OP_SPECOP;
+	op_code.rd = reg_dst;
+	op_code.rt = reg_src;
+	op_code.sa = shift;
+	op_code.spec_op = SpecOp_DSRL;
+	AppendOp( op_code );
+}
+
+
+//
+
+void	CAssemblyWriterPS2::DSRL32( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift )
+{
+	Ps2OpCode	op_code;
+	op_code._u32 = 0;
+	op_code.op = OP_SPECOP;
+	op_code.rd = reg_dst;
+	op_code.rt = reg_src;
+	op_code.sa = shift;
+	op_code.spec_op = SpecOp_DSRL32;
+	AppendOp( op_code );
+}
+
+
+//
+
+void	CAssemblyWriterPS2::DSRA( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift )
+{
+	Ps2OpCode	op_code;
+	op_code._u32 = 0;
+	op_code.op = OP_SPECOP;
+	op_code.rd = reg_dst;
+	op_code.rt = reg_src;
+	op_code.sa = shift;
+	op_code.spec_op = SpecOp_DSRA;
+	AppendOp( op_code );
+}
+
+
+//
+
+void	CAssemblyWriterPS2::DSRA32( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift )
+{
+	Ps2OpCode	op_code;
+	op_code._u32 = 0;
+	op_code.op = OP_SPECOP;
+	op_code.rd = reg_dst;
+	op_code.rt = reg_src;
+	op_code.sa = shift;
+	op_code.spec_op = SpecOp_DSRA32;
+	AppendOp( op_code );
+}
+
+
+//
+
 void	CAssemblyWriterPS2::SpecOpLogical( EPs2Reg rd, EPs2Reg rs, ESpecOp op, EPs2Reg rt )
 {
 	Ps2OpCode	op_code;
@@ -652,7 +817,31 @@ void	CAssemblyWriterPS2::SRLV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
 
 void	CAssemblyWriterPS2::SRAV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
 {
-	SpecOpLogical( rd, rs, SpecOp_SRAV, rt );
+	SpecOpLogical( rd, rs, SpecOp_DSRAV, rt );
+}
+
+
+//RD = RT << RS
+
+void	CAssemblyWriterPS2::DSLLV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
+{
+	SpecOpLogical( rd, rs, SpecOp_DSLLV, rt );
+}
+
+
+//RD = RT >> RS
+
+void	CAssemblyWriterPS2::DSRLV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
+{
+	SpecOpLogical( rd, rs, SpecOp_DSRLV, rt );
+}
+
+
+//RD = RT >> RS
+
+void	CAssemblyWriterPS2::DSRAV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
+{
+	SpecOpLogical( rd, rs, SpecOp_DSRAV, rt );
 }
 
 
@@ -722,6 +911,22 @@ void	CAssemblyWriterPS2::ADDU( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
 
 //
 
+void	CAssemblyWriterPS2::DADD( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
+{
+	SpecOpLogical(rd, rs, SpecOp_DADD, rt);
+}
+
+
+//
+
+void	CAssemblyWriterPS2::DADDU( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
+{
+	SpecOpLogical( rd, rs, SpecOp_DADDU, rt );
+}
+
+
+//
+
 void	CAssemblyWriterPS2::SUB( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
 {
 	SpecOpLogical( rd, rs, SpecOp_SUB, rt );
@@ -733,6 +938,22 @@ void	CAssemblyWriterPS2::SUB( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
 void	CAssemblyWriterPS2::SUBU( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
 {
 	SpecOpLogical( rd, rs, SpecOp_SUBU, rt );
+}
+
+
+//
+
+void	CAssemblyWriterPS2::DSUB( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
+{
+	SpecOpLogical( rd, rs, SpecOp_DSUB, rt );
+}
+
+
+//
+
+void	CAssemblyWriterPS2::DSUBU( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
+{
+	SpecOpLogical( rd, rs, SpecOp_DSUBU, rt );
 }
 
 
@@ -921,21 +1142,6 @@ void	CAssemblyWriterPS2::NEG_S( EPs2FloatReg fd, EPs2FloatReg fs )
 }
 
 
-//
-/*
-void	CAssemblyWriterPS2::TRUNC_W_S( EPs2FloatReg fd, EPs2FloatReg fs )
-{
-	Cop1Op( Cop1Op_SInstr, fd, fs, Cop1OpFunc_TRUNC_W );
-}
-
-
-//
-
-void	CAssemblyWriterPS2::FLOOR_W_S( EPs2FloatReg fd, EPs2FloatReg fs )
-{
-	Cop1Op( Cop1Op_SInstr, fd, fs, Cop1OpFunc_FLOOR_W );
-}
-*/
 //
 
 void	CAssemblyWriterPS2::CVT_W_S( EPs2FloatReg fd, EPs2FloatReg fs )

@@ -51,6 +51,9 @@
 #include "Math/Math.h"	// VFPU Math
 #include "Math/MathUtil.h"
 
+#include <libpad.h>
+#include <gsKit.h>
+
 using std::sort;
 
 //*****************************************************************************
@@ -69,6 +72,21 @@ extern u32 gNumInstructionsExecuted;
 static bool	gDebugDisplayList = false;
 static bool	gSingleStepFrames = false;
 
+extern GSGLOBAL* gsGlobal;
+extern GSTEXTURE* CurrTex;
+extern GSFONTM* gsFontM;
+
+extern void gsTexWrap(int u, int v);
+extern void gsTexFunc(int func, int mode);
+
+#define GS_TFX_MODULATE 0
+#define GS_TFX_DECAL 1
+#define GS_TFX_REPLACE 2
+#define GS_TFX_ADD 3
+#define GS_TFX_BLEND 4
+
+#define GS_TCC_RGB 0
+#define GS_TCC_RGBA 1
 
 class CDisplayListDebugger
 {
@@ -205,7 +223,7 @@ CCombinerExplorerDebugMenuOption::CCombinerExplorerDebugMenuOption()
 
 void CCombinerExplorerDebugMenuOption::Display() const
 {
-	/*const std::set< u64 > & combiner_states( gRendererPSP->GetRecordedCombinerStates() );
+	const std::set< u64 > & combiner_states( gRendererPS2->GetRecordedCombinerStates() );
 
 	printf( "   Use [] to return\n" );
 	printf( "   Use O to select on/off\n" );
@@ -224,10 +242,10 @@ void CCombinerExplorerDebugMenuOption::Display() const
 		u64		state( *it );
 
 		bool	selected( idx == mSelectedIdx );
-		bool	disabled( gRendererPSP->IsCombinerStateDisabled( state ) );
-		//bool	unhandled( gRendererPSP->IsCombinerStateUnhandled( state ) );
-		bool	forced( gRendererPSP->IsCombinerStateForced( state ) );
-		bool	idefault( gRendererPSP->IsCombinerStateDefault( state ) );
+		bool	disabled( gRendererPS2->IsCombinerStateDisabled( state ) );
+		//bool	unhandled( gRendererPS2->IsCombinerStateUnhandled( state ) );
+		bool	forced( gRendererPS2->IsCombinerStateForced( state ) );
+		bool	idefault( gRendererPS2->IsCombinerStateDefault( state ) );
 		const char *	text_col;
 
 		if(selected)
@@ -263,7 +281,7 @@ void CCombinerExplorerDebugMenuOption::Display() const
 	{
 		DLDebug_PrintMux( stdout, selected_mux );
 
-		RendererPSP::SBlendStateEntry entry1( gRendererPSP->LookupBlendState( selected_mux, false ) );
+		RendererPS2::SBlendStateEntry entry1( gRendererPS2->LookupBlendState( selected_mux, false ) );
 		if( entry1.OverrideFunction != nullptr )
 		{
 			printf( "1 Cycle: Overridden\n" );
@@ -274,7 +292,7 @@ void CCombinerExplorerDebugMenuOption::Display() const
 			entry1.States->Print();
 		}
 
-		RendererPSP::SBlendStateEntry	entry2( gRendererPSP->LookupBlendState( selected_mux, true ) );
+		RendererPS2::SBlendStateEntry	entry2( gRendererPS2->LookupBlendState( selected_mux, true ) );
 		if( entry2.OverrideFunction != nullptr )
 		{
 			printf( "2 Cycles: Overridden\n" );
@@ -285,12 +303,12 @@ void CCombinerExplorerDebugMenuOption::Display() const
 			entry2.States->Print();
 		}
 
-	}*/
+	}
 }
 
 void CCombinerExplorerDebugMenuOption::Update( const SPspPadState & pad_state, float elapsed_time )
 {
-	/*const std::set< u64 > & combiner_states( gRendererPSP->GetRecordedCombinerStates() );
+	const std::set< u64 > & combiner_states( gRendererPS2->GetRecordedCombinerStates() );
 
 	u32		idx( 0 );
 	u64		selected_state( 0 );
@@ -307,36 +325,36 @@ void CCombinerExplorerDebugMenuOption::Update( const SPspPadState & pad_state, f
 
 	if(pad_state.OldButtons != pad_state.NewButtons)
 	{
-		if(pad_state.NewButtons & PSP_CTRL_UP)
+		if(pad_state.NewButtons & PAD_UP)
 		{
 			mSelectedIdx = (mSelectedIdx > 0) ? mSelectedIdx - 1 : mSelectedIdx;
 			InvalidateDisplay();
 		}
-		if(pad_state.NewButtons & PSP_CTRL_DOWN)
+		if(pad_state.NewButtons & PAD_DOWN)
 		{
 			mSelectedIdx = (mSelectedIdx < state_count-1) ? mSelectedIdx + 1 : mSelectedIdx;
 			InvalidateDisplay();
 		}
 
-		if(pad_state.NewButtons & PSP_CTRL_TRIANGLE)
+		if(pad_state.NewButtons & PAD_TRIANGLE)
 		{
 			if(selected_state != 0)
 			{
-				gRendererPSP->ToggleDisableCombinerState( selected_state );
-				gRendererPSP->ToggleNastyTexture( true );
+				gRendererPS2->ToggleDisableCombinerState( selected_state );
+				gRendererPS2->ToggleNastyTexture( true );
 				InvalidateDisplay();
 			}
 		}
 
-		if(pad_state.NewButtons & PSP_CTRL_CIRCLE)
+		if(pad_state.NewButtons & PAD_CIRCLE)
 		{
 			if(selected_state != 0)
 			{
-				gRendererPSP->ToggleDisableCombinerState( selected_state );
+				gRendererPS2->ToggleDisableCombinerState( selected_state );
 				InvalidateDisplay();
 			}
 		}
-	}*/
+	}
 }
 
 //*****************************************************************************
@@ -366,7 +384,7 @@ CBlendDebugMenuOption::CBlendDebugMenuOption()
 
 void CBlendDebugMenuOption::Display() const
 {
-	/*const char * const ForceColor[8] =
+	const char * const ForceColor[8] =
 	{
 		"( OFF )",
 		"( c32::White )",
@@ -459,44 +477,44 @@ void CBlendDebugMenuOption::Display() const
 	printf( "   %s%cdetails.ColourAdjuster.SetRGB%s\n", BLEND_SELECTION(13), ForceColor[gDBlend.ForceRGB]);
 	printf( "%s\n", TERMINAL_WHITE );
 
-#undef BLEND_SELECTION*/
+#undef BLEND_SELECTION
 }
 
 void CBlendDebugMenuOption::Update( const SPspPadState & pad_state, float elapsed_time )
 {
 
-	/*if(pad_state.OldButtons != pad_state.NewButtons)
+	if(pad_state.OldButtons != pad_state.NewButtons)
 	{
-		if(pad_state.NewButtons & PSP_CTRL_UP)
+		if(pad_state.NewButtons & PAD_UP)
 		{
 			mSel = (mSel > 0) ? mSel - 1 : mSel;
 			modify = 0;
 		}
 
-		if(pad_state.NewButtons & PSP_CTRL_DOWN)
+		if(pad_state.NewButtons & PAD_DOWN)
 		{
 			mSel = (mSel < 13) ? mSel + 1 : mSel;	//Number of menu rows
 			modify = 0;
 		}
 
-		if(pad_state.NewButtons & PSP_CTRL_LEFT)
+		if(pad_state.NewButtons & PAD_LEFT)
 		{
 			mIdx = (mIdx > 0) ? mIdx - 1 : mIdx;	//min select
 		}
 
-		if(pad_state.NewButtons & PSP_CTRL_RIGHT)
+		if(pad_state.NewButtons & PAD_RIGHT)
 		{
 			mIdx = (mIdx < 9) ? mIdx + 1 : mIdx;	//max select
 		}
 
-		if(pad_state.NewButtons & PSP_CTRL_CROSS)
+		if(pad_state.NewButtons & PAD_CROSS)
 		{
 			modify ^= true;
 		}
 
 		InvalidateDisplay();
 
-	}*/
+	}
 }
 
 //*****************************************************************************
@@ -597,7 +615,7 @@ DAEDALUS_STATIC_ASSERT( sizeof(TextureVtx) == 20 );
 
 bool CTextureExplorerDebugMenuOption::OverrideDisplay() const
 {
-	/*if( !mDisplayTexture )
+	if( !mDisplayTexture )
 		return false;
 
 	CRefPtr<CNativeTexture> texture;
@@ -615,44 +633,65 @@ bool CTextureExplorerDebugMenuOption::OverrideDisplay() const
 
 	CGraphicsContext::Get()->BeginFrame();
 
-	sceGuDisable(GU_DEPTH_TEST);
+	/*sceGuDisable(GU_DEPTH_TEST);
 	sceGuDepthMask( GL_TRUE );	// GL_TRUE to disable z-writes
-	sceGuShadeModel( GU_FLAT );
+	sceGuShadeModel( GU_FLAT );*/
+	gsKit_set_test(gsGlobal, GS_ZTEST_OFF);
 
-	sceGuTexFilter(GU_NEAREST,GU_NEAREST);
+	/*sceGuTexFilter(GU_NEAREST,GU_NEAREST);
 	sceGuTexScale(1.0f,1.0f);
 	sceGuTexOffset(0.0f,0.0f);
 	sceGuDisable(GU_ALPHA_TEST);
-	sceGuTexFunc(GU_TFX_REPLACE,GU_TCC_RGBA);
+	sceGuTexFunc(GU_TFX_REPLACE,GU_TCC_RGBA);*/
+	if (CurrTex)
+		CurrTex->Filter = GS_FILTER_LINEAR;
+	
+	gsKit_set_test(gsGlobal, GS_ATEST_OFF);
+	gsTexFunc(GS_TFX_REPLACE, GS_TCC_RGBA);
 
 	sceGuSetMatrix( GU_PROJECTION, reinterpret_cast< const ScePspFMatrix4 * >( &gMatrixIdentity ) );
 
-	const f32		screen_width( 480.0f );
-	const f32		screen_height( 272.0f );
+	const f32		screen_width( 640.0f );
+	const f32		screen_height( 480.0f );
 
 	if ( mCheckerTexture != nullptr )
 	{
-		u32				num_verts( 2 );
-		TextureVtx*	p_verts = (TextureVtx*)sceGuGetMemory(num_verts*sizeof(TextureVtx));
+		//u32				num_verts( 2 );
+		//TextureVtx*	p_verts = (TextureVtx*)sceGuGetMemory(num_verts*sizeof(TextureVtx));
 
 		mCheckerTexture->InstallTexture();
 
-		sceGuDisable(GU_BLEND);
-		sceGuTexWrap(GU_REPEAT,GU_REPEAT);
+		/*sceGuDisable(GU_BLEND);
+		sceGuTexWrap(GU_REPEAT,GU_REPEAT);*/
+		
+		//sceGuDisable(GU_BLEND);
+		gsTexWrap(GU_REPEAT, GU_REPEAT);
 
-		p_verts[0].pos = v3( 0.0f, 0.0f, 0.0f );
-		p_verts[0].t0 = v2( 0.0f, 0.0f );
+		//p_verts[0].pos = v3( 0.0f, 0.0f, 0.0f );
+		//p_verts[0].t0 = v2( 0.0f, 0.0f );
 
-		p_verts[1].pos = v3( screen_width, screen_height, 0.0f );
-		p_verts[1].t0 = v2( screen_width, screen_height );
+		//p_verts[1].pos = v3( screen_width, screen_height, 0.0f );
+		//p_verts[1].t0 = v2( screen_width, screen_height );
 
-		sceGuDrawArray(GU_SPRITES,TEXTURE_VERTEX_FLAGS|GU_TRANSFORM_2D,num_verts,nullptr,p_verts);
+		//sceGuDrawArray(GU_SPRITES,TEXTURE_VERTEX_FLAGS|GU_TRANSFORM_2D,num_verts,nullptr,p_verts);
+		gsKit_prim_sprite_texture_3d(gsGlobal, CurrTex,
+			0,
+			0,
+			0,
+			0,  // U1
+			0,  // V1
+			screen_width, // X2
+			screen_height, // Y2
+			0,
+			screen_width, // U2
+			screen_height, // V2
+			GS_SETREG_RGBAQ(0xFF, 0xFF, 0xFF, 0x80, 0x00));
 	}
 
 	if( texture != nullptr )
 	{
-		u32		num_verts( 2 );
-		TextureVtx*	p_verts = (TextureVtx*)sceGuGetMemory(num_verts*sizeof(TextureVtx));
+		//u32		num_verts( 2 );
+		//TextureVtx*	p_verts = (TextureVtx*)sceGuGetMemory(num_verts*sizeof(TextureVtx));
 
 		texture->InstallTexture();
 
@@ -666,21 +705,34 @@ bool CTextureExplorerDebugMenuOption::OverrideDisplay() const
 		left_offset = f32( s32( left_offset ) );
 		top_offset = f32( s32( top_offset ) );
 
-		sceGuBlendFunc( GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
-		sceGuEnable(GU_BLEND);
+		//sceGuBlendFunc( GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
+		//sceGuEnable(GU_BLEND);
 
-		sceGuTexWrap(GU_CLAMP,GU_CLAMP);
+		gsTexWrap(GU_CLAMP,GU_CLAMP);
 
-		p_verts[0].pos = v3( left_offset, top_offset, 0.0f );
-		p_verts[0].t0 = v2( 0.0f, 0.0f );
+		//p_verts[0].pos = v3( left_offset, top_offset, 0.0f );
+		//p_verts[0].t0 = v2( 0.0f, 0.0f );
 
-		p_verts[1].pos = v3( left_offset + display_width, top_offset + display_height, 0.0f );
-		p_verts[1].t0 = v2( (float)texture_width, (float)texture_height );
+		//p_verts[1].pos = v3( left_offset + display_width, top_offset + display_height, 0.0f );
+		//p_verts[1].t0 = v2( (float)texture_width, (float)texture_height );
 
-		sceGuDrawArray(GU_SPRITES,TEXTURE_VERTEX_FLAGS|GU_TRANSFORM_2D,num_verts,nullptr,p_verts);
+		//sceGuDrawArray(GU_SPRITES,TEXTURE_VERTEX_FLAGS|GU_TRANSFORM_2D,num_verts,nullptr,p_verts);
+
+		gsKit_prim_sprite_texture_3d(gsGlobal, CurrTex,
+			left_offset,
+			top_offset,
+			0,
+			0,  // U1
+			0,  // V1
+			left_offset + display_width, // X2
+			top_offset + display_height, // Y2
+			0,
+			(float)texture_width, // U2
+			(float)texture_height, // V2
+			GS_SETREG_RGBAQ(0xFF, 0xFF, 0xFF, 0x80, 0x00));
 	}
 	CGraphicsContext::Get()->EndFrame();
-	*/
+	
 	return true;
 }
 
@@ -736,30 +788,30 @@ void CTextureExplorerDebugMenuOption::Display() const
 
 void CTextureExplorerDebugMenuOption::Update( const SPspPadState & pad_state, float elapsed_time )
 {
-	/*u32		texture_count( mSnapshot.size() );
+	u32		texture_count( mSnapshot.size() );
 
 	if(pad_state.OldButtons != pad_state.NewButtons)
 	{
-		if(pad_state.NewButtons & PSP_CTRL_UP)
+		if(pad_state.NewButtons & PAD_UP)
 		{
 			mSelectedIdx = (mSelectedIdx > 0) ? mSelectedIdx - 1 : mSelectedIdx;
 			InvalidateDisplay();
 		}
-		if(pad_state.NewButtons & PSP_CTRL_DOWN)
+		if(pad_state.NewButtons & PAD_DOWN)
 		{
 			mSelectedIdx = (mSelectedIdx < texture_count-1) ? mSelectedIdx + 1 : mSelectedIdx;
 			InvalidateDisplay();
 		}
 
-		if(pad_state.NewButtons & PSP_CTRL_TRIANGLE)
+		if(pad_state.NewButtons & PAD_TRIANGLE)
 		{
 			CTextureCache::Get()->DropTextures();
 		}
-		if(pad_state.NewButtons & PSP_CTRL_CROSS)
+		if(pad_state.NewButtons & PAD_CROSS)
 		{
 			mDisplayTexture = !mDisplayTexture;
 		}
-		if(pad_state.NewButtons & PSP_CTRL_LTRIGGER)
+		if(pad_state.NewButtons & PAD_L1)
 		{
 			mScaleFactor = mScaleFactor / 2;
 			if(mScaleFactor < 1)
@@ -767,7 +819,7 @@ void CTextureExplorerDebugMenuOption::Update( const SPspPadState & pad_state, fl
 				mScaleFactor = 1;
 			}
 		}
-		if(pad_state.NewButtons & PSP_CTRL_RTRIGGER)
+		if(pad_state.NewButtons & PAD_R1)
 		{
 			mScaleFactor = mScaleFactor * 2;
 			if(mScaleFactor > 16)
@@ -789,7 +841,7 @@ void CTextureExplorerDebugMenuOption::Update( const SPspPadState & pad_state, fl
 		{
 			mTextureOffset += pad_state.Stick * STICK_ADJUST_PIXELS_PER_SECOND * elapsed_time;
 		}
-	}*/
+	}
 
 }
 
@@ -829,9 +881,9 @@ void CDisplayListLengthDebugMenuOption::Display() const
 
 void CDisplayListLengthDebugMenuOption::Update( const SPspPadState & pad_state, float elapsed_time )
 {
-	/*float	rate_adjustment( 1.0f );
+	float	rate_adjustment( 1.0f );
 
-	if(pad_state.NewButtons & PSP_CTRL_RTRIGGER)
+	if(pad_state.NewButtons & PAD_R1)
 	{
 		rate_adjustment = 5.0f;
 	}
@@ -840,12 +892,12 @@ void CDisplayListLengthDebugMenuOption::Update( const SPspPadState & pad_state, 
 
 	if(pad_state.OldButtons != pad_state.NewButtons)
 	{
-		if(pad_state.NewButtons & PSP_CTRL_UP)
+		if(pad_state.NewButtons & PAD_UP)
 		{
 			new_adjustment = -1;
 		}
 
-		if(pad_state.NewButtons & PSP_CTRL_DOWN)
+		if(pad_state.NewButtons & PAD_DOWN)
 		{
 			new_adjustment = +1;
 		}
@@ -865,7 +917,7 @@ void CDisplayListLengthDebugMenuOption::Update( const SPspPadState & pad_state, 
 		mFractionalAdjustment -= float( adjustment );
 
 		InvalidateDisplay();
-	}*/
+	}
 }
 
 //*****************************************************************************
@@ -943,14 +995,16 @@ void IDisplayListDebugger::Run()
 	//
 	//	Enter the debug menu as soon as select is newly pressed
 	//
-   /* SceCtrlData		pad;
+	struct padButtonStatus	pad;
 	SPspPadState	pad_state;
 
 	pad_state.OldButtons = 0;
 
-	sceCtrlPeekBufferPositive(&pad, 1);
+	//sceCtrlPeekBufferPositive(&pad, 1);
+	padRead(0, 0, &pad);
+	pad.btns ^= 0xFFFF;
 
-	pad_state.OldButtons = pad.Buttons;
+	pad_state.OldButtons = pad.btns;
 
 	bool menu_button_pressed( false );
 
@@ -980,7 +1034,7 @@ void IDisplayListDebugger::Run()
 	bool	dump_next_screen( false );
 	bool	dump_texture_dlist( false );
 
-	while( (pad_state.NewButtons & PSP_CTRL_HOME) != 0 || !menu_button_pressed )
+	while( (pad_state.NewButtons & PAD_L3) != 0 || !menu_button_pressed )
 	{
 		//guSwapBuffersBehaviour( PSP_DISPLAY_SETBUF_IMMEDIATE );
 
@@ -1064,14 +1118,16 @@ void IDisplayListDebugger::Run()
 
 		//sceDisplayWaitVblankStart();
 
-		sceCtrlPeekBufferPositive(&pad, 1);
+		//sceCtrlPeekBufferPositive(&pad, 1);
+		padRead(0, 0, &pad);
+		pad.btns ^= 0xFFFF;
 
-		pad_state.NewButtons = pad.Buttons;
+		pad_state.NewButtons = pad.btns;
 
 		const s32	STICK_DEADZONE = 20;
 
-		s32		stick_x( pad.Lx - 128 );
-		s32		stick_y( pad.Ly - 128 );
+		s32		stick_x( pad.ljoy_h - 128 );
+		s32		stick_y( pad.ljoy_v - 128 );
 
 		if(stick_x >= -STICK_DEADZONE && stick_x <= STICK_DEADZONE)
 		{
@@ -1151,7 +1207,7 @@ void IDisplayListDebugger::Run()
 		{
 			if(pad_state.OldButtons != pad_state.NewButtons)
 			{
-				if(pad_state.NewButtons & PSP_CTRL_SQUARE)
+				if(pad_state.NewButtons & PAD_SQUARE)
 				{
 					p_current_option = nullptr;
 					need_update_display = true;
@@ -1162,7 +1218,7 @@ void IDisplayListDebugger::Run()
 		{
 			if(pad_state.OldButtons != pad_state.NewButtons)
 			{
-				if(pad_state.NewButtons & PSP_CTRL_UP)
+				if(pad_state.NewButtons & PAD_UP)
 				{
 					if( highlighted_option > 0 )
 					{
@@ -1170,7 +1226,7 @@ void IDisplayListDebugger::Run()
 						need_update_display = true;
 					}
 				}
-				if(pad_state.NewButtons & PSP_CTRL_DOWN)
+				if(pad_state.NewButtons & PAD_DOWN)
 				{
 					if( highlighted_option < menu_options.size() - 1 )
 					{
@@ -1178,7 +1234,7 @@ void IDisplayListDebugger::Run()
 						need_update_display = true;
 					}
 				}
-				if(pad_state.NewButtons & PSP_CTRL_CROSS)
+				if(pad_state.NewButtons & PAD_CROSS)
 				{
 					p_current_option = menu_options[ highlighted_option ];
 					need_update_display = true;
@@ -1189,24 +1245,24 @@ void IDisplayListDebugger::Run()
 
 		if(pad_state.OldButtons != pad_state.NewButtons)
 		{
-			if(pad_state.NewButtons & PSP_CTRL_HOME)
+			if(pad_state.NewButtons & PAD_L3)
 			{
 				menu_button_pressed = true;
 			}
-			if(pad_state.NewButtons & PSP_CTRL_START)
+			if(pad_state.NewButtons & PAD_START)
 			{
 				dump_next_screen = true;
 			}
-			if(pad_state.NewButtons & PSP_CTRL_LTRIGGER)
+			if(pad_state.NewButtons & PAD_L1)
 			{
 				gGlobalPreferences.ViewportType = EViewportType( (gGlobalPreferences.ViewportType+1) % NUM_VIEWPORT_TYPES );
 				CGraphicsContext::Get()->ClearAllSurfaces();
 			}
-			if(pad_state.NewButtons & PSP_CTRL_RTRIGGER)
+			if(pad_state.NewButtons & PAD_R1)
 			{
 				dump_texture_dlist = true;
 			}
-			if(pad_state.NewButtons & PSP_CTRL_SELECT)
+			if(pad_state.NewButtons & PAD_SELECT)
 			{
 				gSingleStepFrames = true;
 				menu_button_pressed = true;
@@ -1224,7 +1280,7 @@ void IDisplayListDebugger::Run()
 		CDebugMenuOption *	p_option( *it );
 
 		delete p_option;
-	}*/
+	}
 }
 
 #endif

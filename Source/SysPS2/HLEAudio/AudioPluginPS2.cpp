@@ -52,13 +52,8 @@ extern u32 gSoundSync;
 static const u32	kOutputFrequency = 44100;
 static const u32	MAX_OUTPUT_FREQUENCY = kOutputFrequency * 4;
 
-
-static bool audio_open = false;
-
-
 // Large kAudioBufferSize creates huge delay on sound //Corn
 static const u32	kAudioBufferSize = 1024 * 4; // OSX uses a circular buffer length, 1024 * 1024
-
 
 class AudioPluginPS2 : public CAudioPlugin
 {
@@ -75,70 +70,50 @@ public:
 	virtual EProcessResult	ProcessAList();
 	virtual void			Update(bool wait);
 
-	//virtual void SetFrequency(u32 frequency);
-	virtual void AddBuffer(u8* start, u32 length);
-	virtual void FillBuffer(Sample* buffer, u32 num_samples);
+	virtual void			AddBuffer(u8* start, u32 length);
 
-	virtual void StopAudio();
-	virtual void StartAudio();
-	static u32 AudioThread(void* arg);
-public:
-	CAudioBuffer* mAudioBufferUncached;
-	ThreadHandle mAudioThread;
-	s32 mSemaphore;
+	virtual void			StopAudio();
+	virtual void			StartAudio();
+	static u32				AudioThread(void* arg);
 private:
-	CAudioBuffer* mAudioBuffer;
-	bool mKeepRunning;
-	bool mExitAudioThread;
-	u32 mFrequency;
-//	ThreadHandle mAudioThread;
-	//s32 mSemaphore;
-	//	u32 mBufferLenMs;
+	CAudioBuffer			mAudioBuffer;
+	u32						mFrequency;
+	s32						mSemaphore;
+	ThreadHandle 			mAudioThread;
+	volatile bool			mKeepRunning;	// Should the audio thread keep running?
 };
-
-static AudioPluginPS2* ac;
-
-void AudioPluginPS2::FillBuffer(Sample* buffer, u32 num_samples)
-{
-	PollSema(mSemaphore);
-
-	mAudioBufferUncached->Drain(buffer, num_samples);
-
-	SignalSema(mSemaphore);
-}
-
 
 EAudioPluginMode gAudioPluginEnabled(APM_DISABLED);
 
-
 AudioPluginPS2::AudioPluginPS2()
-	:mKeepRunning(false)
-	//: mAudioBuffer( kAudioBufferSize )
+	: mAudioBuffer(kAudioBufferSize)
 	, mFrequency(44100)
-	, mAudioThread ( kInvalidThreadHandle )
-	//, mKeepRunning( false )
-	//, mBufferLenMs ( 0 )
+	, mSemaphore(-1)
+	, mAudioThread(kInvalidThreadHandle)
+	, mKeepRunning(false) 
 {
 	ee_sema_t sema;
 	sema.init_count = 1;
 	sema.max_count = 1;
 	sema.option = 0;
 	mSemaphore = CreateSema(&sema);
-
-	// Allocate audio buffer with malloc_64 to avoid cached/uncached aliasing
-	void* mem = memalign(128, sizeof(CAudioBuffer));
-	mAudioBuffer = new(mem) CAudioBuffer(kAudioBufferSize);
-	mAudioBufferUncached = (CAudioBuffer*)MAKE_UNCACHED_PTR(mem);
-	// Ideally we could just invalidate this range?
-	//SyncDCache(mAudioBuffer, mAudioBuffer + sizeof(CAudioBuffer));
 }
 
 AudioPluginPS2::~AudioPluginPS2()
 {
-	mAudioBuffer->~CAudioBuffer();
-	free(mAudioBuffer);
+	if (mKeepRunning)
+	{
+		WaitSema(mSemaphore);
+		mKeepRunning = false;
+		JoinThread(mAudioThread, 0);
+		ReleaseThreadHandle(mAudioThread);
+		mAudioThread = kInvalidThreadHandle;
+		SignalSema(mSemaphore);
+		audsrv_quit();
+	}
+	
+	mAudioBuffer.~CAudioBuffer();
 	DeleteSema(mSemaphore);
-	audsrv_quit();
 }
 
 bool	AudioPluginPS2::StartEmulation()
@@ -151,8 +126,6 @@ void	AudioPluginPS2::StopEmulation()
 {
 	Audio_Reset();
 	StopAudio();
-	DeleteSema(mSemaphore);
-	audsrv_quit();
 }
 
 void	AudioPluginPS2::DacrateChanged(int system_type)
@@ -174,12 +147,8 @@ void	AudioPluginPS2::LenChanged()
 	{
 		u32 address = Memory_AI_GetRegister(AI_DRAM_ADDR_REG) & 0xFFFFFF;
 		u32	length = Memory_AI_GetRegister(AI_LEN_REG);
-
+		
 		AddBuffer(g_pu8RamBase + address, length);
-	}
-	else
-	{
-		StopAudio();
 	}
 }
 
@@ -196,8 +165,6 @@ EProcessResult	AudioPluginPS2::ProcessAList()
 			result = PR_COMPLETED;
 			break;
 		case APM_ENABLED_ASYNC:
-			DAEDALUS_ERROR("Async audio is unimplemented");
-			Audio_Ucode();
 			result = PR_COMPLETED;
 			break;
 		case APM_ENABLED_SYNC:
@@ -209,49 +176,39 @@ EProcessResult	AudioPluginPS2::ProcessAList()
 	return result;
 }
 
-static char audio_buf[kAudioBufferSize];
-
-int audioCallback(void* userdata)
-{
-	AudioPluginPS2* ac(reinterpret_cast<AudioPluginPS2*>(userdata));
-
-	printf("callback\n");
-
-	//ac->FillBuffer(reinterpret_cast<Sample*>(audio_buf), kAudioBufferSize/sizeof(Sample));
-	if (ac->mAudioBufferUncached->GetNumBufferedSamples() > 0)
-		iWakeupThread(ac->mAudioThread);
-
-	return 0;
-}
-
 u32 AudioPluginPS2::AudioThread(void* arg)
 {
+	static char audio_buf[kAudioBufferSize];
+
 	AudioPluginPS2* plugin = static_cast<AudioPluginPS2*>(arg);
 	int ret;
 
-	while (1)
+	while (plugin->mKeepRunning)
 	{
-		printf("thread\n");
-		
-		SleepThread();
-
 		WaitSema(plugin->mSemaphore);
-		ret = plugin->mAudioBufferUncached->Drain(reinterpret_cast<Sample*>(audio_buf), kAudioBufferSize / sizeof(Sample));
+		ret = plugin->mAudioBuffer.Drain(reinterpret_cast<Sample*>(audio_buf), kAudioBufferSize / sizeof(Sample));
+		SignalSema(plugin->mSemaphore);
+
 		audsrv_wait_audio(ret * sizeof(Sample));
 		audsrv_play_audio(audio_buf, ret * sizeof(Sample));
-		SignalSema(plugin->mSemaphore);
+
+		SleepThread();
 	}
+
+	ExitDeleteThread();
+	return 0;
 }
 
 void AudioPluginPS2::Update(bool Wait)
 {
-	if (audio_open)
+	/*static char audio_buf[kAudioBufferSize];
+
+	if (mKeepRunning)
 	{
-		int ret = mAudioBufferUncached->Drain(reinterpret_cast<Sample*>(audio_buf), kAudioBufferSize / sizeof(Sample));
-		//printf("ret %d %d\n", ret, ret * sizeof(Sample));
+		int ret = mAudioBuffer.Drain(reinterpret_cast<Sample*>(audio_buf), kAudioBufferSize / sizeof(Sample));
 		audsrv_wait_audio(ret * sizeof(Sample));
 		audsrv_play_audio(audio_buf, ret * sizeof(Sample));
-	}
+	}*/
 }
 
 void AudioPluginPS2::StartAudio()
@@ -264,14 +221,11 @@ void AudioPluginPS2::StartAudio()
 
 	mKeepRunning = true;
 
-	ac = this;
-
 	ret = audsrv_init();
 
 	if (ret != 0) {
-		printf("Failed to initialize audsrv: %s\n", audsrv_get_error_string());
+		printf("AudioPluginPS2: Failed to initialize audsrv: %s\n", audsrv_get_error_string());
 		mKeepRunning = false;
-		audio_open = false;
 		return;
 	}
 
@@ -282,27 +236,14 @@ void AudioPluginPS2::StartAudio()
 	ret = audsrv_set_format(&format);
 
 	if (ret != 0) {
-		printf("Set format returned: %s\n", audsrv_get_error_string());
+		printf("AudioPluginPS2: Set format returned: %s\n", audsrv_get_error_string());
 		mKeepRunning = false;
-		audio_open = false;
 		return;
 	}
 
 	audsrv_set_volume(MAX_VOLUME);
 
-	/*mAudioThread = dCreateThread("Audio", &AudioThread, this);
-
-	ret = audsrv_on_fillbuf(kAudioBufferSize, audioCallback, this);
-	if (ret != AUDSRV_ERR_NOERROR)
-	{
-		printf("audsrv_on_fillbuf failed with err=%d\n", ret);
-		mKeepRunning = false;
-		audio_open = false;
-		return;
-	}*/
-
-	// Everything OK
-	audio_open = true;
+	mAudioThread = DCreateThread("Audio", &AudioThread, this);
 }
 
 void AudioPluginPS2::AddBuffer(u8* start, u32 length)
@@ -324,7 +265,10 @@ void AudioPluginPS2::AddBuffer(u8* start, u32 length)
 			break;
 
 		case APM_ENABLED_SYNC:
-			mAudioBufferUncached->AddSamples(reinterpret_cast<const Sample*>(start), num_samples, mFrequency, kOutputFrequency);
+			WaitSema(mSemaphore);
+			mAudioBuffer.AddSamples(reinterpret_cast<const Sample*>(start), num_samples, mFrequency, kOutputFrequency);
+			SignalSema(mSemaphore);
+			WakeupThread(mAudioThread);
 			break;
 	}
 
@@ -342,12 +286,10 @@ void AudioPluginPS2::StopAudio()
 {
 	if (!mKeepRunning)
 		return;
-
-	if (audio_open)
-		audsrv_stop_audio();
-
-	mKeepRunning = false;
-	audio_open = false;
+	
+	WaitSema(mSemaphore);
+	audsrv_stop_audio();
+	SignalSema(mSemaphore);
 }
 
 CAudioPlugin* CreateAudioPlugin()

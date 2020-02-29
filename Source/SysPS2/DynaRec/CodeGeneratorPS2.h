@@ -62,8 +62,11 @@ private:
 		// Not virtual base
 				void				SetVar( u32 * p_var, u32 value );
 				void				SetVar( u32 * p_var, EPs2Reg reg_src );
+				void				SetVar64( u64 * p_var, u64 value );
+				void				SetVar64( u64 * p_var, EPs2Reg reg_src );
 				void				SetFloatVar( f32 * p_var, EPs2FloatReg reg_src );
 				void				GetVar( EPs2Reg dst_reg, const u32 * p_var );
+				void				GetVar64( EPs2Reg dst_reg, const u64 * p_var );
 				void				GetFloatVar( EPs2FloatReg dst_reg, const f32 * p_var );
 				void				GetBaseRegisterAndOffset( const void * p_address, EPs2Reg * p_reg, s16 * p_offset );
 
@@ -103,6 +106,9 @@ private:
 				void				GenerateDSRA( EN64Reg rd, EN64Reg rt, u32 sa );
 				void				GenerateDSLL32( EN64Reg rd, EN64Reg rt, u32 sa );
 				void				GenerateDSLL( EN64Reg rd, EN64Reg rt, u32 sa );
+				void				GenerateDSRL32( EN64Reg rd, EN64Reg rt, u32 sa );
+				void				GenerateDSRL( EN64Reg rd, EN64Reg rt, u32 sa );
+				void				GenerateDSUBU( EN64Reg rd, EN64Reg rs, EN64Reg rt );
 
 				void				GenerateADDIU( EN64Reg rt, EN64Reg rs, s16 immediate );
 				void				GenerateANDI( EN64Reg rt, EN64Reg rs, u16 immediate );
@@ -206,39 +212,30 @@ private:
 				void				GenerateSRLV( EN64Reg rd, EN64Reg rs, EN64Reg rt );
 				void				GenerateSRAV( EN64Reg rd, EN64Reg rs, EN64Reg rt );
 
+				void				GenerateDSLLV( EN64Reg rd, EN64Reg rs, EN64Reg rt );
+				void				GenerateDSRLV( EN64Reg rd, EN64Reg rs, EN64Reg rt );
+				void				GenerateDSRAV( EN64Reg rd, EN64Reg rs, EN64Reg rt );
+
 private:
 				void				SetRegisterSpanList( const SRegisterUsageInfo & register_usage, bool loops_to_self );
 
 				void				ExpireOldIntervals( u32 instruction_idx );
 				void				SpillAtInterval( const SRegisterSpan & live_span );
 
-				EPs2Reg				GetRegisterNoLoad( EN64Reg n64_reg, u32 lo_hi_idx, EPs2Reg scratch_reg );
-				EPs2Reg				GetRegisterNoLoadLo( EN64Reg n64_reg, EPs2Reg scratch_reg )		{ return GetRegisterNoLoad( n64_reg, 0, scratch_reg ); }
-				EPs2Reg				GetRegisterNoLoadHi( EN64Reg n64_reg, EPs2Reg scratch_reg )		{ return GetRegisterNoLoad( n64_reg, 1, scratch_reg ); }
+				EPs2Reg				GetRegisterNoLoad( EN64Reg n64_reg, EPs2Reg scratch_reg );
+				EPs2Reg				GetRegisterAndLoad( EN64Reg n64_reg, EPs2Reg scratch_reg );
 
-				EPs2Reg				GetRegisterAndLoad( EN64Reg n64_reg, u32 lo_hi_idx, EPs2Reg scratch_reg );
-				EPs2Reg				GetRegisterAndLoadLo( EN64Reg n64_reg, EPs2Reg scratch_reg )	{ return GetRegisterAndLoad( n64_reg, 0, scratch_reg ); }
-				EPs2Reg				GetRegisterAndLoadHi( EN64Reg n64_reg, EPs2Reg scratch_reg )	{ return GetRegisterAndLoad( n64_reg, 1, scratch_reg ); }
+				void				GetRegisterValue( EPs2Reg ps2_reg, EN64Reg n64_reg );
 
-				void				GetRegisterValue( EPs2Reg ps2_reg, EN64Reg n64_reg, u32 lo_hi_idx );
+				void				LoadRegister( EPs2Reg ps2_reg, EN64Reg n64_reg );
 
-				void				LoadRegister( EPs2Reg ps2_reg, EN64Reg n64_reg, u32 lo_hi_idx );
-				void				LoadRegisterLo( EPs2Reg ps2_reg, EN64Reg n64_reg )				{ LoadRegister( ps2_reg, n64_reg, 0 ); }
-				void				LoadRegisterHi( EPs2Reg ps2_reg, EN64Reg n64_reg )				{ LoadRegister( ps2_reg, n64_reg, 1 ); }
+				void				PrepareCachedRegister( EN64Reg n64_reg );
 
-				void				PrepareCachedRegister( EN64Reg n64_reg, u32 lo_hi_idx );
-				void				PrepareCachedRegisterLo( EN64Reg n64_reg )						{ PrepareCachedRegister( n64_reg, 0 ); }
-				void				PrepareCachedRegisterHi( EN64Reg n64_reg )						{ PrepareCachedRegister( n64_reg, 1 ); }
-
-				void				StoreRegister( EN64Reg n64_reg, u32 lo_hi_idx, EPs2Reg ps2_reg );
-				void				StoreRegisterLo( EN64Reg n64_reg, EPs2Reg ps2_reg )				{ StoreRegister( n64_reg, 0, ps2_reg ); }
-				void				StoreRegisterHi( EN64Reg n64_reg, EPs2Reg ps2_reg )				{ StoreRegister( n64_reg, 1, ps2_reg ); }
-
-				void				SetRegister64( EN64Reg n64_reg, s32 lo_value, s32 hi_value );
+				void				StoreRegister( EN64Reg n64_reg, EPs2Reg ps2_reg );
 
 				void				SetRegister32s( EN64Reg n64_reg, s32 value );
 
-				void				SetRegister( EN64Reg n64_reg, u32 lo_hi_idx, u32 value );
+				void				SetRegister( EN64Reg n64_reg, u64 value );
 				/*
 				enum EUpdateRegOptions
 				{
@@ -257,7 +254,7 @@ private:
 
 				const CN64RegisterCachePS2 & GetRegisterCacheFromHandle( RegisterSnapshotHandle snapshot ) const;
 
-				void				FlushRegister( CN64RegisterCachePS2 & cache, EN64Reg n64_reg, u32 lo_hi_idx, bool invalidate );
+				void				FlushRegister( CN64RegisterCachePS2 & cache, EN64Reg n64_reg, bool invalidate );
 				void				FlushAllRegisters( CN64RegisterCachePS2 & cache, bool invalidate );
 				void				FlushAllFloatingPointRegisters( CN64RegisterCachePS2 & cache, bool invalidate );
 				void				FlushAllTemporaryRegisters( CN64RegisterCachePS2 & cache, bool invalidate );
@@ -267,8 +264,8 @@ private:
 
 				void				GenerateGenericR4300( OpCode op_code, CPU_Instruction p_instruction );
 
-				typedef u32 (*ReadMemoryFunction)( u32 address, u32 current_pc );
-				typedef void (*WriteMemoryFunction)( u32 address, u32 value, u32 current_pc );
+				typedef u64 (*ReadMemoryFunction)( u32 address, u32 current_pc );
+				typedef void (*WriteMemoryFunction)( u32 address, u64 value, u32 current_pc );
 
 
 				bool				GenerateDirectLoad( EPs2Reg psp_dst, EN64Reg n64_base, s16 offset, OpCodeValue load_op, u32 swizzle );

@@ -123,6 +123,16 @@ struct Ps2OpCode
 			unsigned cop1_bc : 2;
 			unsigned : 14;
 		};
+
+		// MMI
+		struct
+		{
+			unsigned mmi_op : 11;
+			unsigned : 5;
+			unsigned : 5;
+			unsigned : 5;
+			unsigned : 6;
+		};
 	};
 };
 

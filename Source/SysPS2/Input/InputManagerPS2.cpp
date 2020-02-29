@@ -383,6 +383,7 @@ void IInputManager::SwapJoyStick(OSContPad *pPad, struct padButtonStatus *pad)
 //*****************************************************************************
 //
 //*****************************************************************************
+extern void Wait_Pad_Ready();
 void IInputManager::GetState( OSContPad pPad[4] )
 {
 	// Clear the initial state of the four controllers
@@ -394,9 +395,12 @@ void IInputManager::GetState( OSContPad pPad[4] )
 	}
 
 	struct padButtonStatus pad;
+	pad.btns = 0;
 
-	padRead(0, 0, &pad);
-	pad.btns ^= 0xFFFF;
+	Wait_Pad_Ready();
+
+	if (padRead(0, 0, &pad))
+		pad.btns ^= 0xFFFF;
 
 	//	'Normalise' from 0..255 -> -128..+127
 	//
@@ -802,8 +806,8 @@ CControllerConfig *	IInputManager::BuildDefaultConfig()
 	p_config->SetButtonMapping( N64Button_A, eval.Parse( "PS2.Cross" ) );
 	p_config->SetButtonMapping( N64Button_B, eval.Parse( "PS2.Square" ) );
 	p_config->SetButtonMapping( N64Button_Z, eval.Parse( "PS2.Triangle" ) );
-	p_config->SetButtonMapping( N64Button_L, eval.Parse( "PS2.LTrigger" ) );
-	p_config->SetButtonMapping( N64Button_R, eval.Parse( "PS2.RTrigger" ) );
+	p_config->SetButtonMapping( N64Button_L, eval.Parse( "PS2.L2" ) );
+	p_config->SetButtonMapping( N64Button_R, eval.Parse( "PS2.R2" ) );
 
 	p_config->SetButtonMapping( N64Button_Up, eval.Parse( "PS2.Circle & PS2.Up" ) );
 	p_config->SetButtonMapping( N64Button_Down, eval.Parse( "PS2.Circle & PS2.Down" ) );

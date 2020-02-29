@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <gsKit.h>
 extern GSGLOBAL* gsGlobal;
+extern int gsBlend;
 
 /*
 
@@ -168,7 +169,7 @@ void InitBlenderMode( u32 blendmode )					// Set Alpha Blender mode
 	//case 0x07c2:					// In * AFog + Fog * 1-A || In * 0 + In * 1				Conker - ??
 
 		////sceGuDisable( GU_BLEND );
-		//gsGlobal->PrimAlphaEnable = GS_SETTING_OFF;
+		gsBlend = GS_SETTING_OFF;
 		break;
 
 	//
@@ -186,8 +187,8 @@ void InitBlenderMode( u32 blendmode )					// Set Alpha Blender mode
 	case 0xc410:					// Fog * AFog + In * 1-A || :In * AIn + Mem * 1-A		Donald Duck - Stars
 	case 0xc810:					// Fog * AShade + In * 1-A || :In * AIn + Mem * 1-A		SSV - Fog? and MM - Shadows
 	case 0xcb02:					// Fog * AShade + In * 1-A || :In * 0 + In * 1			Doom 64 - Weapons
-		sceGuEnable( GU_BLEND );
-		sceGuBlendFunc( GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
+		///sceGuEnable( GU_BLEND );
+		///sceGuBlendFunc( GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
 		break;
 #endif
 	//
@@ -195,7 +196,7 @@ void InitBlenderMode( u32 blendmode )					// Set Alpha Blender mode
 	//
 	default:
 		////sceGuEnable( GU_BLEND );
-		//gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
+		gsBlend = GS_SETTING_ON;
 
 		// Hack for shadows in ISS64
 		if(g_ROM.GameHacks == ISS64)
@@ -217,7 +218,7 @@ void InitBlenderMode( u32 blendmode )					// Set Alpha Blender mode
 			DL_PF( "		 Blend: SRCALPHA/INVSRCALPHA (default: 0x%04x)", blendmode );
 #endif
 			////sceGuBlendFunc( GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
-			//gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0, 1, 0, 1, 0), 0);
+			gsKit_set_primalpha(gsGlobal, GS_SETREG_ALPHA(0, 1, 0, 1, 0), 0);
 		}
 		break;
 	}

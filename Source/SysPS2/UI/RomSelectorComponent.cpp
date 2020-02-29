@@ -52,7 +52,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <gsKit.h>
 
 extern GSGLOBAL* gsGlobal;
-extern void gsScissor(int x, int y, int width, int height);
+extern void gsKit_scissor(int x, int y, int width, int height);
 
 namespace
 {
@@ -447,7 +447,7 @@ void IRomSelectorComponent::RenderRomList()
 
 	/*sceGuEnable(GU_SCISSOR_TEST);
 	sceGuScissor(LIST_TEXT_LEFT, BELOW_MENU_MIN, LIST_TEXT_LEFT+LIST_TEXT_WIDTH, BELOW_MENU_MIN+LIST_TEXT_HEIGHT);*/
-	gsScissor(LIST_TEXT_LEFT, LIST_TEXT_LEFT + LIST_TEXT_WIDTH - 1, BELOW_MENU_MIN, BELOW_MENU_MIN + LIST_TEXT_HEIGHT - 1);
+	gsKit_scissor(LIST_TEXT_LEFT, LIST_TEXT_LEFT + LIST_TEXT_WIDTH - 1, BELOW_MENU_MIN, BELOW_MENU_MIN + LIST_TEXT_HEIGHT - 1);
 #warning fix me
 	const char * const	ptr_text( "> " );
 	u32					ptr_text_width( mpContext->GetTextWidth( ptr_text ) );
@@ -487,7 +487,7 @@ void IRomSelectorComponent::RenderRomList()
 
 	// Restore scissoring
 	//sceGuScissor(0,0, 480,272);
-	gsScissor(0, gsGlobal->Width - 1, 0, gsGlobal->Height - 1);
+	gsKit_scissor(0, gsGlobal->Width - 1, 0, gsGlobal->Height - 1);
 }
 
 void IRomSelectorComponent::RenderCategoryList()

@@ -230,6 +230,8 @@ static bool	Initialize()
 	char *p = (char *)malloc(size);
 	printf("malloc %p size %d\n", p, size/(1024*1024));*/
 
+	ChangeThreadPriority(GetThreadId(), 64);
+
 	if (!System_Init())
 		return false;
 
@@ -339,7 +341,8 @@ static void DisplayRomsAndChoose(bool show_splash)
 int main(int argc, char* argv[])
 {
 	//argc = 2;
-	//argv[1] = "Roms/rom6.z64";
+	//argv[1] = "mass:Roms/rom3.z64";
+
 	if (Initialize())
 	{
 #ifdef DAEDALUS_BATCH_TEST_ENABLED

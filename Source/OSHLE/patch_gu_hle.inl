@@ -118,6 +118,203 @@ inline void vfpu_matrix_Ortho(u8 *m, float left, float right, float bottom, floa
 		"usv.q    C130, 48 + %0\n"
 	:"=m"(*m) : "r"(left), "r"(right), "r"(bottom), "r"(top), "r"(near), "r"(far), "r"(scale));
 }
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+
+inline void vu0_matrix_IdentF(u8* m) {
+	__asm__ volatile (
+		/* 1 0 0 0 */
+		/* 0 1 0 0 */
+		/* 0 0 1 0 */
+		/* 0 0 0 1 */
+
+		"vmr32.xyzw		vf3, vf0			\n"
+		"vmr32.xyzw		vf2, vf3			\n" /* 0 1 0 0 */
+		"vmr32.xyzw		vf1, vf2			\n" /* 1 0 0 0 */
+		"qmfc2			$t0, vf1			\n"
+		"sd				$t0, 0 + %0			\n"
+		"qmfc2			$t1, vf2			\n"
+		"sd				$zero, 8 + %0		\n"
+		"sd				$t1, 16 + %0		\n"
+		"sd				$zero, 24 + %0		\n"
+		"sd				$zero, 32 + %0		\n"
+		"sd				$t0, 40 + %0		\n"
+		"sd				$zero, 48 + %0		\n"
+		"sd				$t1, 56 + %0		\n"
+		:"=m"(*m));
+}
+
+inline void vu0_matrix_TranslateF(u8* m, float X, float Y, float Z) {
+	__asm__ volatile (
+		/* 1 0 0 0 */
+		/* 0 1 0 0 */
+		/* 0 0 1 0 */
+		/* x y z 1 */
+		
+		"vmr32.xyzw		vf3, vf0			\n"
+		"vmr32.xyzw		vf2, vf3			\n" /* 0 1 0 0 */
+		"vmr32.xyzw		vf1, vf2			\n" /* 1 0 0 0 */
+		"qmfc2			$t0, vf1			\n"
+		"sd				$t0, 0 + %0			\n"
+		"qmfc2			$t1, vf2			\n"
+		"sd				$zero, 8 + %0		\n"
+		"sd				$t1, 16 + %0		\n"
+		"sd				$zero, 24 + %0		\n"
+		"sd				$zero, 32 + %0		\n"
+		"sd				$t0, 40 + %0		\n"
+		"sw				%1, 48 + %0			\n"
+		"sw				%2, 52 + %0			\n"
+		"sw				%3, 56 + %0			\n"
+		"sw				$t0, 60 + %0		\n"
+		:"=m"(*m) : "r"(X), "r"(Y), "r"(Z));
+}
+
+inline void vu0_matrix_ScaleF(u8* m, float X, float Y, float Z) {
+	__asm__ volatile (
+		/* x 0 0 0 */
+		/* 0 y 0 0 */
+		/* 0 0 z 0 */
+		/* 0 0 0 1 */
+
+		"sw				%1, 0 + %0			\n"
+		"sw				$zero, 4 + %0		\n"
+		"sd				$zero, 8 + %0		\n"
+		"sw				$zero, 16 + %0		\n"
+		"sw				%2, 20 + %0			\n"
+		"sd				$zero, 24 + %0		\n"
+		"sd				$zero, 32 + %0		\n"
+		"sw				%3, 40 + %0			\n"
+		"sw				$zero, 44 + %0		\n"
+		"qmfc2			$t0, vf0			\n"
+		"sd				$zero, 48 + %0		\n"
+		"pcpyud			$t0, $t0, $t0		\n"
+		"sd				$t0, 56 + %0		\n"
+		:"=m"(*m) : "r"(X), "r"(Y), "r"(Z));
+}
+
+inline void vu0_matrix_OrthoF(u8* m, float left, float right, float bottom, float top, float near, float far, float scale)
+{
+	__asm__ volatile (
+
+		"vmove.xyzw		vf4, vf0			\n" /* 0 0 0 1 */
+		"vmr32.xyzw		vf3, vf0			\n" /* 0 0 1 0 */
+		"vmr32.xyzw		vf2, vf3			\n" /* 0 1 0 0 */
+		"vmr32.xyzw		vf1, vf2			\n" /* 1 0 0 0 */
+
+		"pextlw			%2, %6, %2			\n"
+		"pextlw			%2, %4, %2			\n"
+		"qmtc2			%2, vf5				\n" // [right, top,    far ]
+		"pextlw			%1, %5, %1			\n"
+		"pextlw			%1, %3, %1			\n"
+		"qmtc2			%1, vf6				\n" // [left,  bottom, near]
+		"dsll32			%7, %7, 0			\n"
+		"pcpyld			%7, %7, $zero		\n"
+		"qmtc2			%7, vf4				\n" // [0, 0, 0, scale]
+		"vsub.xyz		vf7, vf5, vf6		\n"	// [  dx,   dy,   dz]
+		"vdiv			Q, vf4w, vf7x		\n"
+		"vwaitq								\n"
+		"vaddq.x		vf7, vf0, Q			\n"
+		"vdiv			Q, vf4w, vf7y		\n"
+		"vwaitq								\n"
+		"vaddq.y		vf7, vf0, Q			\n"
+		"vdiv			Q, vf4w, vf7z		\n"
+		"vwaitq								\n"
+		"vaddq.z		vf7, vf0, Q			\n" // [scale / dx, scale / dy, scale / dz]
+		"vadd.w			vf8, vf0, vf0		\n" // 2.0
+		"vmulw.x		vf1, vf7, vf8w		\n" // m->x.x = 2.0 / dx
+		"vmulw.y		vf2, vf7, vf8w		\n" // m->y.y = 2.0 / dy
+		"vmulw.z		vf3, vf7, vf8w		\n" // m->z.z = -2.0 / dz
+		"vsub.z			vf3, vf0, vf3		\n"
+		"vadd.xyz		vf4, vf5, vf6		\n"
+		"vsub.xyz		vf4, vf0, vf4		\n" // m->w[x, y, z] = [-(right+left), -(top+bottom), -(far+near)]
+		"vmul.xyz		vf4, vf4, vf7		\n"	// [-(right+left)/dx, -(top+bottom)/dy, -(far+near)/dz]
+		"qmfc2			%1, vf1				\n"
+		"qmfc2			%2, vf2				\n"
+		"qmfc2			%3, vf3				\n"
+		"qmfc2			%4, vf4				\n"
+		"sd				%1, 0 + %0			\n"
+		"pcpyud			%1, %1, %1			\n"
+		"sd				%1, 8 + %0			\n"
+		"sd				%2, 16 + %0			\n"
+		"pcpyud			%2, %2, %2			\n"
+		"sd				%2, 24 + %0			\n"
+		"sd				%3, 32 + %0			\n"
+		"pcpyud			%3, %3, %3			\n"
+		"sd				%3, 40 + %0			\n"
+		"sd				%4, 48 + %0			\n"
+		"pcpyud			%4, %4, %4			\n"
+		"sd				%4, 56 + %0			\n"
+		:"=m"(*m) : "r"(left), "r"(right), "r"(bottom), "r"(top), "r"(near), "r"(far), "r"(scale));
+}
+
+inline void vu0_matrix_Ortho(u8* m, float left, float right, float bottom, float top, float near, float far, float scale)
+{
+	__asm__ volatile (
+		"vmove.xyzw		vf4, vf0			\n" /* 0 0 0 1 */
+		"vmr32.xyzw		vf3, vf0			\n" /* 0 0 1 0 */
+		"vmr32.xyzw		vf2, vf3			\n" /* 0 1 0 0 */
+		"vmr32.xyzw		vf1, vf2			\n" /* 1 0 0 0 */
+
+		"pextlw			%2, %6, %2			\n"
+		"pextlw			%2, %4, %2			\n"
+		"qmtc2			%2, vf5				\n" // [right, top,    far ]
+		"pextlw			%1, %5, %1			\n"
+		"pextlw			%1, %3, %1			\n"
+		"qmtc2			%1, vf6				\n" // [left,  bottom, near]
+		"dsll32			%7, %7, 0			\n"
+		"pcpyld			%7, %7, $zero		\n"
+		"qmtc2			%7, vf4				\n" // [0, 0, 0, scale]
+		"vsub.xyz		vf7, vf5, vf6		\n"	// [  dx,   dy,   dz]
+		"vdiv			Q, vf4w, vf7x		\n"
+		"vwaitq								\n"
+		"vaddq.x		vf7, vf0, Q			\n"
+		"vdiv			Q, vf4w, vf7y		\n"
+		"vwaitq								\n"
+		"vaddq.y		vf7, vf0, Q			\n"
+		"vdiv			Q, vf4w, vf7z		\n"
+		"vwaitq								\n"
+		"vaddq.z		vf7, vf0, Q			\n" // [scale / dx, scale / dy, scale / dz]
+		"vadd.w			vf8, vf0, vf0		\n" // 2.0
+		"vmulw.x		vf1, vf7, vf8w		\n" // m->x.x = 2.0 / dx
+		"vmulw.y		vf2, vf7, vf8w		\n" // m->y.y = 2.0 / dy
+		"vmulw.z		vf3, vf7, vf8w		\n" // m->z.z = -2.0 / dz
+		"vsub.z			vf3, vf0, vf3		\n"
+		"vadd.xyz		vf4, vf5, vf6		\n"
+		"vsub.xyz		vf4, vf0, vf4		\n" // m->w[x, y, z] = [-(right+left), -(top+bottom), -(far+near)]
+		"vmul.xyz		vf4, vf4, vf7		\n"	// [-(right+left)/dx, -(top+bottom)/dy, -(far+near)/dz]
+
+		"vadd.w			vf9, vf0, vf0		\n"
+		"vmulw.xyzw		vf1, vf1, vf9w		\n"
+		"vftoi15.xyzw	vf1, vf1 \n"
+		"qmfc2			%1, vf1				\n"
+		"sd				%1, 0 + %0			\n"
+		"pcpyud			%1, %1, %1			\n"
+		"sd				%1, 8 + %0			\n"
+
+		"vmulw.xyzw		vf2, vf2, vf9w		\n"
+		"vftoi15.xyzw	vf2, vf2			\n"
+		"qmfc2			%2, vf2				\n"
+		"sd				%2, 16 + %0			\n"
+		"pcpyud			%2, %2, %2			\n"
+		"sd				%2, 24 + %0			\n"
+
+		"vmulw.xyzw		vf3, vf3, vf9w		\n"
+		"vftoi15.xyzw	vf3, vf3			\n"
+		"qmfc2			%3, vf3				\n"
+		"sd				%3, 32 + %0			\n"
+		"pcpyud			%3, %3, %3			\n"
+		"sd				%3, 40 + %0			\n"
+
+		"vmulw.xyzw		vf4, vf4, vf9w		\n"
+		"vftoi15.xyzw	vf4, vf4			\n"
+		"qmfc2			%4, vf4				\n"
+		"sd				%4, 48 + %0			\n"
+		"pcpyud			%4, %4, %4			\n"
+		"sd				%4, 56 + %0			\n"
+
+		:"=m"(*m) : "r"(left), "r"(right), "r"(bottom), "r"(top), "r"(near), "r"(far), "r"(scale));
+	printf("5\n");
+}
+
 #endif
 
 u32 Patch_guMtxIdentF()
@@ -128,6 +325,8 @@ TEST_DISABLE_GU_FUNCS
 
 #ifdef DAEDALUS_PSP_USE_VFPU
 	vfpu_matrix_IdentF(pMtxBase);
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+	vu0_matrix_IdentF(pMtxBase);
 #else
 	// 0x00000000 is 0.0 in IEEE fp
 	// 0x3f800000 is 1.0 in IEEE fp
@@ -203,6 +402,12 @@ TEST_DISABLE_GU_FUNCS
 	const f32 fz = gGPR[REG_a3]._f32_0;
 
 	vfpu_matrix_TranslateF(pMtxBase, fx, fy, fz);
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+	const f32 fx = gGPR[REG_a1]._f32_0;
+	const f32 fy = gGPR[REG_a2]._f32_0;
+	const f32 fz = gGPR[REG_a3]._f32_0;
+
+	vu0_matrix_TranslateF(pMtxBase, fx, fy, fz);
 #else
 	// 0x00000000 is 0.0 in IEEE fp
 	// 0x3f800000 is 1.0 in IEEE fp
@@ -289,7 +494,12 @@ TEST_DISABLE_GU_FUNCS
 	const f32 fz = gGPR[REG_a3]._f32_0;
 
 	vfpu_matrix_ScaleF(pMtxBase, fx, fy, fz);
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+	const f32 fx = gGPR[REG_a1]._f32_0;
+	const f32 fy = gGPR[REG_a2]._f32_0;
+	const f32 fz = gGPR[REG_a3]._f32_0;
 
+	vu0_matrix_ScaleF(pMtxBase, fx, fy, fz);
 #else
 	QuickWrite32Bits(pMtxBase, 0x00, gGPR[REG_a1]._u32_0);
 	QuickWrite32Bits(pMtxBase, 0x04, 0);
@@ -431,6 +641,8 @@ TEST_DISABLE_GU_FUNCS
 
 #ifdef DAEDALUS_PSP_USE_VFPU //Corn
 	vfpu_norm_3Dvec(&x._f32, &y._f32, &z._f32);
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+	vu0_norm_3Dvec(&x._f32, &y._f32, &z._f32);
 #else
 	f32 fLenRecip = 1.0f / sqrtf((x._f32 * x._f32) + (y._f32 * y._f32) + (z._f32 * z._f32));
 
@@ -464,6 +676,8 @@ TEST_DISABLE_GU_FUNCS
 #endif
 #ifdef DAEDALUS_PSP_USE_VFPU //Corn
 	vfpu_norm_3Dvec(&x._f32, &y._f32, &z._f32);
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+	vu0_norm_3Dvec(&x._f32, &y._f32, &z._f32);
 #else
 	f32 fLenRecip = 1.0f / sqrtf((x._f32 * x._f32) + (y._f32 * y._f32) + (z._f32 * z._f32));
 
@@ -496,7 +710,8 @@ TEST_DISABLE_GU_FUNCS
 
 #ifdef DAEDALUS_PSP_USE_VFPU //Corn
 	vfpu_matrix_OrthoF(pMtxBase, l._f32, r._f32, b._f32, t._f32, n._f32, f._f32, s._f32);
-
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+	vu0_matrix_OrthoF(pMtxBase, l._f32, r._f32, b._f32, t._f32, n._f32, f._f32, s._f32);
 #else
 	f32 fRmL = r._f32 - l._f32;
 	f32 fTmB = t._f32 - b._f32;
@@ -550,7 +765,7 @@ u32 Patch_guOrtho()
 {
 TEST_DISABLE_GU_FUNCS
 
-#ifdef DAEDALUS_PSP_USE_VFPU
+#if defined( DAEDALUS_PSP_USE_VFPU ) || defined( DAEDALUS_PS2_USE_VU0z )
 	u32 s_TempMatrix[16];
 	REG32 l, r, b, t, n, f, s;
 
@@ -564,7 +779,11 @@ TEST_DISABLE_GU_FUNCS
 	f._u32 = QuickRead32Bits(pStackBase, 0x18);	//Far
 	s._u32 = QuickRead32Bits(pStackBase,  0x1c);	//Scale
 
+#ifdef DAEDALUS_PSP_USE_VFPU
 	vfpu_matrix_Ortho((u8 *)s_TempMatrix, l._f32, r._f32, b._f32, t._f32, n._f32, f._f32, s._f32);
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+	vu0_matrix_Ortho((u8*)s_TempMatrix, l._f32, r._f32, b._f32, t._f32, n._f32, f._f32, s._f32);
+#endif
 
 //Convert to proper N64 fixed point matrix
 	u8 * pMtxLBaseHiBits = (u8 *)(pMtxBase + 0x00);

@@ -28,15 +28,12 @@ CN64RegisterCachePS2::CN64RegisterCachePS2()
 
 void	CN64RegisterCachePS2::Reset()
 {
-	for( u32 lo_hi_idx = 0; lo_hi_idx < 2; ++lo_hi_idx )
+	for( u32 i = 0; i < NUM_N64_REGS; ++i )
 	{
-		for( u32 i = 0; i < NUM_N64_REGS; ++i )
-		{
-			mRegisterCacheInfo[ i ][ lo_hi_idx ].Ps2Register = Ps2Reg_R0;
-			mRegisterCacheInfo[ i ][ lo_hi_idx ].Valid = false;
-			mRegisterCacheInfo[ i ][ lo_hi_idx ].Dirty = false;
-			mRegisterCacheInfo[ i ][ lo_hi_idx ].Known = false;
-		}
+		mRegisterCacheInfo[ i ].Ps2Register = Ps2Reg_R0;
+		mRegisterCacheInfo[ i ].Valid = false;
+		mRegisterCacheInfo[ i ].Dirty = false;
+		mRegisterCacheInfo[ i ].Known = false;
 	}
 
 	for( u32 i = 0; i < NUM_N64_FP_REGS; ++i )
@@ -50,14 +47,14 @@ void	CN64RegisterCachePS2::Reset()
 
 //
 
-void	CN64RegisterCachePS2::ClearCachedReg( EN64Reg n64_reg, u32 lo_hi_idx )
+void	CN64RegisterCachePS2::ClearCachedReg( EN64Reg n64_reg )
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT( IsCached( n64_reg, lo_hi_idx ), "This register is not currently cached" );
 	DAEDALUS_ASSERT( !IsDirty( n64_reg, lo_hi_idx ), "This register is being cleared while still dirty" );
 #endif
-	mRegisterCacheInfo[ n64_reg ][ lo_hi_idx ].Ps2Register = Ps2Reg_R0;
-	mRegisterCacheInfo[ n64_reg ][ lo_hi_idx ].Valid = false;
-	mRegisterCacheInfo[ n64_reg ][ lo_hi_idx ].Dirty = false;
-	mRegisterCacheInfo[ n64_reg ][ lo_hi_idx ].Known = false;
+	mRegisterCacheInfo[ n64_reg ].Ps2Register = Ps2Reg_R0;
+	mRegisterCacheInfo[ n64_reg ].Valid = false;
+	mRegisterCacheInfo[ n64_reg ].Dirty = false;
+	mRegisterCacheInfo[ n64_reg ].Known = false;
 }

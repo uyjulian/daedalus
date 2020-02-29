@@ -50,6 +50,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #define __has_feature(x) 0
 
-//#define USE_FILEXIO
+#define DAEDALUS_PS2_USE_VU0
+#define USE_FILEXIO
 
 #endif // SYSPS2_INCLUDE_PLATFORM_H_

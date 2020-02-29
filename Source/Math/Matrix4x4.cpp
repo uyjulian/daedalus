@@ -105,6 +105,114 @@ void myApplyMatrix(v4 *v_out, const Matrix4x4 *mat, const v4 *v_in)
 		"sv.q   R200, 0x0(%0)\n"
 	: : "r" (v_out) , "r" (mat) ,"r" (v_in) );
 }*/
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+
+void MatrixMultiplyUnaligned(Matrix4x4* m_out, const Matrix4x4* mat_a, const Matrix4x4* mat_b) // 8 byte aligned ?
+{
+	asm __volatile__(
+		"ld			$t0, 0(%0)	\n"
+		"ld			$t1, 8(%0)	\n"
+		"pcpyld		$t0, $t1, $t0	\n"
+		"qmtc2		$t0, vf1		\n"
+		"ld			$t2, 16(%0)	\n"
+		"ld			$t3, 24(%0)	\n"
+		"pcpyld		$t2, $t3, $t2	\n"
+		"qmtc2		$t2, vf2		\n"
+		"ld			$t0, 32(%0)	\n"
+		"ld			$t1, 40(%0)	\n"
+		"pcpyld		$t0, $t1, $t0	\n"
+		"qmtc2		$t0, vf3		\n"
+		"ld			$t2, 48(%0)	\n"
+		"ld			$t3, 56(%0)	\n"
+		"pcpyld		$t2, $t3, $t2	\n"
+		"qmtc2		$t2, vf4		\n"
+		"ld			$t0, 0(%1)	\n"
+		"ld			$t1, 8(%1)	\n"
+		"pcpyld		$t0, $t1, $t0	\n"
+		"qmtc2		$t0, vf5		\n"
+		"ld			$t2, 16(%1)	\n"
+		"ld			$t3, 24(%1)	\n"
+		"pcpyld		$t2, $t3, $t2	\n"
+		"qmtc2		$t2, vf6		\n"
+		"ld			$t0, 32(%1)	\n"
+		"ld			$t1, 40(%1)	\n"
+		"pcpyld		$t0, $t1, $t0	\n"
+		"qmtc2		$t0, vf7		\n"
+		"ld			$t2, 48(%1)	\n"
+		"ld			$t3, 56(%1)	\n"
+		"pcpyld		$t2, $t3, $t2	\n"
+		"qmtc2		$t2, vf8		\n"
+		"vmulax.xyzw	ACC, vf5, vf1	\n"
+		"vmadday.xyzw	ACC, vf6, vf1	\n"
+		"vmaddaz.xyzw	ACC, vf7, vf1	\n"
+		"vmaddw.xyzw	vf1, vf8, vf1	\n"
+		"vmulax.xyzw	ACC, vf5, vf2	\n"
+		"vmadday.xyzw	ACC, vf6, vf2	\n"
+		"vmaddaz.xyzw	ACC, vf7, vf2	\n"
+		"vmaddw.xyzw	vf2, vf8, vf2	\n"
+		"vmulax.xyzw	ACC, vf5, vf3	\n"
+		"vmadday.xyzw	ACC, vf6, vf3	\n"
+		"vmaddaz.xyzw	ACC, vf7, vf3	\n"
+		"vmaddw.xyzw	vf3, vf8, vf3	\n"
+		"vmulax.xyzw	ACC, vf5, vf4	\n"
+		"vmadday.xyzw	ACC, vf6, vf4	\n"
+		"vmaddaz.xyzw	ACC, vf7, vf4	\n"
+		"vmaddw.xyzw	vf4, vf8, vf4	\n"
+		"qmfc2		$t0, vf1	\n"
+		"qmfc2		$t1, vf2	\n"
+		"qmfc2		$t2, vf3	\n"
+		"qmfc2		$t3, vf4	\n"
+		"sd			$t0, 0(%2)	\n"
+		"pcpyud		$t0, $t0, $t0	\n"
+		"sd			$t0, 8(%2)	\n"
+		"sd			$t1, 16(%2)	\n"
+		"pcpyud		$t1, $t1, $t1	\n"
+		"sd			$t1, 24(%2)	\n"
+		"sd			$t2, 32(%2)	\n"
+		"pcpyud		$t2, $t2, $t2	\n"
+		"sd			$t2, 40(%2)	\n"
+		"sd			$t3, 48(%2)	\n"
+		"pcpyud		$t3, $t3, $t3	\n"
+		"sd			$t3, 56(%2)	\n"
+		: : "r" (mat_a), "r" (mat_b), "r" (m_out)
+	);
+}
+
+void MatrixMultiplyAligned(Matrix4x4* m_out, const Matrix4x4* mat_a, const Matrix4x4* mat_b) // 16 byte aligned
+{
+	asm __volatile__(
+		"lqc2		vf1, 0x00(%0)	\n"
+		"lqc2		vf2, 0x10(%0)	\n"
+		"lqc2		vf3, 0x20(%0)	\n"
+		"lqc2		vf4, 0x30(%0)	\n"
+		"lqc2		vf5, 0x00(%1)	\n"
+		"lqc2		vf6, 0x10(%1)	\n"
+		"lqc2		vf7, 0x20(%1)	\n"
+		"lqc2		vf8, 0x30(%1)	\n"
+		"vmulax.xyzw	ACC, vf5, vf1	\n"
+		"vmadday.xyzw	ACC, vf6, vf1	\n"
+		"vmaddaz.xyzw	ACC, vf7, vf1	\n"
+		"vmaddw.xyzw	vf1, vf8, vf1	\n"
+		"vmulax.xyzw	ACC, vf5, vf2	\n"
+		"vmadday.xyzw	ACC, vf6, vf2	\n"
+		"vmaddaz.xyzw	ACC, vf7, vf2	\n"
+		"vmaddw.xyzw	vf2, vf8, vf2	\n"
+		"vmulax.xyzw	ACC, vf5, vf3	\n"
+		"vmadday.xyzw	ACC, vf6, vf3	\n"
+		"vmaddaz.xyzw	ACC, vf7, vf3	\n"
+		"vmaddw.xyzw	vf3, vf8, vf3	\n"
+		"vmulax.xyzw	ACC, vf5, vf4	\n"
+		"vmadday.xyzw	ACC, vf6, vf4	\n"
+		"vmaddaz.xyzw	ACC, vf7, vf4	\n"
+		"vmaddw.xyzw	vf4, vf8, vf4	\n"
+		"sqc2		vf1, 0x00(%2)	\n"
+		"sqc2		vf2, 0x10(%2)	\n"
+		"sqc2		vf3, 0x20(%2)	\n"
+		"sqc2		vf4, 0x30(%2)	\n"
+		: : "r" (mat_a), "r" (mat_b), "r" (m_out)
+	);
+}
+
 #else // DAEDALUS_PSP_USE_VFPU
 
 
@@ -337,7 +445,7 @@ Matrix4x4 Matrix4x4::operator*( const Matrix4x4 & rhs ) const
 	Matrix4x4 r;
 
 //VFPU
-#ifdef DAEDALUS_PSP
+#if defined( DAEDALUS_PSP ) || defined( DAEDALUS_PS2_USE_VU0 )
 	MatrixMultiplyUnaligned( &r, this, &rhs );
 //CPU
 #else

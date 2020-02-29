@@ -52,7 +52,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysPS2/GL.h"
 
 extern void gsViewport(int x, int y, int width, int height);
-extern void gsScissor(int x0, int x1, int y0, int y1);
+extern void gsKit_scissor(int x0, int x1, int y0, int y1);
 
 #endif
 
@@ -86,7 +86,7 @@ struct TempVerts
 		Verts = static_cast<DaedalusVtx*>(malloc(bytes));
 #endif
 #ifdef DAEDALUS_PS2
-		Verts = static_cast<DaedalusVtx*>(memalign(16, bytes));
+		Verts = static_cast<DaedalusVtx*>(memalign(128, bytes));
 #endif
 		Count = count;
 		return Verts;
@@ -107,6 +107,13 @@ void	_TnLVFPUDKR( u32 num_vertices, const Matrix4x4 * projection_matrix, const F
 void	_TnLVFPUDKRB( u32 num_vertices, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out );
 void	_TnLVFPUCBFD( const Matrix4x4 * world_matrix, const Matrix4x4 * projection_matrix, const FiddledVtx * p_in, const DaedalusVtx4 * p_out, u32 num_vertices, const TnLParams * params, const s8 * model_norm, u32 v0 );
 void	_TnLVFPUPD( const Matrix4x4 * world_matrix, const Matrix4x4 * projection_matrix, const FiddledVtxPD * p_in, const DaedalusVtx4 * p_out, u32 num_vertices, const TnLParams * params, const u8 * model_norm );
+
+void	_TnLVU0(const Matrix4x4* world_matrix, const Matrix4x4* projection_matrix, const FiddledVtx* p_in, const DaedalusVtx4* p_out, u32 num_vertices, const TnLParams* params);
+void	_TnLVU0_Plight(const Matrix4x4* world_matrix, const Matrix4x4* projection_matrix, const FiddledVtx* p_in, const DaedalusVtx4* p_out, u32 num_vertices, const TnLParams* params);
+void	_TnLVU0DKR(u32 num_vertices, const Matrix4x4* projection_matrix, const FiddledVtx* p_in, const DaedalusVtx4* p_out);
+void	_TnLVU0DKRB(u32 num_vertices, const Matrix4x4* projection_matrix, const FiddledVtx* p_in, const DaedalusVtx4* p_out);
+void	_TnLVU0CBFD(const Matrix4x4* world_matrix, const Matrix4x4* projection_matrix, const FiddledVtx* p_in, const DaedalusVtx4* p_out, u32 num_vertices, const TnLParams* params, const s8* model_norm, u32 v0);
+void	_TnLVU0PD(const Matrix4x4* world_matrix, const Matrix4x4* projection_matrix, const FiddledVtxPD* p_in, const DaedalusVtx4* p_out, u32 num_vertices, const TnLParams* params, const u8* model_norm);
 
 void	_ConvertVertice( DaedalusVtx * dest, const DaedalusVtx4 * source );
 void	_ConvertVerticesIndexed( DaedalusVtx * dest, const DaedalusVtx4 * source, u32 num_vertices, const u16 * indices );
@@ -439,6 +446,9 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 #ifdef DAEDALUS_PSP_USE_VFPU
 		const s32 NSign = vfpu_TriNormSign((u8*)&mVtxProjected[0], v0, v1, v2);
 		if( NSign <= 0 )
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+		const s32 NSign = vu0_TriNormSign((u8*)& mVtxProjected[0], v0, v1, v2);
+		if( NSign <= 0 )
 #else
 		const v4 & A = mVtxProjected[v0].ProjectedPos;
 		const v4 & B = mVtxProjected[v1].ProjectedPos;
@@ -510,15 +520,11 @@ void BaseRenderer::FlushTris()
 	TempVerts temp_verts;
 
 	// If any bit is set here it means we have to clip the trianlges since PSP HW clipping sux!
-#if defined(DAEDALUS_PS2)
-	#warning fix me, clips to much on ps2?
-#else
 	if(mVtxClipFlagsUnion != 0)
 	{
 		PrepareTrisClipped( &temp_verts );
 	}
 	else
-#endif
 	{
 		PrepareTrisUnclipped( &temp_verts );
 	}
@@ -585,9 +591,9 @@ ALIGNED_TYPE(const v4, NDCPlane[6], 16) =
 };
 
 
-//VFPU tris clip(fast)
+//VFPU/VU0 tris clip(fast)
 
-#ifdef DAEDALUS_PSP_USE_VFPU
+#if defined( DAEDALUS_PSP_USE_VFPU ) || defined( DAEDALUS_PS2_USE_VU0 )
 u32 clip_tri_to_frustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 {
 	u32 vOut( 3 );
@@ -983,6 +989,33 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 	}
 }*/
 
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+
+void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
+{
+	const FiddledVtx* const pVtxBase((const FiddledVtx*)(g_pu8RamBase + address));
+
+	UpdateWorldProject();
+	PokeWorldProject();
+
+	const Matrix4x4& mat_world_project = mWorldProject;
+	const Matrix4x4& mat_world = mModelViewStack[mModelViewTop];
+
+#ifdef DAEDALUS_DEBUG_DISPLAYLIST
+	DL_PF("    Ambient color RGB[%f][%f][%f] Texture scale X[%f] Texture scale Y[%f]", mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z, mTnL.TextureScaleX, mTnL.TextureScaleY);
+	DL_PF("    Light[%d %s] Texture[%s] EnvMap[%s] Fog[%s]", mTnL.NumLights, (mTnL.Flags.Light) ? (mTnL.Flags.PointLight) ? "Point" : "Normal" : "Off", (mTnL.Flags.Texture) ? "On" : "Off", (mTnL.Flags.TexGen) ? (mTnL.Flags.TexGenLin) ? "Linear" : "Spherical" : "Off", (mTnL.Flags.Fog) ? "On" : "Off");
+#endif
+
+	if (!mTnL.Flags.PointLight)
+	{	//Normal rendering
+		_TnLVU0(&mat_world, &mat_world_project, pVtxBase, &mVtxProjected[v0], n, &mTnL);
+	}
+	else
+	{	//Point light for Zelda MM
+		_TnLVU0_Plight(&mat_world, &mat_world_project, pVtxBase, &mVtxProjected[v0], n, &mTnL);
+	}
+}
+
 #else	//Transform using VFPU(fast) or FPU/CPU(slow)
 
 //
@@ -1206,6 +1239,22 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 	_TnLVFPUCBFD( &mat_world, &mat_project, pVtxBase, &mVtxProjected[v0], n, &mTnL, mn, v0<<1 );
 }
 
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
+{
+	const FiddledVtx* const pVtxBase((const FiddledVtx*)(g_pu8RamBase + address));
+	const Matrix4x4& mat_project = mProjectionMat;
+	const Matrix4x4& mat_world = mModelViewStack[mModelViewTop];
+
+#ifdef DAEDALUS_DEBUG_DISPLAYLIST
+	DL_PF("    Ambient color RGB[%f][%f][%f] Texture scale X[%f] Texture scale Y[%f]", mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z, mTnL.TextureScaleX, mTnL.TextureScaleY);
+	DL_PF("    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light) ? "On" : "Off", (mTnL.Flags.Texture) ? "On" : "Off", (mTnL.Flags.TexGen) ? (mTnL.Flags.TexGenLin) ? "Linear" : "Spherical" : "Off", (mTnL.Flags.Fog) ? "On" : "Off");
+#endif
+
+	const s8* mn = (s8*)(g_pu8RamBase + gAuxAddr);
+	_TnLVU0CBFD(&mat_world, &mat_project, pVtxBase, &mVtxProjected[v0], n, &mTnL, mn, v0 << 1);
+}
+
 #else
 //FPU/CPU version //Corn
 
@@ -1376,6 +1425,8 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 
 #ifdef DAEDALUS_PSP_USE_VFPU
 		_TnLVFPUDKRB( n, &mModelViewStack[0], (const FiddledVtx*)pVtxBase, &mVtxProjected[v0] );
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+		_TnLVU0DKRB(n, &mModelViewStack[0], (const FiddledVtx*)pVtxBase, &mVtxProjected[v0]);
 #else
 		v4 & BaseVec( mVtxProjected[0].TransformedPos );
 
@@ -1431,6 +1482,8 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 		}
 #ifdef DAEDALUS_PSP_USE_VFPU
 		_TnLVFPUDKR( n, &mat_world_project, (const FiddledVtx*)pVtxBase, &mVtxProjected[v0] );
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+		_TnLVU0DKR(n, &mat_world_project, (const FiddledVtx*)pVtxBase, &mVtxProjected[v0]);
 #else
 		for (u32 i = v0; i < v0 + n; i++)
 		{
@@ -1490,6 +1543,25 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 	const u8 *mn = (u8*)(g_pu8RamBase + gAuxAddr);
 
 	_TnLVFPUPD( &mat_world, &mat_project, pVtxBase, &mVtxProjected[v0], n, &mTnL, mn );
+}
+
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
+{
+	const FiddledVtxPD* const pVtxBase = (const FiddledVtxPD*)(g_pu8RamBase + address);
+
+	const Matrix4x4& mat_world = mModelViewStack[mModelViewTop];
+	const Matrix4x4& mat_project = mProjectionMat;
+
+#ifdef DAEDALUS_DEBUG_DISPLAYLIST
+	DL_PF("    Ambient color RGB[%f][%f][%f] Texture scale X[%f] Texture scale Y[%f]", mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z, mTnL.TextureScaleX, mTnL.TextureScaleY);
+	DL_PF("    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light) ? "On" : "Off", (mTnL.Flags.Texture) ? "On" : "Off", (mTnL.Flags.TexGen) ? (mTnL.Flags.TexGenLin) ? "Linear" : "Spherical" : "Off", (mTnL.Flags.Fog) ? "On" : "Off");
+#endif
+
+	//Model & Color base vector
+	const u8* mn = (u8*)(g_pu8RamBase + gAuxAddr);
+
+	_TnLVU0PD(&mat_world, &mat_project, pVtxBase, &mVtxProjected[v0], n, &mTnL, mn);
 }
 
 #else
@@ -2033,7 +2105,7 @@ void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 	s32 h = Max<s32>( b - t, 0 );
 	glScissor( l, (s32)mScreenHeight - (t + h), w, h );
 #elif defined(DAEDALUS_PS2)
-	gsScissor(l, r, t, b);
+	gsKit_scissor(l, r, t, b);
 #else
 	DAEDALUS_ERROR("Need to implement scissor for this platform.")
 #endif

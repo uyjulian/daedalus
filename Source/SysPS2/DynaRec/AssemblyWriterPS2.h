@@ -63,13 +63,15 @@ class CAssemblyWriterPS2
 	private:
 	public:
 		void				LoadConstant( EPs2Reg reg, s32 value );
+		void				LoadConstant64( EPs2Reg reg, s64 value );
 
 		void				LoadRegister( EPs2Reg reg_dst, OpCodeValue load_op, EPs2Reg reg_base, s16 offset );
 		void				StoreRegister( EPs2Reg reg_src, OpCodeValue store_op, EPs2Reg reg_base, s16 offset );
-
+		void				Exchange64( EPs2Reg reg );
 		void				NOP();
 		void				LUI( EPs2Reg reg, u16 value );
 
+		void				SD( EPs2Reg reg_src, EPs2Reg reg_base, s16 offset );
 		void				SW( EPs2Reg reg_src, EPs2Reg reg_base, s16 offset );
 		void				SH( EPs2Reg reg_src, EPs2Reg reg_base, s16 offset );
 		void				SB( EPs2Reg reg_src, EPs2Reg reg_base, s16 offset );
@@ -79,6 +81,7 @@ class CAssemblyWriterPS2
 		void				LH( EPs2Reg reg_dst, EPs2Reg reg_base, s16 offset );
 		void				LHU( EPs2Reg reg_dst, EPs2Reg reg_base, s16 offset );
 		void				LW( EPs2Reg reg_dst, EPs2Reg reg_base, s16 offset );
+		void				LD( EPs2Reg reg_dst, EPs2Reg reg_base, s16 offset );
 
 		void				LWC1( EPs2FloatReg reg_dst, EPs2Reg reg_base, s16 offset );
 		void				SWC1( EPs2FloatReg reg_src, EPs2Reg reg_base, s16 offset );
@@ -100,12 +103,14 @@ class CAssemblyWriterPS2
 		CJumpLocation		BLTZL( EPs2Reg a, CCodeLabel target, bool insert_delay );
 		CJumpLocation		BGEZL( EPs2Reg a, CCodeLabel target, bool insert_delay );
 
-		//void				EXT( EPs2Reg reg_dst, EPs2Reg reg_src, u32 size, u32 lsb );
-		//void				INS( EPs2Reg reg_dst, EPs2Reg reg_src, u32 msb, u32 lsb );
 		void				ADDI( EPs2Reg reg_dst, EPs2Reg reg_src, s16 value );
 		void				ADDIU( EPs2Reg reg_dst, EPs2Reg reg_src, s16 value );
 		void				SLTI( EPs2Reg reg_dst, EPs2Reg reg_src, s16 value );
 		void				SLTIU( EPs2Reg reg_dst, EPs2Reg reg_src, s16 value );
+		void				DADDI( EPs2Reg reg_dst, EPs2Reg reg_src, s16 value );
+		void				DADDIU( EPs2Reg reg_dst, EPs2Reg reg_src, s16 value );
+		void				DSUB( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt );
+		void				DSUBU( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt );
 
 		void				ANDI( EPs2Reg reg_dst, EPs2Reg reg_src, u16 immediate );
 		void				ORI( EPs2Reg reg_dst, EPs2Reg reg_src, u16 immediate );
@@ -137,6 +142,18 @@ class CAssemblyWriterPS2
 		void				SLT( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt );
 		void				SLTU( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt );
 
+		void				DADD( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt );
+		void				DADDU( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt );
+		void				DSRA32( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift );
+		void				DSRA( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift );
+		void				DSLL32( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift );
+		void				DSLL( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift );
+		void				DSRL32( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift );
+		void				DSRL( EPs2Reg reg_dst, EPs2Reg reg_src, u32 shift );
+		void				DSLLV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt );
+		void				DSRLV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt );
+		void				DSRAV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt );
+
 		void				Cop1Op( ECop1Op cop1_op, EPs2FloatReg fd, EPs2FloatReg fs, ECop1OpFunction cop1_funct, EPs2FloatReg ft );
 		void				Cop1Op( ECop1Op cop1_op, EPs2FloatReg fd, EPs2FloatReg fs, ECop1OpFunction cop1_funct );
 
@@ -155,8 +172,6 @@ class CAssemblyWriterPS2
 		void				MOV_S( EPs2FloatReg fd, EPs2FloatReg fs );
 		void				NEG_S( EPs2FloatReg fd, EPs2FloatReg fs );
 
-		//void				TRUNC_W_S( EPs2FloatReg fd, EPs2FloatReg fs );
-		//void				FLOOR_W_S( EPs2FloatReg fd, EPs2FloatReg fs );
 		void				CVT_W_S( EPs2FloatReg fd, EPs2FloatReg fs );
 
 		void				CMP_S( EPs2FloatReg fs, ECop1OpFunction	cmp_op, EPs2FloatReg ft );
@@ -185,4 +200,4 @@ class CAssemblyWriterPS2
 		CAssemblyBuffer *				mpAssemblyBufferB;
 };
 
-#endif // SYSPSP_DYNAREC_ASSEMBLYWRITERPSP_H_
+#endif // SYSPS2_DYNAREC_ASSEMBLYWRITERPS2_H_

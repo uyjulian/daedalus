@@ -11,10 +11,10 @@
 #define _MultLo		(_AuxBase + 0x10)
 #define _MultHi		(_AuxBase + 0x18)
 #define _Temp1		(_AuxBase + 0x20)
-#define _Temp2		(_AuxBase + 0x24)
-#define _Temp3		(_AuxBase + 0x28)
-#define _Temp4		(_AuxBase + 0x2C)
-#define _Events		(_AuxBase + 0x30)
+#define _Temp2		(_AuxBase + 0x28)
+#define _Temp3		(_AuxBase + 0x30)
+#define _Temp4		(_AuxBase + 0x38)
+#define _Events		(_AuxBase + 0x40)
 
 	.set noat
 
@@ -22,6 +22,7 @@
 	.extern CPU_UpdateCounter
 	.extern IndirectExitMap_Lookup
 	.extern g_MemoryLookupTableReadForDynarec
+	.extern Write64BitsForDynaRec
 	.extern Write32BitsForDynaRec
 	.extern Write16BitsForDynaRec
 	.extern Write8BitsForDynaRec
@@ -41,16 +42,20 @@
 	.global _ReadBitsDirect_u16
 	.global _ReadBitsDirect_s16
 	.global _ReadBitsDirect_u32
+	.global _ReadBitsDirect_u64
 
 	.global _ReadBitsDirectBD_u8
 	.global _ReadBitsDirectBD_s8
 	.global _ReadBitsDirectBD_u16
 	.global _ReadBitsDirectBD_s16
 	.global _ReadBitsDirectBD_u32
-
+	.global _ReadBitsDirectBD_u64
+	
+	.global _WriteBitsDirect_u64
 	.global _WriteBitsDirect_u32
 	.global _WriteBitsDirect_u16
 	.global _WriteBitsDirect_u8
+	.global _WriteBitsDirectBD_u64
 	.global _WriteBitsDirectBD_u32
 	.global _WriteBitsDirectBD_u16
 	.global _WriteBitsDirectBD_u8
@@ -71,8 +76,8 @@ exit_dynarec_text:
     .set noreorder
 
 .macro ins dest,src,pos,size
-	sw	$t1, -32($sp)
-	sw	$t0, -16($sp)
+	sd	$t1, -32($sp)
+	sd	$t0, -16($sp)
 
 	li	$t0, ~(((1<<\size)-1)<<\pos)
 	and	\dest, $t0
@@ -81,16 +86,16 @@ exit_dynarec_text:
 	and	$t1, $t0
 	or	\dest, $t1
 	
-	lw	$t1, -32($sp)
-	lw	$t0, -16($sp)	
+	ld	$t1, -32($sp)
+	ld	$t0, -16($sp)	
 .endm
 
 .macro ext dest,src,pos,size
-	sw	$t0, -16($sp)
+	sd	$t0, -16($sp)
 	srl	\dest, \src, \pos
 	li	$t0, ((1 << \size) - 1 )
 	and	\dest, $t0
-	lw	$t0, -16($sp)
+	ld	$t0, -16($sp)
 .endm
 
 #######################################################################################
@@ -113,6 +118,8 @@ _DaedalusICacheInvalidate:
 
 	# Do while current < end
 invalidate_next:
+	#sync.l
+	#cache 		0x18, 0($a0)
 	sync.l
 	sync.p
 	cache		0x0B, 0($a0)					# 8 is for icache invalidate
@@ -131,17 +138,17 @@ invalidate_next:
 #
 #
 _EnterDynaRec:
-	addiu	$sp, $sp, -80	# Push return address on the stack
-	sd		$ra, 0($sp)
-	sd		$fp, 8($sp)		# Store s8 - we use this as our base pointer
-	sd		$s0, 16($sp)
-	sd		$s1, 24($sp)
-	sd		$s2, 32($sp)
-	sd		$s3, 40($sp)
-	sd		$s4, 48($sp)
-	sd		$s5, 56($sp)
-	sd		$s6, 64($sp)
-	sd		$s7, 72($sp)
+	addiu	$sp, $sp, -160	# Push return address on the stack
+	sq		$ra, 0($sp)
+	sq		$fp, 16($sp)		# Store s8 - we use this as our base pointer
+	sq		$s0, 32($sp)
+	sq		$s1, 48($sp)
+	sq		$s2, 64($sp)
+	sq		$s3, 80($sp)
+	sq		$s4, 96($sp)
+	sq		$s5, 112($sp)
+	sq		$s6, 128($sp)
+	sq		$s7, 144($sp)
 
 	or		$s7, $a2, $0	# Read address table
 	or		$s6, $a3, $0	# Upper bound
@@ -175,18 +182,18 @@ _ReturnFromDynaRecIfStuffToDo:
 #######################################################################################
 #
 _ReturnFromDynaRec:
-	ld		$ra, 0($sp)		# Restore our return address
-	ld		$fp, 8($sp)		# And s8
-	ld		$s0, 16($sp)
-	ld		$s1, 24($sp)
-	ld		$s2, 32($sp)
-	ld		$s3, 40($sp)
-	ld		$s4, 48($sp)
-	ld		$s5, 56($sp)
-	ld		$s6, 64($sp)
-	ld		$s7, 72($sp)
+	lq		$ra, 0($sp)		# Restore our return address
+	lq		$fp, 16($sp)		# And s8
+	lq		$s0, 32($sp)
+	lq		$s1, 48($sp)
+	lq		$s2, 64($sp)
+	lq		$s3, 80($sp)
+	lq		$s4, 96($sp)
+	lq		$s5, 112($sp)
+	lq		$s6, 128($sp)
+	lq		$s7, 144($sp)
 	jr		$ra
-	addiu	$sp, $sp, +80
+	addiu	$sp, $sp, +160
 
 #######################################################################################
 #	Check if we need to exit the dynarec system and jump out as necessary.
@@ -353,12 +360,14 @@ _IndirectExitCheck:
 	READ_BITS _ReadBitsDirect_u16, lhu
 	READ_BITS _ReadBitsDirect_s16, lh
 	READ_BITS _ReadBitsDirect_u32, lw
-
+	READ_BITS _ReadBitsDirect_u64, ld
+	
 	READ_BITS_BD _ReadBitsDirectBD_u8, lbu
 	READ_BITS_BD _ReadBitsDirectBD_s8, lb
 	READ_BITS_BD _ReadBitsDirectBD_u16, lhu
 	READ_BITS_BD _ReadBitsDirectBD_s16, lh
 	READ_BITS_BD _ReadBitsDirectBD_u32, lw
+	READ_BITS_BD _ReadBitsDirectBD_u64, ld
 
 #######################################################################################
 #	These functions handle writing a value out to memory.
@@ -371,6 +380,35 @@ _IndirectExitCheck:
 # a1 value
 # a2 current_pc
 #
+_WriteBitsDirect_u64:
+	sw		$ra, _Temp1($fp) 	# Temp storage
+
+	jal		Write64BitsForDynaRec
+	sw		$a2, _CurrentPC($fp) 	# CurrentPC
+
+	jal		_ReturnFromDynaRecIfStuffToDo
+	move	$a0,$0
+
+	lw		$ra, _Temp1($fp) 	# Temp storage
+	jr		$ra
+	nop
+
+_WriteBitsDirectBD_u64:
+	sw		$ra, _Temp1($fp) 	# Temp storage
+
+	sw		$a2, _CurrentPC($fp) 	# CurrentPC
+	li		$v1, 1				# EXEC_DELAY
+
+	jal		Write64BitsForDynaRec
+	sw		$v1, _Delay($fp)		# Delay
+
+	jal		_ReturnFromDynaRecIfStuffToDo
+	move	$a0,$0
+
+	lw		$ra, _Temp1($fp) 	# Temp storage
+	jr		$ra
+	sw		$0, _Delay($fp)		# Delay <- NO_DELAY
+
 _WriteBitsDirect_u32:
 	sw		$ra, _Temp1($fp) 	# Temp storage
 
@@ -647,67 +685,84 @@ dtof_inf:
 #######################################################################################
 /**
  * Unsigned 64bit multiply (A * B) -> 128bit result
- * void _DMULTU(u32 A_LSB, u32 A_MSB, u32 B_LSB, u32 B_MSB);
- * input: a0, a1, a2, a3
+ * void _DMULTU(u64 A, u32 B);
+ * input: a0, a1
  * output: -
- * clobber: a0, a1, a2, a3, v0, v1
+ * clobber: a0, a1, a2, v0, v1
  * uses: -
  */
 _DMULTU:
-	multu	$a2,$a0
-	mfhi	$v0
-	mflo	$v1
-	sw		$v1,_MultLo+0($fp)
-	multu	$a2,$a1
-	mflo	$a2
-	addu	$v1,$v0,$a2
-	sltu	$a2,$v1,$v0
-	mfhi	$v0
-	multu	$a3,$a0
-	mflo	$a0
-	addu	$a0,$v1,$a0
-	sltu	$v1,$a0,$v1
-	sw		$a0,_MultLo+4($fp)
-	mfhi	$a0
-	addu	$a2,$a2,$a0
-	addu	$v1,$v1,$a2
-	multu	$a3,$a1
-	mflo	$a1
-	addu	$a1,$v0,$a1
-	addu	$v1,$a1,$v1
-	sw		$v1,_MultHi+0($fp)
-	sltu	$v0,$a1,$v0
-	mfhi	$a0
-	addu	$v0,$v0,$a0
-	sltu	$a1,$v1,$a1
-	addu	$a1,$a1,$v0
+	pexcw	$a0, $a0
+	pexcw	$a1, $a1
+	pmultuw $v0, $a0, $a1
+	pexew  	$a1, $a1
+	pmultuw $v1, $a0, $a1
+	dsrl32  $a0, $v0, 0
+	daddu	$a0, $a0, $v1 		// temp2
+	pexcw	$a1, $v1
+	dsrl32  $a1, $a1, 0
+	daddu	$a1, $a1, $a0 		// result2
+	sw		$v0, _MultLo+0($fp)
+	sw		$a1, _MultLo+4($fp)
+	dsrl32  $a1, $a1, 0 		// (result2 >> 32)
+	pcpyud	$a0, $v1, $zero 	// temp3
+	dsrl32  $a0, $a0, 0 		// (temp3 >> 32)
+	pcpyud	$a2, $v0, $zero		// op2 * op4
+	daddu	$a0, $a2, $a0		// temp4
+	daddu	$a0, $a1, $a0 		// result3
 	jr		$ra
-	sw		$a1,_MultHi+4($fp)
+	sd		$a0, _MultHi+0($fp)
 
 #######################################################################################
 /**
- * Signed 64bit multiply (A * B) -> 64bit result (should be 128bit!)
- * void _DMULT(u32 A_LSB, u32 A_MSB, u32 B_LSB, u32 B_MSB);
- * input: a0, a1, a2, a3
+ * Signed 64bit multiply (A * B) -> 128bit result
+ * void _DMULT(u64 A, u64 B);
+ * input: a0, a1
  * output: -
- * clobber: a0, a1, a2, a3, v0
- * uses: -
+ * clobber: a0, a1, a2, a3, v0, v1
+ * uses: t0
  */
 _DMULT:
-	multu	$a2,$a0
-	mflo	$v0
-	sw		$v0,_MultLo+0($fp)
-	mfhi	$v0
-	mult	$a3,$a0
-	mflo	$a0
-	mult	$a1,$a2
-	mflo	$a2
-	addu	$a0,$a0,$a2
-	addu	$v0,$a0,$v0
-	sw		$v0,_MultLo+4($fp)
-	sw		$zero,_MultHi+0($fp)
+	sq		$t0, _Temp1+0($fp)
+	bgez	$a0, rs_pos
+	move	$a3, $zero			// sign
+	dsubu	$a0, $zero, $a0
+	ori		$a3, 1
+rs_pos:
+	bgez	$a1, rt_pos
+	pexcw	$a0, $a0
+	dsubu	$a1, $zero, $a1
+	xori	$a3, 1
+rt_pos:
+	pexcw	$a1, $a1
+	pmultuw $v0, $a0, $a1
+	pexew  	$a1, $a1
+	pmultuw $v1, $a0, $a1
+	dsrl32  $a0, $v0, 0
+	daddu	$a0, $a0, $v1 		// temp2
+	pexcw	$a1, $v1
+	dsrl32  $a1, $a1, 0
+	daddu	$a1, $a1, $a0 		// result2
+	pextlw	$t0, $a1, $v0		// lo
+	dsrl32  $a1, $a1, 0 		// (result2 >> 32)
+	pcpyud	$a0, $v1, $zero 	// temp3
+	dsrl32  $a0, $a0, 0 		// (temp3 >> 32)
+	pcpyud	$a2, $v0, $zero		// op2 * op4
+	daddu	$a0, $a2, $a0		// temp4
+	beq		$a3, $zero, no_sign
+	daddu	$a0, $a1, $a0 		// result3, hi
+	beq		$t0, $zero, lo_zero
+	nor		$a0, $a0, $a0
+	nor		$t0, $t0, $t0
+	b 		no_sign
+	daddiu	$t0, $t0, 1
+lo_zero:
+	daddiu	$a0, $a0, 1
+no_sign:
+	sd		$t0, _MultLo+0($fp)
+	sd		$a0, _MultHi+0($fp)
 	jr		$ra
-	sw		$zero,_MultHi+4($fp)
+	lq		$t0, _Temp1+0($fp)
 
 #######################################################################################
 /**
@@ -719,6 +774,9 @@ _DMULT:
  * uses: t0
  */
 _DDIVU:
+	 move 	$a2, $a1
+	 dsrl32 $a1, $a0, 0
+	 pextlw	$a1, $a1, $a1
      beqz	$a1, DDIVU_skip1	//Check if we need a full 64bit division
      sw		$zero,_MultHi+4($fp)	//Reminder hi
 
@@ -726,7 +784,7 @@ _DDIVU:
      mflo	$a3
      mfhi	$a1
      sw		$a3,_MultLo+4($fp)	//Quot hi
-     sw		$t0,_Temp1($fp)	//save reg content
+     sd		$t0,_Temp1($fp)	//save reg content
      move	$v0,$zero
      move	$v1,$zero
      b		DDIVU_skip2
@@ -751,7 +809,7 @@ DDIVU_skip4:
      bnez	$a3, DDIVU_loop1
      srl	$t0,$a0,0x1f
 
-     lw		$t0,_Temp1($fp)	//restore reg content
+     ld		$t0,_Temp1($fp)	//restore reg content
      sw		$v0,_MultLo+0($fp)	//Quot lo
      jr		$ra
      sw		$a1,_MultHi+0($fp)	//Reminder lo
@@ -775,7 +833,10 @@ DDIVU_skip1:	//Do a 32bit div only
  * uses: t0, t1, t2
  */
 _DDIV:
-	sw		$t2,_Temp3($fp)	//save reg content
+	move 	$a2, $a1
+	dsrl32 	$a1, $a0, 0
+	pextlw	$a1, $a1, $a1
+	sd		$t2,_Temp3($fp)	//save reg content
      
 	bgez	$a1,DDIV_skip1	//Make numerator positive if needed
 	slt		$t2, $a1, $zero      //sign = value < 0 ? 1 : 0
@@ -785,12 +846,12 @@ _DDIV:
 	subu	$a1,$a1,$v0
 DDIV_skip1:
 	bgez	$a2,DDIV_skip2	//Make dividend positive if needed
-	sw		$t0,_Temp1($fp)	//save reg content
+	sd		$t0,_Temp1($fp)	//save reg content
 	xori	$t2,$t2,0x1		//sign ^= 1
  	negu	$a2,$a2
 DDIV_skip2:
  	beqz	$a1,DDIV_skip8	//Check if top 32bit == 0
-	sw		$t1,_Temp2($fp)	//save reg content
+	sd		$t1,_Temp2($fp)	//save reg content
 
  	divu	$a1,$a2			//Do long 64bit division
  	move	$v0,$zero
@@ -820,7 +881,7 @@ DDIV_skip6:
  	
 DDIV_loop2:
  	beqz	$t2,DDIV_skip7	//Need sign flip on result?
-	lw		$t0,_Temp1($fp)	//restore reg content
+	ld		$t0,_Temp1($fp)	//restore reg content
 
  	negu	$v0,$v0
  	negu	$t1,$t1
@@ -831,9 +892,9 @@ DDIV_skip7:	//No sign flip needed
  	sw		$v0,_MultLo+0($fp)	//Quot lo
  	sw		$t1,_MultLo+4($fp)	//Quot hi
  	sw		$a3,_MultHi+0($fp)	//Rem lo
-	lw		$t1,_Temp2($fp)	//restore reg content
+	ld		$t1,_Temp2($fp)	//restore reg content
  	jr		$ra
-	lw		$t2,_Temp3($fp)	//restore reg content
+	ld		$t2,_Temp3($fp)	//restore reg content
 
 DDIV_skip8:	//Do short 32bit division 
 	divu	$a0,$a2

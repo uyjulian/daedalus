@@ -67,6 +67,11 @@ public:
 	{
 		vfpu_norm_3Dvec(&x, &y, &z);
 	}
+#elif defined( DAEDALUS_PS2_USE_VU0 )
+	void Normalise()
+	{
+		vu0_norm_3Dvec(&x, &y, &z);
+	}
 #else
 	void Normalise()
 	{

@@ -84,19 +84,25 @@ extern "C" { void _IndirectExitCheck( u32 instructions_executed, CIndirectExitMa
 
 extern "C"
 {
-	u32 _ReadBitsDirect_u8( u32 address, u32 current_pc );
-	u32 _ReadBitsDirect_s8( u32 address, u32 current_pc );
-	u32 _ReadBitsDirect_u16( u32 address, u32 current_pc );
-	u32 _ReadBitsDirect_s16( u32 address, u32 current_pc );
-	u32 _ReadBitsDirect_u32( u32 address, u32 current_pc );
+	u64 _ReadBitsDirect_u8( u32 address, u32 current_pc );
+	u64 _ReadBitsDirect_s8( u32 address, u32 current_pc );
+	u64 _ReadBitsDirect_u16( u32 address, u32 current_pc );
+	u64 _ReadBitsDirect_s16( u32 address, u32 current_pc );
+	u64 _ReadBitsDirect_u32( u32 address, u32 current_pc );
+	u64 _ReadBitsDirect_u64( u32 address, u32 current_pc );
 
-	u32 _ReadBitsDirectBD_u8( u32 address, u32 current_pc );
-	u32 _ReadBitsDirectBD_s8( u32 address, u32 current_pc );
-	u32 _ReadBitsDirectBD_u16( u32 address, u32 current_pc );
-	u32 _ReadBitsDirectBD_s16( u32 address, u32 current_pc );
-	u32 _ReadBitsDirectBD_u32( u32 address, u32 current_pc );
+	u64 _ReadBitsDirectBD_u8( u32 address, u32 current_pc );
+	u64 _ReadBitsDirectBD_s8( u32 address, u32 current_pc );
+	u64 _ReadBitsDirectBD_u16( u32 address, u32 current_pc );
+	u64 _ReadBitsDirectBD_s16( u32 address, u32 current_pc );
+	u64 _ReadBitsDirectBD_u32( u32 address, u32 current_pc );
+	u64 _ReadBitsDirectBD_u64( u32 address, u32 current_pc );
 
 	// Dynarec calls this for simplicity
+	void Write64BitsForDynaRec(u32 address, u64 value)
+	{
+		Write64Bits_NoSwizzle(address, value);
+	}
 	void Write32BitsForDynaRec( u32 address, u32 value )
 	{
 		Write32Bits_NoSwizzle( address, value );
@@ -110,13 +116,15 @@ extern "C"
 		Write8Bits_NoSwizzle( address, value );
 	}
 
-	void _WriteBitsDirect_u32( u32 address, u32 value, u32 current_pc );
-	void _WriteBitsDirect_u16( u32 address, u32 value, u32 current_pc );		// Value in low 16 bits
-	void _WriteBitsDirect_u8( u32 address, u32 value, u32 current_pc );			// Value in low 8 bits
+	void _WriteBitsDirect_u64( u32 address, u64 value, u32 current_pc );
+	void _WriteBitsDirect_u32( u32 address, u64 value, u32 current_pc );
+	void _WriteBitsDirect_u16( u32 address, u64 value, u32 current_pc );		// Value in low 16 bits
+	void _WriteBitsDirect_u8( u32 address, u64 value, u32 current_pc );			// Value in low 8 bits
 
-	void _WriteBitsDirectBD_u32( u32 address, u32 value, u32 current_pc );
-	void _WriteBitsDirectBD_u16( u32 address, u32 value, u32 current_pc );		// Value in low 16 bits
-	void _WriteBitsDirectBD_u8( u32 address, u32 value, u32 current_pc );			// Value in low 8 bits
+	void _WriteBitsDirectBD_u64( u32 address, u64 value, u32 current_pc );
+	void _WriteBitsDirectBD_u32( u32 address, u64 value, u32 current_pc );
+	void _WriteBitsDirectBD_u16( u32 address, u64 value, u32 current_pc );		// Value in low 16 bits
+	void _WriteBitsDirectBD_u8( u32 address, u64 value, u32 current_pc );			// Value in low 8 bits
 }
 
 #define ReadBitsDirect_u8 _ReadBitsDirect_u8
@@ -124,18 +132,21 @@ extern "C"
 #define ReadBitsDirect_u16 _ReadBitsDirect_u16
 #define ReadBitsDirect_s16 _ReadBitsDirect_s16
 #define ReadBitsDirect_u32 _ReadBitsDirect_u32
+#define ReadBitsDirect_u64 _ReadBitsDirect_u64
 
 #define ReadBitsDirectBD_u8 _ReadBitsDirectBD_u8
 #define ReadBitsDirectBD_s8 _ReadBitsDirectBD_s8
 #define ReadBitsDirectBD_u16 _ReadBitsDirectBD_u16
 #define ReadBitsDirectBD_s16 _ReadBitsDirectBD_s16
 #define ReadBitsDirectBD_u32 _ReadBitsDirectBD_u32
+#define ReadBitsDirectBD_u64 _ReadBitsDirectBD_u64
 
-
+#define WriteBitsDirect_u64 _WriteBitsDirect_u64
 #define WriteBitsDirect_u32 _WriteBitsDirect_u32
 #define WriteBitsDirect_u16 _WriteBitsDirect_u16
 #define WriteBitsDirect_u8 _WriteBitsDirect_u8
 
+#define WriteBitsDirectBD_u64 _WriteBitsDirectBD_u64
 #define WriteBitsDirectBD_u32 _WriteBitsDirectBD_u32
 #define WriteBitsDirectBD_u16 _WriteBitsDirectBD_u16
 #define WriteBitsDirectBD_u8 _WriteBitsDirectBD_u8
@@ -264,7 +275,7 @@ const EPs2Reg	gRegistersToUseForCaching[] =
 	Ps2Reg_S2,
 	Ps2Reg_S3,
 	Ps2Reg_S4,
-//	Ps2Reg_S5,		//Used as load base register in ps2, K0 is probably trashed by interupts :(
+//	Ps2Reg_S5,		//Used as load base register in ps2, K0 is probably trashed by interrupts :(
 //	Ps2Reg_S6,		// Memory upper bound
 //	Ps2Reg_S7,		// Used for g_pu8RamBase - 0x80000000
 //	Ps2Reg_S8,		// Used for base register (&gCPUState)
@@ -355,23 +366,20 @@ void	CCodeGeneratorPS2::SetRegisterSpanList( const SRegisterUsageInfo & register
 	{
 		mUseFixedRegisterAllocation = true;
 		u32		cache_reg_idx( 0 );
-		u32		HiLo = 0;
-		while ( HiLo<2 )		// If there are still unused registers, assign to high part of reg
+
+		RegisterSpanList::const_iterator span_it = mRegisterSpanList.begin();
+		while( span_it < mRegisterSpanList.end() )
 		{
-			RegisterSpanList::const_iterator span_it = mRegisterSpanList.begin();
-			while( span_it < mRegisterSpanList.end() )
+			const SRegisterSpan &	span( *span_it );
+			if( cache_reg_idx < NUM_CACHE_REGS )
 			{
-				const SRegisterSpan &	span( *span_it );
-				if( cache_reg_idx < NUM_CACHE_REGS )
-				{
-					EPs2Reg		cachable_reg( gRegistersToUseForCaching[cache_reg_idx] );
-					mRegisterCache.SetCachedReg( span.Register, HiLo, cachable_reg );
-					cache_reg_idx++;
-				}
-				++span_it;
+				EPs2Reg		cachable_reg( gRegistersToUseForCaching[cache_reg_idx] );
+				mRegisterCache.SetCachedReg( span.Register, cachable_reg );
+				cache_reg_idx++;
 			}
-			++HiLo;
+			++span_it;
 		}
+
 		//
 		//	Pull all the cached registers into memory
 		//
@@ -380,23 +388,19 @@ void	CCodeGeneratorPS2::SetRegisterSpanList( const SRegisterUsageInfo & register
 		while( i < NUM_N64_REGS )
 		{
 			EN64Reg	n64_reg = EN64Reg( i );
-			u32 lo_hi_idx = 0;
-			while( lo_hi_idx < 2)
-			{
-				if( mRegisterCache.IsCached( n64_reg, lo_hi_idx ) )
-				{
-					PrepareCachedRegister( n64_reg, lo_hi_idx );
 
-					//
-					//	If the register is modified anywhere in the fragment, we need
-					//	to mark it as dirty so it's flushed correctly on exit.
-					//
-					if( register_usage.IsModified( n64_reg ) )
-					{
-						mRegisterCache.MarkAsDirty( n64_reg, lo_hi_idx, true );
-					}
+			if( mRegisterCache.IsCached( n64_reg ) )
+			{
+				PrepareCachedRegister( n64_reg );
+
+				//
+				//	If the register is modified anywhere in the fragment, we need
+				//	to mark it as dirty so it's flushed correctly on exit.
+				//
+				if( register_usage.IsModified( n64_reg ) )
+				{
+					mRegisterCache.MarkAsDirty( n64_reg, true );
 				}
-				++lo_hi_idx;
 			}
 			++i;
 		}
@@ -420,11 +424,11 @@ void	CCodeGeneratorPS2::ExpireOldIntervals( u32 instruction_idx )
 		}
 
 		// This interval is no longer active - flush the register and return it to the list of available regs
-		EPs2Reg		ps2_reg( mRegisterCache.GetCachedReg( span.Register, 0 ) );
+		EPs2Reg		ps2_reg( mRegisterCache.GetCachedReg( span.Register ) );
 
-		FlushRegister( mRegisterCache, span.Register, 0, true );
+		FlushRegister( mRegisterCache, span.Register, true );
 
-		mRegisterCache.ClearCachedReg( span.Register, 0 );
+		mRegisterCache.ClearCachedReg( span.Register );
 
 		mAvailableRegisters.push( ps2_reg );
 
@@ -445,12 +449,12 @@ void	CCodeGeneratorPS2::SpillAtInterval( const SRegisterSpan & live_span )
 	if( last_span.SpanEnd > live_span.SpanEnd )
 	{
 		// Uncache the old span
-		EPs2Reg		ps2_reg( mRegisterCache.GetCachedReg( last_span.Register, 0 ) );
-		FlushRegister( mRegisterCache, last_span.Register, 0, true );
-		mRegisterCache.ClearCachedReg( last_span.Register, 0 );
+		EPs2Reg		ps2_reg( mRegisterCache.GetCachedReg( last_span.Register ) );
+		FlushRegister( mRegisterCache, last_span.Register, true );
+		mRegisterCache.ClearCachedReg( last_span.Register );
 
 		// Cache the new span
-		mRegisterCache.SetCachedReg( live_span.Register, 0, ps2_reg );
+		mRegisterCache.SetCachedReg( live_span.Register, ps2_reg );
 
 		mActiveIntervals.pop_back();				// Remove the last span
 		mActiveIntervals.push_back( live_span );	// Insert in order of increasing end point
@@ -485,7 +489,7 @@ void	CCodeGeneratorPS2::UpdateRegisterCaching( u32 instruction_idx )
 			// Only process live intervals
 			if( (instruction_idx >= span.SpanStart) & (instruction_idx <= span.SpanEnd) )
 			{
-				if( !mRegisterCache.IsCached( span.Register, 0 ) )
+				if( !mRegisterCache.IsCached( span.Register ) )
 				{
 					if( mAvailableRegisters.empty() )
 					{
@@ -494,7 +498,7 @@ void	CCodeGeneratorPS2::UpdateRegisterCaching( u32 instruction_idx )
 					else
 					{
 						// Use this register for caching
-						mRegisterCache.SetCachedReg( span.Register, 0, mAvailableRegisters.top() );
+						mRegisterCache.SetCachedReg( span.Register, mAvailableRegisters.top() );
 
 						// Pop this register from the available list
 						mAvailableRegisters.pop();
@@ -545,13 +549,13 @@ u32	CCodeGeneratorPS2::GetCompiledCodeSize() const
 }
 
 
-//Get a (cached) N64 register mapped to a PSP register(usefull for dst register)
+//Get a (cached) N64 register mapped to a PS2 register(usefull for dst register)
 
-EPs2Reg	CCodeGeneratorPS2::GetRegisterNoLoad( EN64Reg n64_reg, u32 lo_hi_idx, EPs2Reg scratch_reg )
+EPs2Reg	CCodeGeneratorPS2::GetRegisterNoLoad( EN64Reg n64_reg, EPs2Reg scratch_reg )
 {
-	if( mRegisterCache.IsCached( n64_reg, lo_hi_idx ) )
+	if( mRegisterCache.IsCached( n64_reg ) )
 	{
-		return mRegisterCache.GetCachedReg( n64_reg, lo_hi_idx );
+		return mRegisterCache.GetCachedReg( n64_reg );
 	}
 	else
 	{
@@ -560,46 +564,46 @@ EPs2Reg	CCodeGeneratorPS2::GetRegisterNoLoad( EN64Reg n64_reg, u32 lo_hi_idx, EP
 }
 
 
-//Load value from an emulated N64 register or known value to a PSP register
+//Load value from an emulated N64 register or known value to a PS2 register
 
-void	CCodeGeneratorPS2::GetRegisterValue( EPs2Reg ps2_reg, EN64Reg n64_reg, u32 lo_hi_idx )
+void	CCodeGeneratorPS2::GetRegisterValue( EPs2Reg ps2_reg, EN64Reg n64_reg )
 {
-	if( mRegisterCache.IsKnownValue( n64_reg, lo_hi_idx ) )
+	if( mRegisterCache.IsKnownValue( n64_reg ) )
 	{
-		//printf( "Loading %s[%d] <- %08x\n", RegNames[ n64_reg ], lo_hi_idx, mRegisterCache.GetKnownValue( n64_reg, lo_hi_idx ) );
-		LoadConstant( ps2_reg, mRegisterCache.GetKnownValue( n64_reg, lo_hi_idx )._s32 );
-		if( mRegisterCache.IsCached( n64_reg, lo_hi_idx ) )
+		//printf( "Loading %s[%d] <- %08x\n", RegNames[ n64_reg ], lo_hi_idx, mRegisterCache.GetKnownValue( n64_reg ) );
+		LoadConstant64( ps2_reg, mRegisterCache.GetKnownValue( n64_reg )._s64 );
+		if( mRegisterCache.IsCached( n64_reg ) )
 		{
-			mRegisterCache.MarkAsValid( n64_reg, lo_hi_idx, true );
-			mRegisterCache.MarkAsDirty( n64_reg, lo_hi_idx, true );
-			mRegisterCache.ClearKnownValue( n64_reg, lo_hi_idx );
+			mRegisterCache.MarkAsValid( n64_reg, true );
+			mRegisterCache.MarkAsDirty( n64_reg, true );
+			mRegisterCache.ClearKnownValue( n64_reg );
 		}
 	}
 	else
 	{
-		GetVar( ps2_reg, lo_hi_idx ? &gGPR[ n64_reg ]._u32_1 : &gGPR[ n64_reg ]._u32_0 );
+		GetVar64( ps2_reg, &gGPR[ n64_reg ]._u64 );
 	}
 }
 
 
-//Get (cached) N64 register value mapped to a PSP register (or scratch reg)
+//Get (cached) N64 register value mapped to a PS2 register (or scratch reg)
 //and also load the value if not loaded yet(usefull for src register)
 
-EPs2Reg	CCodeGeneratorPS2::GetRegisterAndLoad( EN64Reg n64_reg, u32 lo_hi_idx, EPs2Reg scratch_reg )
+EPs2Reg	CCodeGeneratorPS2::GetRegisterAndLoad( EN64Reg n64_reg, EPs2Reg scratch_reg )
 {
 	EPs2Reg		reg;
 	bool		need_load( false );
 
-	if( mRegisterCache.IsCached( n64_reg, lo_hi_idx ) )
+	if( mRegisterCache.IsCached( n64_reg ) )
 	{
 //		gTotalRegistersCached++;
-		reg = mRegisterCache.GetCachedReg( n64_reg, lo_hi_idx );
+		reg = mRegisterCache.GetCachedReg( n64_reg );
 
 		// We're loading it below, so set the valid flag
-		if( !mRegisterCache.IsValid( n64_reg, lo_hi_idx ) )
+		if( !mRegisterCache.IsValid( n64_reg ) )
 		{
 			need_load = true;
-			mRegisterCache.MarkAsValid( n64_reg, lo_hi_idx, true );
+			mRegisterCache.MarkAsValid( n64_reg, true );
 		}
 	}
 	else if( n64_reg == N64Reg_R0 )
@@ -615,28 +619,28 @@ EPs2Reg	CCodeGeneratorPS2::GetRegisterAndLoad( EN64Reg n64_reg, u32 lo_hi_idx, E
 
 	if( need_load )
 	{
-		GetRegisterValue( reg, n64_reg, lo_hi_idx );
+		GetRegisterValue( reg, n64_reg );
 	}
 
 	return reg;
 }
 
 
-//	Similar to GetRegisterAndLoad, but ALWAYS loads into the specified psp register
+//	Similar to GetRegisterAndLoad, but ALWAYS loads into the specified ps2 register
 
-void CCodeGeneratorPS2::LoadRegister( EPs2Reg ps2_reg, EN64Reg n64_reg, u32 lo_hi_idx )
+void CCodeGeneratorPS2::LoadRegister( EPs2Reg ps2_reg, EN64Reg n64_reg )
 {
-	if( mRegisterCache.IsCached( n64_reg, lo_hi_idx ) )
+	if( mRegisterCache.IsCached( n64_reg ) )
 	{
-		EPs2Reg	cached_reg( mRegisterCache.GetCachedReg( n64_reg, lo_hi_idx ) );
+		EPs2Reg	cached_reg( mRegisterCache.GetCachedReg( n64_reg ) );
 
 //		gTotalRegistersCached++;
 
 		// Load the register if it's currently invalid
-		if( !mRegisterCache.IsValid( n64_reg,lo_hi_idx ) )
+		if( !mRegisterCache.IsValid( n64_reg ) )
 		{
-			GetRegisterValue( cached_reg, n64_reg, lo_hi_idx );
-			mRegisterCache.MarkAsValid( n64_reg, lo_hi_idx, true );
+			GetRegisterValue( cached_reg, n64_reg );
+			mRegisterCache.MarkAsValid( n64_reg, true );
 		}
 
 		// Copy the register if necessary
@@ -652,7 +656,7 @@ void CCodeGeneratorPS2::LoadRegister( EPs2Reg ps2_reg, EN64Reg n64_reg, u32 lo_h
 	else
 	{
 //		gTotalRegistersUncached++;
-		GetRegisterValue( ps2_reg, n64_reg, lo_hi_idx );
+		GetRegisterValue( ps2_reg, n64_reg );
 	}
 }
 
@@ -661,17 +665,17 @@ void CCodeGeneratorPS2::LoadRegister( EPs2Reg ps2_reg, EN64Reg n64_reg, u32 lo_h
 //	This is usally done when we have a branching instruction - it guarantees that
 //	the register is valid regardless of whether or not the branch is taken.
 
-void	CCodeGeneratorPS2::PrepareCachedRegister( EN64Reg n64_reg, u32 lo_hi_idx )
+void	CCodeGeneratorPS2::PrepareCachedRegister( EN64Reg n64_reg )
 {
-	if( mRegisterCache.IsCached( n64_reg, lo_hi_idx ) )
+	if( mRegisterCache.IsCached( n64_reg ) )
 	{
-		EPs2Reg	cached_reg( mRegisterCache.GetCachedReg( n64_reg, lo_hi_idx ) );
+		EPs2Reg	cached_reg( mRegisterCache.GetCachedReg( n64_reg ) );
 
 		// Load the register if it's currently invalid
-		if( !mRegisterCache.IsValid( n64_reg,lo_hi_idx ) )
+		if( !mRegisterCache.IsValid( n64_reg ) )
 		{
-			GetRegisterValue( cached_reg, n64_reg, lo_hi_idx );
-			mRegisterCache.MarkAsValid( n64_reg, lo_hi_idx, true );
+			GetRegisterValue( cached_reg, n64_reg );
+			mRegisterCache.MarkAsValid( n64_reg, true );
 		}
 	}
 }
@@ -679,13 +683,13 @@ void	CCodeGeneratorPS2::PrepareCachedRegister( EN64Reg n64_reg, u32 lo_hi_idx )
 
 //
 
-void CCodeGeneratorPS2::StoreRegister( EN64Reg n64_reg, u32 lo_hi_idx, EPs2Reg ps2_reg )
+void CCodeGeneratorPS2::StoreRegister( EN64Reg n64_reg, EPs2Reg ps2_reg )
 {
-	mRegisterCache.ClearKnownValue( n64_reg, lo_hi_idx );
+	mRegisterCache.ClearKnownValue( n64_reg );
 
-	if( mRegisterCache.IsCached( n64_reg, lo_hi_idx ) )
+	if( mRegisterCache.IsCached( n64_reg ) )
 	{
-		EPs2Reg	cached_reg( mRegisterCache.GetCachedReg( n64_reg, lo_hi_idx ) );
+		EPs2Reg	cached_reg( mRegisterCache.GetCachedReg( n64_reg ) );
 
 //		gTotalRegistersCached++;
 
@@ -694,76 +698,29 @@ void CCodeGeneratorPS2::StoreRegister( EN64Reg n64_reg, u32 lo_hi_idx, EPs2Reg p
 		{
 			OR( cached_reg, ps2_reg, Ps2Reg_R0 );
 		}
-		mRegisterCache.MarkAsDirty( n64_reg, lo_hi_idx, true );
-		mRegisterCache.MarkAsValid( n64_reg, lo_hi_idx, true );
+		mRegisterCache.MarkAsDirty( n64_reg, true );
+		mRegisterCache.MarkAsValid( n64_reg, true );
 	}
 	else
 	{
 //		gTotalRegistersUncached++;
 
-		SetVar( lo_hi_idx ? &gGPR[ n64_reg ]._u32_1 : &gGPR[ n64_reg ]._u32_0, ps2_reg );
+		SetVar64( &gGPR[ n64_reg ]._u64, ps2_reg );
 
-		mRegisterCache.MarkAsDirty( n64_reg, lo_hi_idx, false );
+		mRegisterCache.MarkAsDirty( n64_reg, false );
 	}
 }
 
 
 //
 
-void CCodeGeneratorPS2::SetRegister64( EN64Reg n64_reg, s32 lo_value, s32 hi_value )
+inline void CCodeGeneratorPS2::SetRegister( EN64Reg n64_reg, u64 value )
 {
-	SetRegister( n64_reg, 0, lo_value );
-	SetRegister( n64_reg, 1, hi_value );
-}
-
-
-//	Set the low 32 bits of a register to a known value (and hence the upper
-//	32 bits are also known though sign extension)
-
-inline void CCodeGeneratorPS2::SetRegister32s( EN64Reg n64_reg, s32 value )
-{
-	//SetRegister64( n64_reg, value, value >= 0 ? 0 : 0xffffffff );
-	SetRegister64( n64_reg, value, value >> 31 );
-}
-
-
-//
-
-inline void CCodeGeneratorPS2::SetRegister( EN64Reg n64_reg, u32 lo_hi_idx, u32 value )
-{
-	mRegisterCache.SetKnownValue( n64_reg, lo_hi_idx, value );
-	mRegisterCache.MarkAsDirty( n64_reg, lo_hi_idx, true );
-	if( mRegisterCache.IsCached( n64_reg, lo_hi_idx ) )
+	mRegisterCache.SetKnownValue( n64_reg, value );
+	mRegisterCache.MarkAsDirty( n64_reg, true );
+	if( mRegisterCache.IsCached( n64_reg ) )
 	{
-		mRegisterCache.MarkAsValid( n64_reg, lo_hi_idx, false );		// The actual cache is invalid though!
-	}
-}
-
-
-//
-
-void CCodeGeneratorPS2::UpdateRegister( EN64Reg n64_reg, EPs2Reg ps2_reg, bool options )
-{
-	//if(n64_reg == N64Reg_R0) return;	//Try to modify R0!!!
-
-	StoreRegisterLo( n64_reg, ps2_reg );
-
-	//Skip storing sign extension on some regs //Corn
-	if( N64Reg_DontNeedSign( n64_reg ) ) return;
-
-	if( options == URO_HI_SIGN_EXTEND )
-	{
-		EPs2Reg scratch_reg = Ps2Reg_V0;
-		if( mRegisterCache.IsCached( n64_reg, 1 ) )
-		{
-			scratch_reg = mRegisterCache.GetCachedReg( n64_reg, 1 );
-		}
-		SRA( scratch_reg, ps2_reg, 0x1f );		// Sign extend
-		StoreRegisterHi( n64_reg, scratch_reg );
-	}
-	else	// == URO_HI_CLEAR
-	{
-		SetRegister( n64_reg, 1, 0 );
+		mRegisterCache.MarkAsValid( n64_reg, false );		// The actual cache is invalid though!
 	}
 }
 
@@ -866,24 +823,24 @@ const CN64RegisterCachePS2 & CCodeGeneratorPS2::GetRegisterCacheFromHandle( Regi
 //	Flush a specific register back to memory if dirty.
 //	Clears the dirty flag and invalidates the contents if specified
 
-void CCodeGeneratorPS2::FlushRegister( CN64RegisterCachePS2 & cache, EN64Reg n64_reg, u32 lo_hi_idx, bool invalidate )
+void CCodeGeneratorPS2::FlushRegister( CN64RegisterCachePS2 & cache, EN64Reg n64_reg, bool invalidate )
 {
-	if( cache.IsDirty( n64_reg, lo_hi_idx ) )
+	if( cache.IsDirty( n64_reg ) )
 	{
-		if( cache.IsKnownValue( n64_reg, lo_hi_idx ) )
+		if( cache.IsKnownValue( n64_reg ) )
 		{
-			s32		known_value( cache.GetKnownValue( n64_reg, lo_hi_idx )._s32 );
+			s64		known_value( cache.GetKnownValue( n64_reg )._s64 );
 
-			SetVar( lo_hi_idx ? &gGPR[ n64_reg ]._u32_1 : &gGPR[ n64_reg ]._u32_0, known_value );
+			SetVar64( &gGPR[ n64_reg ]._u64, known_value );
 		}
-		else if( cache.IsCached( n64_reg, lo_hi_idx ) )
+		else if( cache.IsCached( n64_reg ) )
 		{
 			#ifdef DAEDALUS_ENABLE_ASSERTS
-			DAEDALUS_ASSERT( cache.IsValid( n64_reg, lo_hi_idx ), "Register is dirty but not valid?" );
+			DAEDALUS_ASSERT( cache.IsValid( n64_reg ), "Register is dirty but not valid?" );
 			#endif
-			EPs2Reg	cached_reg( cache.GetCachedReg( n64_reg, lo_hi_idx ) );
+			EPs2Reg	cached_reg( cache.GetCachedReg( n64_reg ) );
 
-			SetVar( lo_hi_idx ? &gGPR[ n64_reg ]._u32_1 : &gGPR[ n64_reg ]._u32_0, cached_reg );
+			SetVar64( &gGPR[ n64_reg ]._u64, cached_reg );
 		}
 		#ifdef DAEDALUS_DEBUG_CONSOLE
 		else
@@ -892,16 +849,16 @@ void CCodeGeneratorPS2::FlushRegister( CN64RegisterCachePS2 & cache, EN64Reg n64
 		}
 		#endif
 		// We're no longer dirty
-		cache.MarkAsDirty( n64_reg, lo_hi_idx, false );
+		cache.MarkAsDirty( n64_reg, false );
 	}
 
 	// Invalidate the register, so we pick up any values the function might have changed
 	if( invalidate )
 	{
-		cache.ClearKnownValue( n64_reg, lo_hi_idx );
-		if( cache.IsCached( n64_reg, lo_hi_idx ) )
+		cache.ClearKnownValue( n64_reg );
+		if( cache.IsCached( n64_reg ) )
 		{
-			cache.MarkAsValid( n64_reg, lo_hi_idx, false );
+			cache.MarkAsValid( n64_reg, false );
 		}
 	}
 }
@@ -923,8 +880,7 @@ void	CCodeGeneratorPS2::FlushAllRegisters( CN64RegisterCachePS2 & cache, bool in
 	{
 		EN64Reg	n64_reg = EN64Reg( i );
 
-		FlushRegister( cache, n64_reg, 0, invalidate );
-		FlushRegister( cache, n64_reg, 1, invalidate );
+		FlushRegister( cache, n64_reg, invalidate );
 	}
 
 	FlushAllFloatingPointRegisters( cache, invalidate );
@@ -973,15 +929,10 @@ void	CCodeGeneratorPS2::FlushAllTemporaryRegisters( CN64RegisterCachePS2 & cache
 	{
 		EN64Reg	n64_reg = EN64Reg( i );
 
-		if( cache.IsTemporary( n64_reg, 0 ) )
+		if( cache.IsTemporary( n64_reg ) )
 		{
-			FlushRegister( cache, n64_reg, 0, invalidate );
+			FlushRegister( cache, n64_reg, invalidate );
 		}
-		if( cache.IsTemporary( n64_reg, 1 ) )
-		{
-			FlushRegister( cache, n64_reg, 1, invalidate );
-		}
-
 	}
 
 	// XXXX some fp regs are preserved across function calls?
@@ -998,13 +949,9 @@ void	CCodeGeneratorPS2::RestoreAllRegisters( CN64RegisterCachePS2 & current_cach
 	{
 		EN64Reg	n64_reg = EN64Reg( i );
 
-		if( new_cache.IsValid( n64_reg, 0 ) && !current_cache.IsValid( n64_reg, 0 ) )
+		if( new_cache.IsValid( n64_reg ) && !current_cache.IsValid( n64_reg ) )
 		{
-			GetVar( new_cache.GetCachedReg( n64_reg, 0 ), &gGPR[ n64_reg ]._u32_0 );
-		}
-		if( new_cache.IsValid( n64_reg, 1 ) && !current_cache.IsValid( n64_reg, 1 ) )
-		{
-			GetVar( new_cache.GetCachedReg( n64_reg, 1 ), &gGPR[ n64_reg ]._u32_1 );
+			GetVar64( new_cache.GetCachedReg( n64_reg ), &gGPR[ n64_reg ]._u64 );
 		}
 	}
 
@@ -1058,8 +1005,7 @@ CJumpLocation CCodeGeneratorPS2::GenerateExitCode( u32 exit_address, u32 jump_ad
 			//	FlushRegister( mRegisterCache, n64_reg, 1, false );
 			//}
 
-			PrepareCachedRegister( n64_reg, 0 );
-			PrepareCachedRegister( n64_reg, 1 );
+			PrepareCachedRegister( n64_reg );
 		}
 
 		// Assuming we don't need to set CurrentPC/Delay flags before we branch to the top..
@@ -1299,6 +1245,44 @@ void	CCodeGeneratorPS2::SetVar( u32 * p_var, u32 value )
 
 //
 
+void	CCodeGeneratorPS2::SetVar64( u64 * p_var, EPs2Reg reg_src )
+{
+	//DAEDALUS_ASSERT( reg_src != Ps2Reg_AT, "Whoops, splattering source register" );
+
+	EPs2Reg		reg_base;
+	s16			base_offset;
+	GetBaseRegisterAndOffset( p_var, &reg_base, &base_offset );
+
+	SD( reg_src, reg_base, base_offset );
+}
+
+
+//
+
+void	CCodeGeneratorPS2::SetVar64( u64 * p_var, u64 value )
+{
+	EPs2Reg		reg_value;
+
+	if ( value == 0 )
+	{
+		reg_value = Ps2Reg_R0;
+	}
+	else
+	{
+		LoadConstant64( Ps2Reg_V0, value );
+		reg_value = Ps2Reg_V0;
+	}
+
+	EPs2Reg		reg_base;
+	s16			base_offset;
+	GetBaseRegisterAndOffset( p_var, &reg_base, &base_offset );
+
+	SD( reg_value, reg_base, base_offset );
+}
+
+
+//
+
 void	CCodeGeneratorPS2::SetFloatVar( f32 * p_var, EPs2FloatReg reg_src )
 {
 	EPs2Reg		reg_base;
@@ -1318,6 +1302,18 @@ void	CCodeGeneratorPS2::GetVar( EPs2Reg dst_reg, const u32 * p_var )
 	GetBaseRegisterAndOffset( p_var, &reg_base, &base_offset );
 
 	LW( dst_reg, reg_base, base_offset );
+}
+
+
+//
+
+void	CCodeGeneratorPS2::GetVar64( EPs2Reg dst_reg, const u64 * p_var )
+{
+	EPs2Reg		reg_base;
+	s16			base_offset;
+	GetBaseRegisterAndOffset( p_var, &reg_base, &base_offset );
+
+	LD( dst_reg, reg_base, base_offset );
 }
 
 
@@ -1462,7 +1458,7 @@ CJumpLocation	CCodeGeneratorPS2::GenerateOpCode( const STraceEntry& ti, bool bra
 		case SpecOp_DMULT:	GenerateDMULT( rs, rt );	handled = true; break;
 		case SpecOp_DMULTU:	GenerateDMULTU( rs, rt );	handled = true; break;
 		case SpecOp_DDIVU:	GenerateDDIVU( rs, rt );	handled = true; break;
-		case SpecOp_DDIV:	GenerateDDIV( rs, rt );	handled = true; break;
+		case SpecOp_DDIV:	GenerateDDIV( rs, rt );		handled = true; break;
 
 		case SpecOp_ADD:	GenerateADDU( rd, rs, rt );	handled = true; break;
 		case SpecOp_ADDU:	GenerateADDU( rd, rs, rt );	handled = true; break;
@@ -1481,9 +1477,18 @@ CJumpLocation	CCodeGeneratorPS2::GenerateOpCode( const STraceEntry& ti, bool bra
 		case SpecOp_DADDU:	GenerateDADDU( rd, rs, rt );	handled = true; break;
 
 		case SpecOp_DSRA32:	GenerateDSRA32( rd, rt, sa );	handled = true; break;
-		case SpecOp_DSRA:	GenerateDSRA( rd, rt, sa );	handled = true; break;
+		case SpecOp_DSRA:	GenerateDSRA( rd, rt, sa );		handled = true; break;
 		case SpecOp_DSLL32:	GenerateDSLL32( rd, rt, sa );	handled = true; break;
-		case SpecOp_DSLL:	GenerateDSLL( rd, rt, sa );	handled = true; break;
+		case SpecOp_DSLL:	GenerateDSLL( rd, rt, sa );		handled = true; break;
+		case SpecOp_DSRL32:	GenerateDSRL32( rd, rt, sa );	handled = true; break;
+		case SpecOp_DSRL:	GenerateDSRL( rd, rt, sa );		handled = true; break;
+
+		case SpecOp_DSUB:	GenerateDSUBU( rd, rs, rt );	handled = true; break;
+		case SpecOp_DSUBU:	GenerateDSUBU( rd, rs, rt );	handled = true; break;
+
+		case SpecOp_DSLLV:	GenerateDSLLV( rd, rs, rt );	handled = true; break;
+		case SpecOp_DSRAV:	GenerateDSRAV( rd, rs, rt );	handled = true; break;
+		case SpecOp_DSRLV:	GenerateDSRLV( rd, rs, rt );	handled = true; break;
 		default:
 			break;
 		}
@@ -1600,22 +1605,22 @@ CJumpLocation	CCodeGeneratorPS2::GenerateOpCode( const STraceEntry& ti, bool bra
 				case Cop1OpFunc_CVT_S:		GenerateCVT_S_D_Sim( op_code.fd, op_code.fs ); handled = true; break;
 
 				case Cop1OpFunc_CMP_F:		GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_F, op_code.ft ); handled = true; break;
-				//case Cop1OpFunc_CMP_UN:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_UN, op_code.ft ); handled = true; break;
+				case Cop1OpFunc_CMP_UN:		GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_F, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 				case Cop1OpFunc_CMP_EQ:		GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_EQ, op_code.ft ); handled = true; break;	//Conker has issues with this
-				//case Cop1OpFunc_CMP_UEQ:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_UEQ, op_code.ft ); handled = true; break;
+				case Cop1OpFunc_CMP_UEQ:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_EQ, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 				case Cop1OpFunc_CMP_OLT:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_OLT, op_code.ft ); handled = true; break;
-				//case Cop1OpFunc_CMP_ULT:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_ULT, op_code.ft ); handled = true; break;
+				case Cop1OpFunc_CMP_ULT:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_OLT, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 				case Cop1OpFunc_CMP_OLE:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_OLE, op_code.ft ); handled = true; break;
-				//case Cop1OpFunc_CMP_ULE:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_ULE, op_code.ft ); handled = true; break;
+				case Cop1OpFunc_CMP_ULE:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_OLE, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 
 				case Cop1OpFunc_CMP_SF:		GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_F, op_code.ft ); handled = true; break;
-				//case Cop1OpFunc_CMP_NGLE:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_NGLE, op_code.ft ); handled = true; break;
+				case Cop1OpFunc_CMP_NGLE:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_F, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 				case Cop1OpFunc_CMP_SEQ:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_EQ, op_code.ft ); handled = true; break;
-				//case Cop1OpFunc_CMP_NGL:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_NGL, op_code.ft ); handled = true; break;
+				case Cop1OpFunc_CMP_NGL:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_EQ, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 				case Cop1OpFunc_CMP_LT:		GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_OLT, op_code.ft ); handled = true; break;
-				//case Cop1OpFunc_CMP_NGE:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_NGE, op_code.ft ); handled = true; break;
+				case Cop1OpFunc_CMP_NGE:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_OLT, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 				case Cop1OpFunc_CMP_LE:		GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_OLE, op_code.ft ); handled = true; break;
-				//case Cop1OpFunc_CMP_NGT:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_NGT, op_code.ft ); handled = true; break;
+				case Cop1OpFunc_CMP_NGT:	GenerateCMP_D_Sim( op_code.fs, Cop1OpFunc_CMP_OLE, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 				default:
 					break;	//call Generic4300
 				}
@@ -1648,23 +1653,23 @@ CJumpLocation	CCodeGeneratorPS2::GenerateOpCode( const STraceEntry& ti, bool bra
 										break;
 
 			case Cop1OpFunc_CMP_F:		GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_F, op_code.ft ); handled = true; break;
-			//case Cop1OpFunc_CMP_UN:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_UN, op_code.ft ); handled = true; break;
+			case Cop1OpFunc_CMP_UN:		GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_F, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 			case Cop1OpFunc_CMP_EQ:		GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_EQ, op_code.ft ); handled = true; break;
-			//case Cop1OpFunc_CMP_UEQ:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_UEQ, op_code.ft ); handled = true; break;
+			case Cop1OpFunc_CMP_UEQ:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_EQ, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 			case Cop1OpFunc_CMP_OLT:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_OLT, op_code.ft ); handled = true; break;
-			//case Cop1OpFunc_CMP_ULT:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_ULT, op_code.ft ); handled = true; break;
+			case Cop1OpFunc_CMP_ULT:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_OLT, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 			case Cop1OpFunc_CMP_OLE:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_OLE, op_code.ft ); handled = true; break;
-			//case Cop1OpFunc_CMP_ULE:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_ULE, op_code.ft ); handled = true; break;
+			case Cop1OpFunc_CMP_ULE:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_OLE, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 
 			case Cop1OpFunc_CMP_SF:		GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_F, op_code.ft ); handled = true; break;
-			//case Cop1OpFunc_CMP_NGLE:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_NGLE, op_code.ft ); handled = true; break;
+			case Cop1OpFunc_CMP_NGLE:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_F, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 			case Cop1OpFunc_CMP_SEQ:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_EQ, op_code.ft ); handled = true; break;
-			//case Cop1OpFunc_CMP_NGL:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_NGL, op_code.ft ); handled = true; break;
+			case Cop1OpFunc_CMP_NGL:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_EQ, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 			case Cop1OpFunc_CMP_LT:		GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_OLT, op_code.ft ); handled = true; break;
-			//case Cop1OpFunc_CMP_NGE:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_NGE, op_code.ft ); handled = true; break;
+			case Cop1OpFunc_CMP_NGE:	GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_OLT, op_code.ft ); handled = true; break; //no NaN on ps2 fpu
 			case Cop1OpFunc_CMP_LE:		GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_OLE, op_code.ft ); handled = true; break;
 			//This breaks D64, but I think is a bug somewhere else since interpreter trows fp nan exception in Cop1_S_NGT
-			//case Cop1OpFunc_CMP_NGT:	if(g_ROM.GameHacks != DK64)	{GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_NGT, op_code.ft ); handled = true;} break;
+			case Cop1OpFunc_CMP_NGT:	if(g_ROM.GameHacks != DK64)	{GenerateCMP_S( op_code.fs, Cop1OpFunc_CMP_OLE, op_code.ft ); handled = true;} break; //no NaN on ps2 fpu
 			}
 			break;
 
@@ -1836,9 +1841,9 @@ CJumpLocation CCodeGeneratorPS2::ExecuteNativeFunction( CCodeLabel speed_hack, b
 
 inline bool	CCodeGeneratorPS2::GenerateDirectLoad( EPs2Reg ps2_dst, EN64Reg base, s16 offset, OpCodeValue load_op, u32 swizzle )
 {
-	if(mRegisterCache.IsKnownValue( base, 0 ))
+	if(mRegisterCache.IsKnownValue( base ))
 	{
-		u32		base_address( mRegisterCache.GetKnownValue( base, 0 )._u32 );
+		u32		base_address( mRegisterCache.GetKnownValue( base )._u32_0 );
 		u32		address( (base_address + s32( offset )) ^ swizzle );
 
 		if( load_op == OP_LWL )
@@ -1941,7 +1946,7 @@ void	CCodeGeneratorPS2::GenerateLoad( u32 current_pc,
 		return;
 	}
 
-	EPs2Reg		reg_base( GetRegisterAndLoadLo( n64_base, Ps2Reg_A0 ) );
+	EPs2Reg		reg_base( GetRegisterAndLoad( n64_base, Ps2Reg_A0 ) );
 	EPs2Reg		reg_address( reg_base );
 
     if( load_op == OP_LWL )	//We handle both LWL & LWR here
@@ -2182,9 +2187,9 @@ inline void CCodeGeneratorPS2::GenerateAddressCheckFixup( const SAddressCheckFix
 
 inline bool	CCodeGeneratorPS2::GenerateDirectStore( EPs2Reg ps2_src, EN64Reg base, s16 offset, OpCodeValue store_op, u32 swizzle )
 {
-	if(mRegisterCache.IsKnownValue( base, 0 ))
+	if(mRegisterCache.IsKnownValue( base ))
 	{
-		u32		base_address( mRegisterCache.GetKnownValue( base, 0 )._u32 );
+		u32		base_address( mRegisterCache.GetKnownValue( base )._u32_0 );
 		u32		address( (base_address + s32( offset )) ^ swizzle );
 
 		const MemFuncWrite & m( g_MemoryLookupTableWrite[ address >> 18 ] );
@@ -2273,7 +2278,7 @@ void	CCodeGeneratorPS2::GenerateStore( u32 current_pc,
 		return;
 	}
 
-	EPs2Reg		reg_base( GetRegisterAndLoadLo( n64_base, Ps2Reg_A0 ) );
+	EPs2Reg		reg_base( GetRegisterAndLoad( n64_base, Ps2Reg_A0 ) );
 	EPs2Reg		reg_address( reg_base );
 
 	if( (n64_base == N64Reg_SP) | (gMemoryAccessOptimisation & mQuickLoad) )
@@ -2401,7 +2406,7 @@ inline void	CCodeGeneratorPS2::GenerateCACHE( EN64Reg base, s16 offset, u32 cach
 	if(cache == 0 && (action == 0 || action == 4))
 	{
 		FlushAllRegisters(mRegisterCache, true);
-		LoadRegister(Ps2Reg_A0, base, 0);
+		LoadRegister(Ps2Reg_A0, base);
 		ADDI(Ps2Reg_A0, Ps2Reg_A0, offset);
 		JAL( CCodeLabel( ( const void * )( CPU_InvalidateICacheRange ) ), false );
 		ORI(Ps2Reg_A1, Ps2Reg_R0, 0x20);
@@ -2424,7 +2429,7 @@ inline void	CCodeGeneratorPS2::GenerateJAL( u32 address )
 	//EPs2Reg	reg_lo( GetRegisterNoLoadLo( N64Reg_RA, Ps2Reg_V0 ) );
 	//LoadConstant( reg_lo, address + 8 );
 	//UpdateRegister( N64Reg_RA, reg_lo, URO_HI_SIGN_EXTEND, Ps2Reg_V0 );
-	SetRegister32s(N64Reg_RA, address + 8);
+	SetRegister(N64Reg_RA, (u64)(address + 8));
 }
 
 
@@ -2435,7 +2440,7 @@ inline void	CCodeGeneratorPS2::GenerateJR( EN64Reg rs, const SBranchDetails * p_
 	//u32	new_pc( gGPR[ op_code.rs ]._u32_0 );
 	//CPU_TakeBranch( new_pc, CPU_BRANCH_INDIRECT );
 
-	EPs2Reg reg_lo( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
+	EPs2Reg reg_lo( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
 
 	// Necessary? Could just directly compare reg_lo and constant p_branch->TargetAddress??
 	//SetVar( &gCPUState.TargetPC, reg_lo );
@@ -2463,9 +2468,9 @@ inline void	CCodeGeneratorPS2::GenerateJALR( EN64Reg rs, EN64Reg rd, u32 address
 	//*p_branch_jump = GenerateBranchIfNotEqual( &gCPUState.TargetPC, p_branch->TargetAddress, CCodeLabel() );
 	//LoadConstant( savereg_lo, address + 8 );
 	//UpdateRegister( rd, savereg_lo, URO_HI_SIGN_EXTEND, Ps2Reg_V0 );
-	SetRegister32s(rd, address + 8);
+	SetRegister(rd, (u64)(address + 8));
 
-	EPs2Reg reg_lo( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
+	EPs2Reg reg_lo( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
 	SetVar( &gCPUState.TargetPC, reg_lo );
 	*p_branch_jump = GenerateBranchIfNotEqual( reg_lo, p_branch->TargetAddress, CCodeLabel() );
 }
@@ -2479,19 +2484,15 @@ inline void	CCodeGeneratorPS2::GenerateMFLO( EN64Reg rd )
 
 	if( mMultIsValid )
 	{
-		EPs2Reg	reg_lo( GetRegisterNoLoadLo( rd, Ps2Reg_A0 ) );
+		EPs2Reg	reg_lo( GetRegisterNoLoad( rd, Ps2Reg_A0 ) );
 		MFLO( reg_lo );
-		UpdateRegister( rd, reg_lo, URO_HI_SIGN_EXTEND );
+		StoreRegister( rd, reg_lo );
 	}
 	else
 	{
-		EPs2Reg	reg_lo( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-		GetVar( reg_lo, &gCPUState.MultLo._u32_0 );
-		StoreRegisterLo( rd, reg_lo );
-
-		EPs2Reg	reg_hi( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-		GetVar( reg_hi, &gCPUState.MultLo._u32_1 );
-		StoreRegisterHi( rd, reg_hi );
+		EPs2Reg	reg_lo( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+		GetVar64( reg_lo, &gCPUState.MultLo._u64 );
+		StoreRegister( rd, reg_lo );
 	}
 }
 
@@ -2504,19 +2505,15 @@ inline void	CCodeGeneratorPS2::GenerateMFHI( EN64Reg rd )
 
 	if( mMultIsValid )
 	{
-		EPs2Reg	reg_lo( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
+		EPs2Reg	reg_lo( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
 		MFHI( reg_lo );
-		UpdateRegister( rd, reg_lo, URO_HI_SIGN_EXTEND );
+		StoreRegister( rd, reg_lo );
 	}
 	else
 	{
-		EPs2Reg	reg_lo( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-		GetVar( reg_lo, &gCPUState.MultHi._u32_0 );
-		StoreRegisterLo( rd, reg_lo );
-
-		EPs2Reg	reg_hi( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-		GetVar( reg_hi, &gCPUState.MultHi._u32_1 );
-		StoreRegisterHi( rd, reg_hi );
+		EPs2Reg	reg_lo( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+		GetVar64( reg_lo, &gCPUState.MultHi._u64 );
+		StoreRegister( rd, reg_lo );
 	}
 }
 
@@ -2529,11 +2526,8 @@ inline void	CCodeGeneratorPS2::GenerateMTLO( EN64Reg rs )
 
 	//gCPUState.MultLo._u64 = gGPR[ op_code.rs ]._u64;
 
-	EPs2Reg	reg_lo( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	SetVar( &gCPUState.MultLo._u32_0, reg_lo );
-
-	EPs2Reg	reg_hi( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-	SetVar( &gCPUState.MultLo._u32_1, reg_hi );
+	EPs2Reg	reg_lo( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	SetVar64( &gCPUState.MultLo._u64, reg_lo );
 }
 
 
@@ -2545,11 +2539,8 @@ inline void	CCodeGeneratorPS2::GenerateMTHI( EN64Reg rs )
 
 	//gCPUState.MultHi._u64 = gGPR[ op_code.rs ]._u64;
 
-	EPs2Reg	reg_lo( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	SetVar( &gCPUState.MultHi._u32_0, reg_lo );
-
-	EPs2Reg	reg_hi( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-	SetVar( &gCPUState.MultHi._u32_1, reg_hi );
+	EPs2Reg	reg_lo( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	SetVar64( &gCPUState.MultHi._u64, reg_lo );
 }
 
 
@@ -2563,24 +2554,16 @@ inline void	CCodeGeneratorPS2::GenerateMULT( EN64Reg rs, EN64Reg rt )
 	//gCPUState.MultLo = (s64)(s32)(dwResult);
 	//gCPUState.MultHi = (s64)(s32)(dwResult >> 32);
 
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
-	MULT( reg_lo_a, reg_lo_b );
+	MULT( reg_a, reg_b );
 
 	MFLO( Ps2Reg_V0 );
 	MFHI( Ps2Reg_A0 );
 
-	SetVar( &gCPUState.MultLo._u32_0, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_0, Ps2Reg_A0 );
-
-#ifdef ENABLE_64BIT
-	SRA( Ps2Reg_V0, Ps2Reg_V0, 0x1f );		// Sign extend
-	SRA( Ps2Reg_A0, Ps2Reg_A0, 0x1f );		// Sign extend
-
-	SetVar( &gCPUState.MultLo._u32_1, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_1, Ps2Reg_A0 );
-#endif
+	SetVar64( &gCPUState.MultLo._u64, Ps2Reg_V0 );
+	SetVar64( &gCPUState.MultHi._u64, Ps2Reg_A0 );
 }
 
 
@@ -2594,23 +2577,16 @@ inline void	CCodeGeneratorPS2::GenerateMULTU( EN64Reg rs, EN64Reg rt )
 	//gCPUState.MultLo = (s64)(s32)(dwResult);
 	//gCPUState.MultHi = (s64)(s32)(dwResult >> 32);
 
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
-	MULTU( reg_lo_a, reg_lo_b );
+	MULTU( reg_a, reg_b );
 
 	MFLO( Ps2Reg_V0 );
 	MFHI( Ps2Reg_A0 );
 
-	SetVar( &gCPUState.MultLo._u32_0, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_0, Ps2Reg_A0 );
-
-	//Yoshi and DOOM64 must have sign extension //Corn
-	SRA( Ps2Reg_V0, Ps2Reg_V0, 0x1f );		// Sign extend
-	SRA( Ps2Reg_A0, Ps2Reg_A0, 0x1f );		// Sign extend
-
-	SetVar( &gCPUState.MultLo._u32_1, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_1, Ps2Reg_A0 );
+	SetVar64( &gCPUState.MultLo._u64, Ps2Reg_V0 );
+	SetVar64( &gCPUState.MultHi._u64, Ps2Reg_A0 );
 }
 
 
@@ -2630,48 +2606,33 @@ inline void	CCodeGeneratorPS2::GenerateDIV( EN64Reg rs, EN64Reg rt )
 	//}
 
 #ifdef DIVZEROCHK
-	EPs2Reg	reg_lo_rs( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rs( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
-	CJumpLocation	branch( BEQ( reg_lo_rt, Ps2Reg_R0, CCodeLabel(nullptr), true ) );		// Can use branch delay for something?
+	CJumpLocation	branch( BEQ( reg_rt, Ps2Reg_R0, CCodeLabel(nullptr), true ) );		// Can use branch delay for something?
 
-	DIV( reg_lo_rs, reg_lo_rt );
+	DIV( reg_rs, reg_rt );
 
 	MFLO( Ps2Reg_V0 );
 	MFHI( Ps2Reg_A0 );
 
-	SetVar( &gCPUState.MultLo._u32_0, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_0, Ps2Reg_A0 );
-
-	SRA( Ps2Reg_V0, Ps2Reg_V0, 0x1f );		// Sign extend
-	SRA( Ps2Reg_A0, Ps2Reg_A0, 0x1f );		// Sign extend
-
-	SetVar( &gCPUState.MultLo._u32_1, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_1, Ps2Reg_A0 );
+	SetVar64( &gCPUState.MultLo._u64, Ps2Reg_V0 );
+	SetVar64( &gCPUState.MultHi._u64, Ps2Reg_A0 );
 
 	// Branch here - really should trigger exception!
 	PatchJumpLong( branch, GetAssemblyBuffer()->GetLabel() );
 
 #else
-	EPs2Reg	reg_lo_rs( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rs( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
-	DIV( reg_lo_rs, reg_lo_rt );
+	DIV( reg_rs, reg_rt );
 
 	MFLO( Ps2Reg_V0 );
 	MFHI( Ps2Reg_A0 );
 
-	SetVar( &gCPUState.MultLo._u32_0, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_0, Ps2Reg_A0 );
-
-#ifdef ENABLE_64BIT
-	SRA( Ps2Reg_V0, Ps2Reg_V0, 0x1f );		// Sign extend
-	SRA( Ps2Reg_A0, Ps2Reg_A0, 0x1f );		// Sign extend
-
-	SetVar( &gCPUState.MultLo._u32_1, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_1, Ps2Reg_A0 );
-#endif
-
+	SetVar64( &gCPUState.MultLo._u64, Ps2Reg_V0 );
+	SetVar64( &gCPUState.MultHi._u64, Ps2Reg_A0 );
 #endif
 }
 
@@ -2691,48 +2652,33 @@ inline void	CCodeGeneratorPS2::GenerateDIVU( EN64Reg rs, EN64Reg rt )
 	//}
 
 #ifdef DIVZEROCHK
-	EPs2Reg	reg_lo_rs( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rs( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
-	CJumpLocation	branch( BEQ( reg_lo_rt, Ps2Reg_R0, CCodeLabel(nullptr), true ) );		// Can use branch delay for something?
+	CJumpLocation	branch( BEQ( reg_rt, Ps2Reg_R0, CCodeLabel(nullptr), true ) );		// Can use branch delay for something?
 
-	DIVU( reg_lo_rs, reg_lo_rt );
+	DIVU( reg_rs, reg_rt );
 
 	MFLO( Ps2Reg_V0 );
 	MFHI( Ps2Reg_A0 );
 
-	SetVar( &gCPUState.MultLo._u32_0, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_0, Ps2Reg_A0 );
-
-	SRA( Ps2Reg_V0, Ps2Reg_V0, 0x1f );		// Sign extend
-	SRA( Ps2Reg_A0, Ps2Reg_A0, 0x1f );		// Sign extend
-
-	SetVar( &gCPUState.MultLo._u32_1, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_1, Ps2Reg_A0 );
+	SetVar64( &gCPUState.MultLo._u64, Ps2Reg_V0 );
+	SetVar64( &gCPUState.MultHi._u64, Ps2Reg_A0 );
 
 	// Branch here - really should trigger exception!
 	PatchJumpLong( branch, GetAssemblyBuffer()->GetLabel() );
 
 #else
-	EPs2Reg	reg_lo_rs( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rs( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
-	DIVU( reg_lo_rs, reg_lo_rt );
+	DIVU( reg_rs, reg_rt );
 
 	MFLO( Ps2Reg_V0 );
 	MFHI( Ps2Reg_A0 );
 
-	SetVar( &gCPUState.MultLo._u32_0, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_0, Ps2Reg_A0 );
-
-#ifdef ENABLE_64BIT
-	SRA( Ps2Reg_V0, Ps2Reg_V0, 0x1f );		// Sign extend
-	SRA( Ps2Reg_A0, Ps2Reg_A0, 0x1f );		// Sign extend
-
-	SetVar( &gCPUState.MultLo._u32_1, Ps2Reg_V0 );
-	SetVar( &gCPUState.MultHi._u32_1, Ps2Reg_A0 );
-#endif
-
+	SetVar64( &gCPUState.MultLo._u64, Ps2Reg_V0 );
+	SetVar64( &gCPUState.MultHi._u64, Ps2Reg_A0 );
 #endif
 }
 
@@ -2741,50 +2687,48 @@ inline void	CCodeGeneratorPS2::GenerateDIVU( EN64Reg rs, EN64Reg rt )
 
 inline void	CCodeGeneratorPS2::GenerateADDU( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
-	if (mRegisterCache.IsKnownValue(rs, 0)
-		& mRegisterCache.IsKnownValue(rt, 0))
+	if (mRegisterCache.IsKnownValue(rs) & mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister32s(rd, mRegisterCache.GetKnownValue(rs, 0)._s32
-			+ mRegisterCache.GetKnownValue(rt, 0)._s32);
+		SetRegister(rd, (s64)(mRegisterCache.GetKnownValue(rs)._s32_0 + mRegisterCache.GetKnownValue(rt)._s32_0));
 		return;
 	}
 
 	if( rs == N64Reg_R0 )
 	{
-		if(mRegisterCache.IsKnownValue(rt, 0))
+		if(mRegisterCache.IsKnownValue(rt))
 		{
-			SetRegister32s(rd, mRegisterCache.GetKnownValue(rt, 0)._s32);
+			SetRegister(rd, (s64)mRegisterCache.GetKnownValue(rt)._s32_0);
 			return;
 		}
 
 		// As RS is zero, the ADD is just a copy of RT to RD.
 		// Try to avoid loading into a temp register if the dest is cached
-		EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-		LoadRegisterLo( reg_lo_d, rt );
-		UpdateRegister( rd, reg_lo_d, URO_HI_SIGN_EXTEND );
+		EPs2Reg reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+		LoadRegister( reg_d, rt );
+		StoreRegister( rd, reg_d );
 	}
 	else if( rt == N64Reg_R0 )
 	{
-		if(mRegisterCache.IsKnownValue(rs, 0))
+		if(mRegisterCache.IsKnownValue(rs))
 		{
-			SetRegister32s(rd, mRegisterCache.GetKnownValue(rs, 0)._s32);
+			SetRegister(rd, (s64)mRegisterCache.GetKnownValue(rs)._s32_0);
 			return;
 		}
 
 		// As RT is zero, the ADD is just a copy of RS to RD.
 		// Try to avoid loading into a temp register if the dest is cached
-		EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-		LoadRegisterLo( reg_lo_d, rs );
-		UpdateRegister( rd, reg_lo_d, URO_HI_SIGN_EXTEND );
+		EPs2Reg reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+		LoadRegister( reg_d, rs );
+		StoreRegister(rd, reg_d);
 	}
 	else
 	{
 		//gGPR[ op_code.rd ]._s64 = (s64)(s32)( gGPR[ op_code.rs ]._s32_0 + gGPR[ op_code.rt ]._s32_0 );
-		EPs2Reg	reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-		EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-		EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-		ADDU( reg_lo_d, reg_lo_a, reg_lo_b );
-		UpdateRegister( rd, reg_lo_d, URO_HI_SIGN_EXTEND );
+		EPs2Reg	reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+		EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+		EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
+		ADDU( reg_d, reg_a, reg_b );
+		StoreRegister(rd, reg_d);
 	}
 }
 
@@ -2793,20 +2737,18 @@ inline void	CCodeGeneratorPS2::GenerateADDU( EN64Reg rd, EN64Reg rs, EN64Reg rt 
 
 inline void	CCodeGeneratorPS2::GenerateSUBU( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
-	if (mRegisterCache.IsKnownValue(rs, 0)
-		& mRegisterCache.IsKnownValue(rt, 0))
+	if (mRegisterCache.IsKnownValue(rs) & mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister32s(rd, mRegisterCache.GetKnownValue(rs, 0)._s32
-			- mRegisterCache.GetKnownValue(rt, 0)._s32);
+		SetRegister(rd, (s64)mRegisterCache.GetKnownValue(rs)._s32_0 - (s64)mRegisterCache.GetKnownValue(rt)._s32_0);
 		return;
 	}
 
 	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( gGPR[ op_code.rs ]._s32_0 - gGPR[ op_code.rt ]._s32_0 );
-	EPs2Reg	reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-	SUBU( reg_lo_d, reg_lo_a, reg_lo_b );
-	UpdateRegister( rd, reg_lo_d, URO_HI_SIGN_EXTEND );
+	EPs2Reg	reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
+	SUBU( reg_d, reg_a, reg_b );
+	StoreRegister( rd, reg_d );
 }
 
 
@@ -2816,13 +2758,11 @@ inline void	CCodeGeneratorPS2::GenerateDDIVU( EN64Reg rs, EN64Reg rt )
 {
 	mMultIsValid = false;
 
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
-	EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_A1 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A2 ) );
+	EPs2Reg	reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
-	if( reg_lo_a != Ps2Reg_A0 ) OR( Ps2Reg_A0, Ps2Reg_R0, reg_lo_a);
-	if( reg_hi_a != Ps2Reg_A1 ) OR( Ps2Reg_A1, Ps2Reg_R0, reg_hi_a);
-	if( reg_lo_b != Ps2Reg_A2 ) OR( Ps2Reg_A2, Ps2Reg_R0, reg_lo_b);
+	if( reg_rs != Ps2Reg_A0 ) OR( Ps2Reg_A0, Ps2Reg_R0, reg_rs);
+	if( reg_rt != Ps2Reg_A1 ) OR( Ps2Reg_A1, Ps2Reg_R0, reg_rt);
 
 	JAL( CCodeLabel( (void*)_DDIVU ), true );
 }
@@ -2834,13 +2774,11 @@ inline void	CCodeGeneratorPS2::GenerateDDIV( EN64Reg rs, EN64Reg rt )
 {
 	mMultIsValid = false;
 
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
-	EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_A1 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A2 ) );
+	EPs2Reg	reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
-	if( reg_lo_a != Ps2Reg_A0 ) OR( Ps2Reg_A0, Ps2Reg_R0, reg_lo_a);
-	if( reg_hi_a != Ps2Reg_A1 ) OR( Ps2Reg_A1, Ps2Reg_R0, reg_hi_a);
-	if( reg_lo_b != Ps2Reg_A2 ) OR( Ps2Reg_A2, Ps2Reg_R0, reg_lo_b);
+	if( reg_rs != Ps2Reg_A0 ) OR( Ps2Reg_A0, Ps2Reg_R0, reg_rs);
+	if( reg_rt != Ps2Reg_A1 ) OR( Ps2Reg_A1, Ps2Reg_R0, reg_rt);
 
 	JAL( CCodeLabel( (void*)_DDIV ), true );
 }
@@ -2852,15 +2790,11 @@ inline void	CCodeGeneratorPS2::GenerateDMULTU( EN64Reg rs, EN64Reg rt )
 {
 	mMultIsValid = false;
 
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
-	EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_A1 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A2 ) );
-	EPs2Reg	reg_hi_b( GetRegisterAndLoadHi( rt, Ps2Reg_A3 ) );
+	EPs2Reg	reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
-	if( reg_lo_a != Ps2Reg_A0 ) OR( Ps2Reg_A0, Ps2Reg_R0, reg_lo_a);
-	if( reg_hi_a != Ps2Reg_A1 ) OR( Ps2Reg_A1, Ps2Reg_R0, reg_hi_a);
-	if( reg_lo_b != Ps2Reg_A2 ) OR( Ps2Reg_A2, Ps2Reg_R0, reg_lo_b);
-	if( reg_hi_b != Ps2Reg_A3 ) OR( Ps2Reg_A3, Ps2Reg_R0, reg_hi_b);
+	if( reg_rs != Ps2Reg_A0 ) OR( Ps2Reg_A0, Ps2Reg_R0, reg_rs);
+	if( reg_rt != Ps2Reg_A1 ) OR( Ps2Reg_A1, Ps2Reg_R0, reg_rt);
 
 	JAL( CCodeLabel( (void*)_DMULTU ), true );
 }
@@ -2872,15 +2806,11 @@ inline void	CCodeGeneratorPS2::GenerateDMULT( EN64Reg rs, EN64Reg rt )
 {
 	mMultIsValid = false;
 
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
-	EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_A1 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A2 ) );
-	EPs2Reg	reg_hi_b( GetRegisterAndLoadHi( rt, Ps2Reg_A3 ) );
+	EPs2Reg	reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
-	if( reg_lo_a != Ps2Reg_A0 ) OR( Ps2Reg_A0, Ps2Reg_R0, reg_lo_a);
-	if( reg_hi_a != Ps2Reg_A1 ) OR( Ps2Reg_A1, Ps2Reg_R0, reg_hi_a);
-	if( reg_lo_b != Ps2Reg_A2 ) OR( Ps2Reg_A2, Ps2Reg_R0, reg_lo_b);
-	if( reg_hi_b != Ps2Reg_A3 ) OR( Ps2Reg_A3, Ps2Reg_R0, reg_hi_b);
+	if( reg_rs != Ps2Reg_A0 ) OR( Ps2Reg_A0, Ps2Reg_R0, reg_rs);
+	if( reg_rt != Ps2Reg_A1 ) OR( Ps2Reg_A1, Ps2Reg_R0, reg_rt);
 
 	JAL( CCodeLabel( (void*)_DMULT ), true );
 }
@@ -2892,31 +2822,15 @@ inline void	CCodeGeneratorPS2::GenerateDADDIU( EN64Reg rt, EN64Reg rs, s16 immed
 {
 	if( rs == N64Reg_R0 )
 	{
-		SetRegister32s( rt, immediate );
+		SetRegister( rt, (s64)immediate );
 	}
 	else
 	{
-		EPs2Reg	reg_lo_d( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
-		EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
+		EPs2Reg	reg_d( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
+		EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
 
-		if(reg_lo_d == reg_lo_a)
-		{
-			ADDIU( Ps2Reg_A0, reg_lo_a, immediate );
-			SLTU( Ps2Reg_A1, Ps2Reg_A0, reg_lo_a );		// Overflowed?
-			OR( reg_lo_d, Ps2Reg_A0, Ps2Reg_R0 );
-		}
-		else
-		{
-			ADDIU( reg_lo_d, reg_lo_a, immediate );
-			SLTU( Ps2Reg_A1, reg_lo_d, reg_lo_a );		// Overflowed?
-		}
-		StoreRegisterLo( rt, reg_lo_d );
-
-		EPs2Reg	reg_hi_d( GetRegisterNoLoadHi( rt, Ps2Reg_V0 ) );
-		EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_A0 ) );
-
-		ADDU( reg_hi_d, Ps2Reg_A1, reg_hi_a );		// Add on overflow
-		StoreRegisterHi( rt, reg_hi_d );
+		DADDIU(reg_d, reg_a, immediate);
+		StoreRegister(rt, reg_d);
 	}
 }
 
@@ -2927,30 +2841,12 @@ inline void	CCodeGeneratorPS2::GenerateDADDU( EN64Reg rd, EN64Reg rs, EN64Reg rt
 {
 	//gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rt ]._u64 + gGPR[ op_code.rs ]._u64
 
-	//890c250:	00c41021 	addu	d_lo,a_lo,b_lo
-	//890c254:	0046402b 	sltu	t0,d_lo,a_lo
-	//890c260:	ad220000 	sw		d_lo,0(t1)
+	EPs2Reg	reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
-	//890c258:	00e51821 	addu	d_hi,a_hi,b_hi
-	//890c25c:	01031821 	addu	d_hi,t0,d_hi
-	//890c268:	ad230004 	sw		d_hi,4(t1)
-
-	EPs2Reg	reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A1 ) );
-
-	ADDU( reg_lo_d, reg_lo_a, reg_lo_b );
-    //Assumes that just one of the source regs are the same as DST
-	SLTU( Ps2Reg_V1, reg_lo_d, reg_lo_d == reg_lo_a ? reg_lo_b : reg_lo_a  );		// Overflowed?
-	StoreRegisterLo( rd, reg_lo_d );
-
-	EPs2Reg	reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_A0 ) );
-	EPs2Reg	reg_hi_b( GetRegisterAndLoadHi( rt, Ps2Reg_A1 ) );
-
-	ADDU( reg_hi_d, reg_hi_a, reg_hi_b );
-	ADDU( reg_hi_d, Ps2Reg_V1, reg_hi_d );		// Add on overflow
-	StoreRegisterHi( rd, reg_hi_d );
+	DADDU( reg_d, reg_a, reg_b );
+	StoreRegister(rt, reg_d);
 }
 
 
@@ -2960,53 +2856,17 @@ inline void	CCodeGeneratorPS2::GenerateAND( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
 	//gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rs ]._u64 & gGPR[ op_code.rt ]._u64;
 
-	bool HiIsDone = false;
-
-	if (mRegisterCache.IsKnownValue(rs, 1) & mRegisterCache.IsKnownValue(rt, 1))
+	if (mRegisterCache.IsKnownValue(rs) & mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister(rd, 1, mRegisterCache.GetKnownValue(rs, 1)._u32 & mRegisterCache.GetKnownValue(rt, 1)._u32 );
-		HiIsDone = true;
-	}
-	else if ((mRegisterCache.IsKnownValue(rs, 1) & (mRegisterCache.GetKnownValue(rs, 1)._u32 == 0)) |
-		     (mRegisterCache.IsKnownValue(rt, 1) & (mRegisterCache.GetKnownValue(rt, 1)._u32 == 0)) )
-	{
-		SetRegister(rd, 1, 0 );
-		HiIsDone = true;
-	}
-	else if( mRegisterCache.IsKnownValue(rt, 1) & (mRegisterCache.GetKnownValue(rt, 1)._s32 == -1) )
-	{
-		EPs2Reg reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-		LoadRegisterHi( reg_hi_d, rs );
-		StoreRegisterHi( rd, reg_hi_d );
-		HiIsDone = true;
+		SetRegister(rd, mRegisterCache.GetKnownValue(rs)._u64 & mRegisterCache.GetKnownValue(rt)._u64 );
+		return;
 	}
 
-	if (mRegisterCache.IsKnownValue(rs, 0) & mRegisterCache.IsKnownValue(rt, 0))
-	{
-		SetRegister(rd, 0, mRegisterCache.GetKnownValue(rs, 0)._u32 & mRegisterCache.GetKnownValue(rt, 0)._u32 );
-	}
-	else if ((rs == N64Reg_R0) | (rt == N64Reg_R0))
-	{
-		SetRegister64( rd, 0, 0 );
-	}
-	else
-	{
-		// XXXX or into dest register
-		EPs2Reg	reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-		EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-		EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-		AND( reg_lo_d, reg_lo_a, reg_lo_b );
-		StoreRegisterLo( rd, reg_lo_d );
-
-		if(!HiIsDone)
-		{
-			EPs2Reg	reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-			EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-			EPs2Reg	reg_hi_b( GetRegisterAndLoadHi( rt, Ps2Reg_A0 ) );
-			AND( reg_hi_d, reg_hi_a, reg_hi_b );
-			StoreRegisterHi( rd, reg_hi_d );
-		}
-	}
+	EPs2Reg	reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
+	AND( reg_d, reg_a, reg_b );
+	StoreRegister(rd, reg_d);
 }
 
 
@@ -3016,114 +2876,49 @@ void	CCodeGeneratorPS2::GenerateOR( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
 	//gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rs ]._u64 | gGPR[ op_code.rt ]._u64;
 
-	bool HiIsDone = false;
-
-	if (mRegisterCache.IsKnownValue(rs, 1) & mRegisterCache.IsKnownValue(rt, 1))
+	if (mRegisterCache.IsKnownValue(rs) & mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister(rd, 1, mRegisterCache.GetKnownValue(rs, 1)._u32 | mRegisterCache.GetKnownValue(rt, 1)._u32 );
-		HiIsDone = true;
-	}
-	else if ((mRegisterCache.IsKnownValue(rs, 1) & (mRegisterCache.GetKnownValue(rs, 1)._s32 == -1)) |
-		     (mRegisterCache.IsKnownValue(rt, 1) & (mRegisterCache.GetKnownValue(rt, 1)._s32 == -1)) )
-	{
-		SetRegister(rd, 1, ~0 );
-		HiIsDone = true;
-	}
-
-	if (mRegisterCache.IsKnownValue(rs, 0) & mRegisterCache.IsKnownValue(rt, 0))
-	{
-		SetRegister(rd, 0, mRegisterCache.GetKnownValue(rs, 0)._u32 | mRegisterCache.GetKnownValue(rt, 0)._u32);
+		SetRegister(rd, mRegisterCache.GetKnownValue(rs)._u64 | mRegisterCache.GetKnownValue(rt)._u64 );
 		return;
 	}
 
 	if( rs == N64Reg_R0 )
 	{
-		// This doesn't seem to happen
-		/*if (mRegisterCache.IsKnownValue(rt, 1))
+		if(mRegisterCache.IsKnownValue(rt))
 		{
-			SetRegister(rd, 1, mRegisterCache.GetKnownValue(rt, 1)._u32 );
-			HiIsDone = true;
-		}
-		*/
-		if(mRegisterCache.IsKnownValue(rt, 0))
-		{
-			SetRegister64(rd,
-				mRegisterCache.GetKnownValue(rt, 0)._u32, mRegisterCache.GetKnownValue(rt, 1)._u32);
+			SetRegister(rd, mRegisterCache.GetKnownValue(rt)._u64);
 			return;
 		}
 
 		// This case rarely seems to happen...
 		// As RS is zero, the OR is just a copy of RT to RD.
 		// Try to avoid loading into a temp register if the dest is cached
-		EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-		LoadRegisterLo( reg_lo_d, rt );
-		StoreRegisterLo( rd, reg_lo_d );
-		if(!HiIsDone)
-		{
-			EPs2Reg reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-			LoadRegisterHi( reg_hi_d, rt );
-			StoreRegisterHi( rd, reg_hi_d );
-		}
+		EPs2Reg reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+		LoadRegister( reg_d, rt );
+		StoreRegister( rd, reg_d );
 	}
 	else if( rt == N64Reg_R0 )
 	{
-		if (mRegisterCache.IsKnownValue(rs, 1))
+		if (mRegisterCache.IsKnownValue(rs))
 		{
-			SetRegister(rd, 1, mRegisterCache.GetKnownValue(rs, 1)._u32 );
-			HiIsDone = true;
-		}
-
-		if(mRegisterCache.IsKnownValue(rs, 0))
-		{
-			SetRegister64(rd, mRegisterCache.GetKnownValue(rs, 0)._u32,
-				mRegisterCache.GetKnownValue(rs, 1)._u32);
+			SetRegister(rd, mRegisterCache.GetKnownValue(rs)._u64 );
 			return;
 		}
 
 		// As RT is zero, the OR is just a copy of RS to RD.
 		// Try to avoid loading into a temp register if the dest is cached
-		EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-		LoadRegisterLo( reg_lo_d, rs );
-		StoreRegisterLo( rd, reg_lo_d );
-		if(!HiIsDone)
-		{
-			EPs2Reg reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-			LoadRegisterHi( reg_hi_d, rs );
-			StoreRegisterHi( rd, reg_hi_d );
-		}
+		EPs2Reg reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+		LoadRegister( reg_d, rs );
+		StoreRegister( rd, reg_d );
 	}
 	else
 	{
 
-		EPs2Reg	reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-		EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-		EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-		OR( reg_lo_d, reg_lo_a, reg_lo_b );
-		StoreRegisterLo( rd, reg_lo_d );
-
-		if(!HiIsDone)
-		{
-			if( mRegisterCache.IsKnownValue(rs, 1) & (mRegisterCache.GetKnownValue(rs, 1)._u32 == 0) )
-			{
-				EPs2Reg reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-				LoadRegisterHi( reg_hi_d, rt );
-				StoreRegisterHi( rd, reg_hi_d );
-			}
-			else if( mRegisterCache.IsKnownValue(rt, 1) & (mRegisterCache.GetKnownValue(rt, 1)._u32 == 0) )
-			{
-				EPs2Reg reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-				LoadRegisterHi( reg_hi_d, rs );
-				StoreRegisterHi( rd, reg_hi_d );
-			}
-			else
-			{
-				EPs2Reg	reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-				EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-				EPs2Reg	reg_hi_b( GetRegisterAndLoadHi( rt, Ps2Reg_A0 ) );
-				OR( reg_hi_d, reg_hi_a, reg_hi_b );
-				StoreRegisterHi( rd, reg_hi_d );
-			}
-		}
+		EPs2Reg	reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+		EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+		EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
+		OR( reg_d, reg_a, reg_b );
+		StoreRegister( rd, reg_d );
 	}
 }
 
@@ -3134,48 +2929,17 @@ inline void	CCodeGeneratorPS2::GenerateXOR( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
 	//gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rs ]._u64 ^ gGPR[ op_code.rt ]._u64;
 
-	bool HiIsDone = false;
-
-	if (mRegisterCache.IsKnownValue(rs, 1) & mRegisterCache.IsKnownValue(rt, 1))
+	if (mRegisterCache.IsKnownValue(rs) & mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister(rd, 1, mRegisterCache.GetKnownValue(rs, 1)._u32 ^ mRegisterCache.GetKnownValue(rt, 1)._u32 );
-		HiIsDone = true;
-	}
-	else if ((mRegisterCache.IsKnownValue(rs, 1) & (mRegisterCache.GetKnownValue(rs, 1)._u32 == 0)) )
-	{
-		EPs2Reg reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-		LoadRegisterHi( reg_hi_d, rt );
-		StoreRegisterHi( rd, reg_hi_d );
-		HiIsDone = true;
-	}
-	else if ((mRegisterCache.IsKnownValue(rt, 1) & (mRegisterCache.GetKnownValue(rt, 1)._u32 == 0)) )
-	{
-		EPs2Reg reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-		LoadRegisterHi( reg_hi_d, rs );
-		StoreRegisterHi( rd, reg_hi_d );
-		HiIsDone = true;
-	}
-
-	if (mRegisterCache.IsKnownValue(rs, 0) & mRegisterCache.IsKnownValue(rt, 0))
-	{
-		SetRegister(rd, 0, mRegisterCache.GetKnownValue(rs, 0)._u32 ^ mRegisterCache.GetKnownValue(rt, 0)._u32);
+		SetRegister(rd, mRegisterCache.GetKnownValue(rs)._u64 ^ mRegisterCache.GetKnownValue(rt)._u64 );
 		return;
 	}
 
-	EPs2Reg	reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-	XOR( reg_lo_d, reg_lo_a, reg_lo_b );
-	StoreRegisterLo( rd, reg_lo_d );
-
-	if(!HiIsDone)
-	{
-		EPs2Reg	reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-		EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-		EPs2Reg	reg_hi_b( GetRegisterAndLoadHi( rt, Ps2Reg_A0 ) );
-		XOR( reg_hi_d, reg_hi_a, reg_hi_b );
-		StoreRegisterHi( rd, reg_hi_d );
-	}
+	EPs2Reg	reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
+	XOR( reg_d, reg_a, reg_b );
+	StoreRegister( rd, reg_d );
 }
 
 
@@ -3185,34 +2949,17 @@ inline void	CCodeGeneratorPS2::GenerateNOR( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
 	//gGPR[ op_code.rd ]._u64 = ~(gGPR[ op_code.rs ]._u64 | gGPR[ op_code.rt ]._u64);
 
-	bool HiIsDone = false;
-
-	if (mRegisterCache.IsKnownValue(rs, 1) & mRegisterCache.IsKnownValue(rt, 1))
+	if (mRegisterCache.IsKnownValue(rs) & mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister(rd, 1, ~(mRegisterCache.GetKnownValue(rs, 1)._u32 | mRegisterCache.GetKnownValue(rt, 1)._u32) );
-		HiIsDone = true;
-	}
-
-	if (mRegisterCache.IsKnownValue(rs, 0) & mRegisterCache.IsKnownValue(rt, 0))
-	{
-		SetRegister(rd, 0, ~(mRegisterCache.GetKnownValue(rs, 0)._u32 | mRegisterCache.GetKnownValue(rt, 0)._u32) );
+		SetRegister(rd, ~(mRegisterCache.GetKnownValue(rs)._u64 | mRegisterCache.GetKnownValue(rt)._u64) );
 		return;
 	}
 
-	EPs2Reg	reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-	NOR( reg_lo_d, reg_lo_a, reg_lo_b );
-	StoreRegisterLo( rd, reg_lo_d );
-
-	if(!HiIsDone)
-	{
-		EPs2Reg	reg_hi_d( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-		EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-		EPs2Reg	reg_hi_b( GetRegisterAndLoadHi( rt, Ps2Reg_A0 ) );
-		NOR( reg_hi_d, reg_hi_a, reg_hi_b );
-		StoreRegisterHi( rd, reg_hi_d );
-	}
+	EPs2Reg	reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
+	NOR( reg_d, reg_a, reg_b );
+	StoreRegister( rd, reg_d );
 }
 
 
@@ -3220,55 +2967,19 @@ inline void	CCodeGeneratorPS2::GenerateNOR( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 
 inline void	CCodeGeneratorPS2::GenerateSLT( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
-#ifdef ENABLE_64BIT
-	// Because we have a branch here, we need to make sure that we have a consistent view
-	// of the registers regardless of whether we take it or not. We pull in the lo halves of
-	// the registers here so that they're Valid regardless of whether we take the branch or not
-	PrepareCachedRegisterLo( rs );
-	PrepareCachedRegisterLo( rt );
-
-	// If possible, we write directly into the destination register. We have to be careful though -
-	// if the destination register is the same as either of the source registers we have to use
-	// a temporary instead, to avoid overwriting the contents.
-	EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-
-	if((rd == rs) | (rd == rt))
-	{
-		reg_lo_d = Ps2Reg_V0;
-	}
-
-	EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_hi_b( GetRegisterAndLoadHi( rt, Ps2Reg_A0 ) );
-
-	CJumpLocation	branch( BNE( reg_hi_a, reg_hi_b, CCodeLabel(nullptr), false ) );
-	SLT( reg_lo_d, reg_hi_a, reg_hi_b );		// In branch delay slot
-
-	// If the branch was not taken, it means that the high part of the registers was equal, so compare bottom half
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-
-	SLT( reg_lo_d, reg_lo_a, reg_lo_b );
-
-	// Patch up the branch
-	PatchJumpLong( branch, GetAssemblyBuffer()->GetLabel() );
-
-#else
 	/*
 	if (mRegisterCache.IsKnownValue(rs, 0) & mRegisterCache.IsKnownValue(rt, 0))
 	{
-		SetRegister32s(rd, (mRegisterCache.GetKnownValue(rs, 0)._s32 < mRegisterCache.GetKnownValue(rt, 0)._s32) );
+		SetRegister32s(rd, (mRegisterCache.GetKnownValue(rs)._s32 < mRegisterCache.GetKnownValue(rt)._s32) );
 		return;
 	}
 	*/
-	EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
-	SLT( reg_lo_d, reg_lo_a, reg_lo_b );
-
-#endif
-
-	UpdateRegister( rd, reg_lo_d, URO_HI_CLEAR );
+	SLT( reg_d, reg_a, reg_b );
+	StoreRegister( rd, reg_d );
 }
 
 
@@ -3276,55 +2987,19 @@ inline void	CCodeGeneratorPS2::GenerateSLT( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 
 inline void	CCodeGeneratorPS2::GenerateSLTU( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
-#ifdef ENABLE_64BIT
-	// Because we have a branch here, we need to make sure that we have a consistant view
-	// of the registers regardless of whether we take it or not. We pull in the lo halves of
-	// the registers here so that they're Valid regardless of whether we take the branch or not
-	PrepareCachedRegisterLo( rs );
-	PrepareCachedRegisterLo( rt );
-
-	// If possible, we write directly into the destination register. We have to be careful though -
-	// if the destination register is the same as either of the source registers we have to use
-	// a temporary instead, to avoid overwriting the contents.
-	EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-
-	if((rd == rs) | (rd == rt))
-	{
-		reg_lo_d = Ps2Reg_V0;
-	}
-
-	EPs2Reg	reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_hi_b( GetRegisterAndLoadHi( rt, Ps2Reg_A0 ) );
-
-	CJumpLocation	branch( BNE( reg_hi_a, reg_hi_b, CCodeLabel(nullptr), false ) );
-	SLTU( reg_lo_d, reg_hi_a, reg_hi_b );		// In branch delay slot
-
-	// If the branch was not taken, it means that the high part of the registers was equal, so compare bottom half
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-
-	SLTU( reg_lo_d, reg_lo_a, reg_lo_b );
-
-	// Patch up the branch
-	PatchJumpLong( branch, GetAssemblyBuffer()->GetLabel() );
-
-#else
 	/*
 	if (mRegisterCache.IsKnownValue(rs, 0) & mRegisterCache.IsKnownValue(rt, 0))
 	{
-		SetRegister32s(rd, (mRegisterCache.GetKnownValue(rs, 0)._u32 < mRegisterCache.GetKnownValue(rt, 0)._u32) );
+		SetRegister32s(rd, (mRegisterCache.GetKnownValue(rs)._u32 < mRegisterCache.GetKnownValue(rt)._u32) );
 		return;
 	}
 	*/
-	EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg	reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
-	SLTU( reg_lo_d, reg_lo_a, reg_lo_b );
-
-#endif
-
-	UpdateRegister( rd, reg_lo_d, URO_HI_CLEAR );
+	SLTU( reg_d, reg_a, reg_b );
+	StoreRegister( rd, reg_d );
 }
 
 
@@ -3336,21 +3011,21 @@ inline void	CCodeGeneratorPS2::GenerateADDIU( EN64Reg rt, EN64Reg rs, s16 immedi
 
 	if( rs == N64Reg_R0 )
 	{
-		SetRegister32s( rt, immediate );
+		SetRegister( rt, (s64)immediate );
 	}
-	else if(mRegisterCache.IsKnownValue( rs, 0 ))
+	else if(mRegisterCache.IsKnownValue( rs ))
 	{
-		s32		known_value( mRegisterCache.GetKnownValue( rs, 0 )._s32 + (s32)immediate );
-		SetRegister32s( rt, known_value );
+		s32		known_value( mRegisterCache.GetKnownValue( rs )._s32_0 + (s32)immediate );
+		SetRegister( rt, known_value );
 	}
 	else
 	{
 
-		EPs2Reg dst_reg( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
-		EPs2Reg	src_reg( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
+		EPs2Reg dst_reg( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
+		EPs2Reg	src_reg( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
 		ADDIU( dst_reg, src_reg, immediate );
 
-		UpdateRegister( rt, dst_reg, URO_HI_SIGN_EXTEND );
+		StoreRegister( rt, dst_reg );
 	}
 }
 
@@ -3361,20 +3036,18 @@ inline void	CCodeGeneratorPS2::GenerateANDI( EN64Reg rt, EN64Reg rs, u16 immedia
 {
 	//gGPR[op_code.rt]._u64 = gGPR[op_code.rs]._u64 & (u64)(u16)op_code.immediate;
 
-	if(mRegisterCache.IsKnownValue( rs, 0 ))
+	if(mRegisterCache.IsKnownValue( rs ))
 	{
-		s32		known_value_lo( mRegisterCache.GetKnownValue( rs, 0 )._u32 & (u32)immediate );
-		s32		known_value_hi( 0 );
-
-		SetRegister64( rt, known_value_lo, known_value_hi );
+		s64		known_value( mRegisterCache.GetKnownValue( rs )._u64 & (u64)immediate );
+		SetRegister( rt, known_value );
 	}
 	else
 	{
-		EPs2Reg dst_reg( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
-		EPs2Reg	src_reg( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
+		EPs2Reg dst_reg( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
+		EPs2Reg	src_reg( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
 		ANDI( dst_reg, src_reg, immediate );
 
-		UpdateRegister( rt, dst_reg, URO_HI_CLEAR );
+		StoreRegister( rt, dst_reg );
 	}
 }
 
@@ -3387,32 +3060,20 @@ inline void	CCodeGeneratorPS2::GenerateORI( EN64Reg rt, EN64Reg rs, u16 immediat
 
 	if( rs == N64Reg_R0 )
 	{
-			// If we're oring again 0, then we're just setting a constant value
-			SetRegister64( rt, immediate, 0 );
+		// If we're oring again 0, then we're just setting a constant value
+		SetRegister( rt, immediate );
 	}
-	else if(mRegisterCache.IsKnownValue( rs, 0 ))
+	else if(mRegisterCache.IsKnownValue( rs ))
 	{
-		s32		known_value_lo( mRegisterCache.GetKnownValue( rs, 0 )._u32 | (u32)immediate );
-		s32		known_value_hi( mRegisterCache.GetKnownValue( rs, 1 )._u32 );
-
-		SetRegister64( rt, known_value_lo, known_value_hi );
+		s64		known_value( mRegisterCache.GetKnownValue( rs )._u64 | (u64)immediate );
+		SetRegister( rt, known_value );
 	}
 	else
 	{
-		EPs2Reg dst_reg( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
-		EPs2Reg	src_reg( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
+		EPs2Reg dst_reg( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
+		EPs2Reg	src_reg( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
 		ORI( dst_reg, src_reg, immediate );
-		StoreRegisterLo( rt, dst_reg );
-
-#ifdef ENABLE_64BIT	//This is out of spec but seems we can always ignore copying the hi part
-		// If the source/dest regs are different we need to copy the high bits across
-		if(rt != rs)
-		{
-			EPs2Reg dst_reg_hi( GetRegisterNoLoadHi( rt, Ps2Reg_V0 ) );
-			LoadRegisterHi( dst_reg_hi, rs );
-			StoreRegisterHi( rt, dst_reg_hi );
-		}
-#endif
+		StoreRegister( rt, dst_reg );
 	}
 }
 
@@ -3423,31 +3084,18 @@ inline void	CCodeGeneratorPS2::GenerateXORI( EN64Reg rt, EN64Reg rs, u16 immedia
 {
 	//gGPR[op_code.rt]._u64 = gGPR[op_code.rs]._u64 ^ (u64)(u16)op_code.immediate;
 
-	if(mRegisterCache.IsKnownValue( rs, 0 ))
+	if(mRegisterCache.IsKnownValue( rs ))
 	{
-		s32		known_value_lo( mRegisterCache.GetKnownValue( rs, 0 )._u32 ^ (u32)immediate );
-		s32		known_value_hi( mRegisterCache.GetKnownValue( rs, 1 )._u32 );
-
-		SetRegister64( rt, known_value_lo, known_value_hi );
+		s64		known_value( mRegisterCache.GetKnownValue( rs )._u64 ^ (u64)immediate );
+		SetRegister( rt, known_value );
+		return;
 	}
-	else
-	{
-		EPs2Reg dst_reg( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
-		EPs2Reg	src_reg( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
-		XORI( dst_reg, src_reg, immediate );
-		StoreRegisterLo( rt, dst_reg );
 
-#ifdef ENABLE_64BIT	//This is out of spec but seems we can always ignore copying the hi part
-		// If the source/dest regs are different we need to copy the high bits across
-		// (if they are the same, we're xoring 0 to the top half which is essentially a NOP)
-		if(rt != rs)
-		{
-			EPs2Reg dst_reg_hi( GetRegisterNoLoadHi( rt, Ps2Reg_V0 ) );
-			LoadRegisterHi( dst_reg_hi, rs );
-			StoreRegisterHi( rt, dst_reg_hi );
-		}
-#endif
-	}
+	EPs2Reg dst_reg( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
+	EPs2Reg	src_reg( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	
+	XORI( dst_reg, src_reg, immediate );
+	StoreRegister( rt, dst_reg );
 }
 
 
@@ -3457,7 +3105,7 @@ inline void	CCodeGeneratorPS2::GenerateLUI( EN64Reg rt, s16 immediate )
 {
 	//gGPR[op_code.rt]._s64 = (s64)(s32)((s32)(s16)op_code.immediate<<16);
 
-	SetRegister32s( rt, s32( immediate ) << 16 );
+	SetRegister( rt, s64( immediate ) << 16 );
 }
 
 
@@ -3465,64 +3113,18 @@ inline void	CCodeGeneratorPS2::GenerateLUI( EN64Reg rt, s16 immediate )
 
 inline void	CCodeGeneratorPS2::GenerateSLTI( EN64Reg rt, EN64Reg rs, s16 immediate )
 {
-#ifdef ENABLE_64BIT
-	// Because we have a branch here, we need to make sure that we have a consistant view
-	// of the register regardless of whether we take it or not. We pull in the lo halves of
-	// the register here so that it's Valid regardless of whether we take the branch or not
-	PrepareCachedRegisterLo( rs );
-
-	// If possible, we write directly into the destination register. We have to be careful though -
-	// if the destination register is the same as either of the source registers we have to use
-	// a temporary instead, to avoid overwriting the contents.
-	EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
-
-	if(rt == rs)
-	{
-		reg_lo_d = Ps2Reg_V0;
-	}
-
-	CJumpLocation	branch;
-
-	EPs2Reg		reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-	if( immediate >= 0 )
-	{
-		// Positive data - we can avoid a contant load here
-		branch = BNE( reg_hi_a, Ps2Reg_R0, CCodeLabel(nullptr), false );
-		SLTI( reg_lo_d, reg_hi_a, 0x0000 );		// In branch delay slot
-	}
-	else
-	{
-		// Negative data
-		LoadConstant( Ps2Reg_A0, -1 );
-		branch = BNE( reg_hi_a, Ps2Reg_A0, CCodeLabel(nullptr), false );
-		SLTI( reg_lo_d, reg_hi_a, 0xffff );		// In branch delay slot
-	}
-	// If the branch was not taken, it means that the high part of the registers was equal, so compare bottom half
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-
-	//Potential bug!!!
-	//If using 64bit mode this might need to be SLTIU since sign is already checked in hi word //Strmn
-	SLTI( reg_lo_d, reg_lo_a, immediate );
-
-	// Patch up the branch
-	PatchJumpLong( branch, GetAssemblyBuffer()->GetLabel() );
-
-#else
 	/*
-	if (mRegisterCache.IsKnownValue(rs, 0))
+	if (mRegisterCache.IsKnownValue(rs))
 	{
-		SetRegister32s( rt, (mRegisterCache.GetKnownValue(rs, 0)._s32 < (s32)immediate) );
+		SetRegister32s( rt, (mRegisterCache.GetKnownValue(rs)._s32_0 < (s32)immediate) );
 		return;
 	}
 	*/
-	EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
+	EPs2Reg reg_d( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
 
-	SLTI( reg_lo_d, reg_lo_a, immediate );
-
-#endif
-
-	UpdateRegister( rt, reg_lo_d, URO_HI_CLEAR );
+	SLTI( reg_d, reg_a, immediate );
+	StoreRegister( rt, reg_d );
 }
 
 
@@ -3530,62 +3132,18 @@ inline void	CCodeGeneratorPS2::GenerateSLTI( EN64Reg rt, EN64Reg rs, s16 immedia
 
 inline void	CCodeGeneratorPS2::GenerateSLTIU( EN64Reg rt, EN64Reg rs, s16 immediate )
 {
-#ifdef ENABLE_64BIT
-	// Because we have a branch here, we need to make sure that we have a consistent view
-	// of the register regardless of whether we take it or not. We pull in the lo halves of
-	// the register here so that it's Valid regardless of whether we take the branch or not
-	PrepareCachedRegisterLo( rs );
-
-	// If possible, we write directly into the destination register. We have to be careful though -
-	// if the destination register is the same as either of the source registers we have to use
-	// a temporary instead, to avoid overwriting the contents.
-	EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
-
-	if(rt == rs)
-	{
-		reg_lo_d = Ps2Reg_V0;
-	}
-
-	CJumpLocation	branch;
-
-	EPs2Reg		reg_hi_a( GetRegisterAndLoadHi( rs, Ps2Reg_V0 ) );
-	if( immediate >= 0 )
-	{
-		// Positive data - we can avoid a contant load here
-		branch = BNE( reg_hi_a, Ps2Reg_R0, CCodeLabel(nullptr), false );
-		SLTIU( reg_lo_d, reg_hi_a, 0x0000 );		// In branch delay slot
-	}
-	else
-	{
-		// Negative data
-		LoadConstant( Ps2Reg_A0, -1 );
-		branch = BNE( reg_hi_a, Ps2Reg_A0, CCodeLabel(nullptr), false );
-		SLTIU( reg_lo_d, reg_hi_a, 0xffff );		// In branch delay slot
-	}
-	// If the branch was not taken, it means that the high part of the registers was equal, so compare bottom half
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-
-	SLTIU( reg_lo_d, reg_lo_a, immediate );
-
-	// Patch up the branch
-	PatchJumpLong( branch, GetAssemblyBuffer()->GetLabel() );
-
-#else
 	/*
-	if (mRegisterCache.IsKnownValue(rs, 0))
+	if (mRegisterCache.IsKnownValue(rs))
 	{
-		SetRegister32s( rt, (mRegisterCache.GetKnownValue(rs, 0)._u32 < (u32)immediate) );
+		SetRegister32s( rt, (mRegisterCache.GetKnownValue(rs)._u32_0 < (u32)immediate) );
 		return;
 	}
 	*/
-	EPs2Reg reg_lo_d( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
+	EPs2Reg reg_d( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
 
-	SLTIU( reg_lo_d, reg_lo_a, immediate );
-
-#endif
-
-	UpdateRegister( rt, reg_lo_d, URO_HI_CLEAR );
+	SLTIU( reg_d, reg_a, immediate );
+	StoreRegister( rt, reg_d );
 }
 
 
@@ -3594,17 +3152,18 @@ inline void	CCodeGeneratorPS2::GenerateSLTIU( EN64Reg rt, EN64Reg rs, s16 immedi
 inline void	CCodeGeneratorPS2::GenerateSLL( EN64Reg rd, EN64Reg rt, u32 sa )
 {
 	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( (gGPR[ op_code.rt ]._u32_0 << op_code.sa) & 0xFFFFFFFF );
-	if (mRegisterCache.IsKnownValue(rt, 0))
+	
+	if (mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister32s(rd, (s32)(mRegisterCache.GetKnownValue(rt, 0)._u32 << sa));
+		SetRegister(rd, (s64)(mRegisterCache.GetKnownValue(rt)._u32_0 << sa));
 		return;
 	}
 
-	EPs2Reg reg_lo_rd( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 
-	SLL( reg_lo_rd, reg_lo_rt, sa );
-	UpdateRegister( rd, reg_lo_rd, URO_HI_SIGN_EXTEND );
+	SLL( reg_rd, reg_rt, sa );
+	StoreRegister( rd, reg_rd );
 }
 
 
@@ -3613,26 +3172,18 @@ inline void	CCodeGeneratorPS2::GenerateSLL( EN64Reg rd, EN64Reg rt, u32 sa )
 inline void	CCodeGeneratorPS2::GenerateDSLL( EN64Reg rd, EN64Reg rt, u32 sa )
 {
 	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( (gGPR[ op_code.rt ]._u32_0 << op_code.sa) & 0xFFFFFFFF );
-	//if (mRegisterCache.IsKnownValue(rt, 0))
-	//{
-	//	SetRegister32s(rd, (s32)(mRegisterCache.GetKnownValue(rt, 0)._u32 << sa));
-	//	return;
-	//}
-
-	EPs2Reg reg_lo_rd( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg reg_hi_rd( GetRegisterNoLoadHi( rd, Ps2Reg_A0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
-	EPs2Reg	reg_hi_rt( GetRegisterAndLoadHi( rt, Ps2Reg_A0 ) );
-
-	SLL( reg_hi_rd, reg_hi_rt, sa );
-	if( sa != 0 )
+	
+	/*if (mRegisterCache.IsKnownValue(rt))
 	{
-		SRL( Ps2Reg_A2, reg_lo_rt, 32-sa);
-		OR( reg_hi_rd, reg_hi_rd, Ps2Reg_A2);
-	}
-	SLL( reg_lo_rd, reg_lo_rt, sa );
-	StoreRegisterLo( rd, reg_lo_rd);
-	StoreRegisterHi( rd, reg_hi_rd);
+		SetRegister32s(rd, (s32)(mRegisterCache.GetKnownValue(rt)._u64 << sa));
+		return;
+	}*/
+
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
+
+	DSLL( reg_rd, reg_rt, sa );
+	StoreRegister(rd, reg_rd);
 }
 
 
@@ -3640,12 +3191,11 @@ inline void	CCodeGeneratorPS2::GenerateDSLL( EN64Reg rd, EN64Reg rt, u32 sa )
 
 inline void	CCodeGeneratorPS2::GenerateDSLL32( EN64Reg rd, EN64Reg rt, u32 sa )
 {
-	EPs2Reg reg_hi_rd( GetRegisterNoLoadHi( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_rd( GetRegisterNoLoad(rd, Ps2Reg_V0) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad(rt, Ps2Reg_V0) );
 
-	SLL( reg_hi_rd, reg_lo_rt, sa );
-	SetRegister( rd, 0, 0 );	//Zero lo part
-	StoreRegisterHi( rd, reg_hi_rd );	//Store result
+	DSLL32( reg_rd, reg_rt, sa );
+	StoreRegister( rd, reg_rd );
 }
 
 
@@ -3654,17 +3204,18 @@ inline void	CCodeGeneratorPS2::GenerateDSLL32( EN64Reg rd, EN64Reg rt, u32 sa )
 inline void	CCodeGeneratorPS2::GenerateSRL( EN64Reg rd, EN64Reg rt, u32 sa )
 {
 	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( gGPR[ op_code.rt ]._u32_0 >> op_code.sa );
-	if (mRegisterCache.IsKnownValue(rt, 0))
+	
+	if (mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister32s(rd, (s32)(mRegisterCache.GetKnownValue(rt, 0)._u32 >> sa));
+		SetRegister(rd, (s64)(mRegisterCache.GetKnownValue(rt)._u32_0 >> sa));
 		return;
 	}
 
-	EPs2Reg reg_lo_rd( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 
-	SRL( reg_lo_rd, reg_lo_rt, sa );
-	UpdateRegister( rd, reg_lo_rd, URO_HI_SIGN_EXTEND );
+	SRL( reg_rd, reg_rt, sa );
+	StoreRegister( rd, reg_rd );
 }
 
 
@@ -3673,26 +3224,18 @@ inline void	CCodeGeneratorPS2::GenerateSRL( EN64Reg rd, EN64Reg rt, u32 sa )
 inline void	CCodeGeneratorPS2::GenerateDSRA( EN64Reg rd, EN64Reg rt, u32 sa )
 {
 	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( gGPR[ op_code.rt ]._s32_0 >> op_code.sa );
-	//if (mRegisterCache.IsKnownValue(rt, 0))
-	//{
-	//	SetRegister32s(rd, mRegisterCache.GetKnownValue(rt, 0)._s32 >> sa);
-	//	return;
-	//}
-
-	EPs2Reg reg_lo_rd( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg reg_hi_rd( GetRegisterNoLoadHi( rd, Ps2Reg_A0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
-	EPs2Reg	reg_hi_rt( GetRegisterAndLoadHi( rt, Ps2Reg_A0 ) );
-
-	SRL( reg_lo_rd, reg_lo_rt, sa );
-	if( sa != 0 )
+	
+	/*if (mRegisterCache.IsKnownValue(rt))
 	{
-		SLL( Ps2Reg_A2, reg_hi_rt, 32-sa );
-		OR( reg_lo_rd, reg_lo_rd, Ps2Reg_A2);
-	}
-	SRA( reg_hi_rd, reg_hi_rt, sa );
-	StoreRegisterLo( rd, reg_lo_rd);
-	StoreRegisterHi( rd, reg_hi_rd);
+		SetRegister32s(rd, mRegisterCache.GetKnownValue(rt)._s32 >> sa);
+		return;
+	}*/
+
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
+
+	DSRA( reg_rd, reg_rt, sa );
+	StoreRegister( rd, reg_rd );
 }
 
 
@@ -3700,11 +3243,11 @@ inline void	CCodeGeneratorPS2::GenerateDSRA( EN64Reg rd, EN64Reg rt, u32 sa )
 
 inline void	CCodeGeneratorPS2::GenerateDSRA32( EN64Reg rd, EN64Reg rt, u32 sa )
 {
-	EPs2Reg reg_lo_rd( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_hi_rt( GetRegisterAndLoadHi( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_rd(GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt(GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 
-	SRA( reg_lo_rd, reg_hi_rt, sa );
-	UpdateRegister( rd, reg_lo_rd, URO_HI_SIGN_EXTEND );
+	DSRA32( reg_rd, reg_rt, sa );
+	StoreRegister( rd, reg_rd );
 }
 
 
@@ -3713,17 +3256,18 @@ inline void	CCodeGeneratorPS2::GenerateDSRA32( EN64Reg rd, EN64Reg rt, u32 sa )
 inline void	CCodeGeneratorPS2::GenerateSRA( EN64Reg rd, EN64Reg rt, u32 sa )
 {
 	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( gGPR[ op_code.rt ]._s32_0 >> op_code.sa );
-	if (mRegisterCache.IsKnownValue(rt, 0))
+	
+	if (mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister32s(rd, mRegisterCache.GetKnownValue(rt, 0)._s32 >> sa);
+		SetRegister( rd, (s64)(mRegisterCache.GetKnownValue(rt)._s32_0 >> sa) );
 		return;
 	}
 
-	EPs2Reg reg_lo_rd( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 
-	SRA( reg_lo_rd, reg_lo_rt, sa );
-	UpdateRegister( rd, reg_lo_rd, URO_HI_SIGN_EXTEND );
+	SRA( reg_rd, reg_rt, sa );
+	StoreRegister( rd, reg_rd );
 }
 
 
@@ -3732,21 +3276,19 @@ inline void	CCodeGeneratorPS2::GenerateSRA( EN64Reg rd, EN64Reg rt, u32 sa )
 inline void	CCodeGeneratorPS2::GenerateSLLV( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
 	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( (gGPR[ op_code.rt ]._u32_0 << ( gGPR[ op_code.rs ]._u32_0 & 0x1F ) ) & 0xFFFFFFFF );
-	if (mRegisterCache.IsKnownValue(rs, 0)
-		& mRegisterCache.IsKnownValue(rt, 0))
+	
+	if (mRegisterCache.IsKnownValue(rs) & mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister32s(rd, (s32)(mRegisterCache.GetKnownValue(rt, 0)._u32 <<
-			(mRegisterCache.GetKnownValue(rs, 0)._u32 & 0x1F)));
+		SetRegister(rd, (s64)(mRegisterCache.GetKnownValue(rt)._u32_0 << (mRegisterCache.GetKnownValue(rs)._u32_0 & 0x1F)));
 		return;
 	}
 
-	// PSP sllv does exactly the same op as n64- no need for masking
-	EPs2Reg reg_lo_rd( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg reg_lo_rs( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 
-	SLLV( reg_lo_rd, reg_lo_rs, reg_lo_rt );
-	UpdateRegister( rd, reg_lo_rd, URO_HI_SIGN_EXTEND );
+	SLLV( reg_rd, reg_rs, reg_rt );
+	StoreRegister( rd, reg_rd );
 }
 
 
@@ -3755,21 +3297,19 @@ inline void	CCodeGeneratorPS2::GenerateSLLV( EN64Reg rd, EN64Reg rs, EN64Reg rt 
 inline void	CCodeGeneratorPS2::GenerateSRLV( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
 	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( gGPR[ op_code.rt ]._u32_0 >> ( gGPR[ op_code.rs ]._u32_0 & 0x1F ) );
-	if (mRegisterCache.IsKnownValue(rs, 0)
-		& mRegisterCache.IsKnownValue(rt, 0))
+	
+	if (mRegisterCache.IsKnownValue(rs) & mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister32s(rd, (s32)(mRegisterCache.GetKnownValue(rt, 0)._u32 >>
-			(mRegisterCache.GetKnownValue(rs, 0)._u32 & 0x1F)));
+		SetRegister(rd, (s64)(mRegisterCache.GetKnownValue(rt)._u32_0 >> (mRegisterCache.GetKnownValue(rs)._u32_0 & 0x1F)));
 		return;
 	}
 
-	// PSP srlv does exactly the same op as n64- no need for masking
-	EPs2Reg reg_lo_rd( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg reg_lo_rs( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 
-	SRLV( reg_lo_rd, reg_lo_rs, reg_lo_rt );
-	UpdateRegister( rd, reg_lo_rd, URO_HI_SIGN_EXTEND );
+	SRLV( reg_rd, reg_rs, reg_rt );
+	StoreRegister( rd, reg_rd );
 }
 
 
@@ -3778,21 +3318,99 @@ inline void	CCodeGeneratorPS2::GenerateSRLV( EN64Reg rd, EN64Reg rs, EN64Reg rt 
 inline void	CCodeGeneratorPS2::GenerateSRAV( EN64Reg rd, EN64Reg rs, EN64Reg rt )
 {
 	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( gGPR[ op_code.rt ]._s32_0 >> ( gGPR[ op_code.rs ]._u32_0 & 0x1F ) );
-	if (mRegisterCache.IsKnownValue(rs, 0)
-		& mRegisterCache.IsKnownValue(rt, 0))
+	
+	if (mRegisterCache.IsKnownValue(rs) & mRegisterCache.IsKnownValue(rt))
 	{
-		SetRegister32s(rd, (s32)(mRegisterCache.GetKnownValue(rt, 0)._s32 >>
-			(mRegisterCache.GetKnownValue(rs, 0)._u32 & 0x1F)));
+		SetRegister(rd, (s64)(mRegisterCache.GetKnownValue(rt)._s32_0 >> (mRegisterCache.GetKnownValue(rs)._u32_0 & 0x1F)));
 		return;
 	}
 
-	// PSP srlv does exactly the same op as n64- no need for masking
-	EPs2Reg reg_lo_rd( GetRegisterNoLoadLo( rd, Ps2Reg_V0 ) );
-	EPs2Reg reg_lo_rs( GetRegisterAndLoadLo( rs, Ps2Reg_A0 ) );
-	EPs2Reg	reg_lo_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 
-	SRAV( reg_lo_rd, reg_lo_rs, reg_lo_rt );
-	UpdateRegister( rd, reg_lo_rd, URO_HI_SIGN_EXTEND );
+	SRAV( reg_rd, reg_rs, reg_rt );
+	StoreRegister( rd, reg_rd );
+}
+
+
+//
+
+inline void	CCodeGeneratorPS2::GenerateDSRL( EN64Reg rd, EN64Reg rt, u32 sa )
+{
+	//gGPR[ op_code.rd ]._s64 = (s64)(s32)( (gGPR[ op_code.rt ]._u32_0 >> op_code.sa) & 0xFFFFFFFF );
+
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
+
+	DSRL( reg_rd, reg_rt, sa );
+	StoreRegister( rd, reg_rd );
+}
+
+
+//
+
+inline void	CCodeGeneratorPS2::GenerateDSRL32( EN64Reg rd, EN64Reg rt, u32 sa )
+{
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
+
+	DSRL32( reg_rd, reg_rt, sa );
+	StoreRegister( rd, reg_rd );
+}
+
+
+//
+
+inline void	CCodeGeneratorPS2::GenerateDSLLV( EN64Reg rd, EN64Reg rs, EN64Reg rt )
+{
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
+
+	DSLLV( reg_rd, reg_rs, reg_rt );
+	StoreRegister( rd, reg_rd );
+}
+
+
+//
+
+inline void	CCodeGeneratorPS2::GenerateDSRLV( EN64Reg rd, EN64Reg rs, EN64Reg rt )
+{
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
+
+	DSRLV( reg_rd, reg_rs, reg_rt );
+	StoreRegister( rd, reg_rd );
+}
+
+
+//
+
+inline void	CCodeGeneratorPS2::GenerateDSRAV( EN64Reg rd, EN64Reg rs, EN64Reg rt )
+{
+	EPs2Reg reg_rd( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg reg_rs( GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
+
+	DSRAV( reg_rd, reg_rs, reg_rt );
+	StoreRegister( rd, reg_rd );
+}
+
+
+//
+
+inline void	CCodeGeneratorPS2::GenerateDSUBU( EN64Reg rd, EN64Reg rs, EN64Reg rt )
+{
+	//gGPR[ op_code.rd ]._u64 = gGPR[ op_code.rt ]._u64 - gGPR[ op_code.rs ]._u64
+
+	EPs2Reg	reg_d( GetRegisterNoLoad( rd, Ps2Reg_V0 ) );
+	EPs2Reg	reg_a(GetRegisterAndLoad( rs, Ps2Reg_A0 ) );
+	EPs2Reg	reg_b(GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
+
+	DSUBU( reg_d, reg_a, reg_b );
+	StoreRegister( rt, reg_d );
 }
 
 
@@ -3800,11 +3418,11 @@ inline void	CCodeGeneratorPS2::GenerateSRAV( EN64Reg rd, EN64Reg rs, EN64Reg rt 
 
 inline void	CCodeGeneratorPS2::GenerateLB( u32 address, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg	reg_dst( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
+	EPs2Reg	reg_dst( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
 
 	GenerateLoad( address, reg_dst, base, offset, OP_LB, 3, set_branch_delay ? ReadBitsDirectBD_s8 : ReadBitsDirect_s8 );	// NB this fills the whole of reg_dst
 
-	UpdateRegister( rt, reg_dst, URO_HI_SIGN_EXTEND );
+	StoreRegister( rt, reg_dst );
 }
 
 
@@ -3812,11 +3430,11 @@ inline void	CCodeGeneratorPS2::GenerateLB( u32 address, bool set_branch_delay, E
 
 inline void	CCodeGeneratorPS2::GenerateLBU( u32 address, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg	reg_dst( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
+	EPs2Reg	reg_dst( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
 
 	GenerateLoad( address, reg_dst, base, offset, OP_LBU, 3, set_branch_delay ? ReadBitsDirectBD_u8 : ReadBitsDirect_u8 );	// NB this fills the whole of reg_dst
 
-	UpdateRegister( rt, reg_dst, URO_HI_CLEAR );
+	StoreRegister( rt, reg_dst );
 }
 
 
@@ -3824,11 +3442,11 @@ inline void	CCodeGeneratorPS2::GenerateLBU( u32 address, bool set_branch_delay, 
 
 inline void	CCodeGeneratorPS2::GenerateLH( u32 address, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg	reg_dst( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
+	EPs2Reg	reg_dst( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
 
 	GenerateLoad( address, reg_dst, base, offset, OP_LH, 2, set_branch_delay ? ReadBitsDirect_s16 : ReadBitsDirect_s16 );	// NB this fills the whole of reg_dst
 
-	UpdateRegister( rt, reg_dst, URO_HI_SIGN_EXTEND );
+	StoreRegister( rt, reg_dst );
 }
 
 
@@ -3836,11 +3454,11 @@ inline void	CCodeGeneratorPS2::GenerateLH( u32 address, bool set_branch_delay, E
 
 inline void	CCodeGeneratorPS2::GenerateLHU( u32 address, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg	reg_dst( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
+	EPs2Reg	reg_dst( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
 
 	GenerateLoad( address, reg_dst, base, offset, OP_LHU, 2, set_branch_delay ? ReadBitsDirectBD_u16 : ReadBitsDirect_u16 );	// NB this fills the whole of reg_dst
 
-	UpdateRegister( rt, reg_dst, URO_HI_CLEAR );
+	StoreRegister( rt, reg_dst );
 }
 
 
@@ -3848,7 +3466,7 @@ inline void	CCodeGeneratorPS2::GenerateLHU( u32 address, bool set_branch_delay, 
 
 inline void	CCodeGeneratorPS2::GenerateLW( u32 address, bool set_branch_delay, EN64Reg rt, EN64Reg base, s16 offset )
 {
-	EPs2Reg	reg_dst( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
+	EPs2Reg	reg_dst( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
 
 	// This is for San Francisco 2049, otherwise it crashes when the race is about to start.
 	if(rt == N64Reg_R0)
@@ -3861,7 +3479,7 @@ inline void	CCodeGeneratorPS2::GenerateLW( u32 address, bool set_branch_delay, E
 
 	GenerateLoad( address, reg_dst, base, offset, OP_LW, 0, set_branch_delay ? ReadBitsDirectBD_u32 : ReadBitsDirect_u32 );
 
-	UpdateRegister( rt, reg_dst, URO_HI_SIGN_EXTEND );
+	StoreRegister( rt, reg_dst );
 }
 
 
@@ -3869,14 +3487,10 @@ inline void	CCodeGeneratorPS2::GenerateLW( u32 address, bool set_branch_delay, E
 
 inline void	CCodeGeneratorPS2::GenerateLD( u32 address, bool set_branch_delay, EN64Reg rt, EN64Reg base, s16 offset )
 {
-	EPs2Reg	reg_dst_hi( GetRegisterNoLoadHi( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
-	GenerateLoad( address, reg_dst_hi, base, offset, OP_LW, 0, set_branch_delay ? ReadBitsDirectBD_u32 : ReadBitsDirect_u32 );
-	StoreRegisterHi( rt, reg_dst_hi );
-
-	//Adding 4 to offset should be quite safe //Corn
-	EPs2Reg	reg_dst_lo( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
-	GenerateLoad( address, reg_dst_lo, base, offset + 4, OP_LW, 0, set_branch_delay ? ReadBitsDirectBD_u32 : ReadBitsDirect_u32 );
-	StoreRegisterLo( rt, reg_dst_lo );
+	EPs2Reg	reg_dst( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );	// Use V0 to avoid copying return value if reg is not cached
+	GenerateLoad( address, reg_dst, base, offset, OP_LD, 0, set_branch_delay ? ReadBitsDirectBD_u64 : ReadBitsDirect_u64 );
+	Exchange64( reg_dst );
+	StoreRegister( rt, reg_dst );
 }
 
 
@@ -3913,7 +3527,7 @@ inline void	CCodeGeneratorPS2::GenerateLWC1( u32 address, bool set_branch_delay,
 #ifdef ENABLE_LDC1
 inline void	CCodeGeneratorPS2::GenerateLDC1( u32 address, bool set_branch_delay, u32 ft, EN64Reg base, s32 offset )
 {
-	EPs2Reg		reg_base( GetRegisterAndLoadLo( base, Ps2Reg_A0 ) );
+	EPs2Reg		reg_base( GetRegisterAndLoad( base, Ps2Reg_A0 ) );
 	ADDU( Ps2Reg_A0, reg_base, gMemoryBaseReg );
 
 	EN64FloatReg	n64_ft = EN64FloatReg( ft + 1 );
@@ -3943,7 +3557,7 @@ inline void	CCodeGeneratorPS2::GenerateLWL( u32 address, bool set_branch_delay, 
 	//Will return the value in Ps2Reg_V0 and the shift in Ps2Reg_A3
 	GenerateLoad( address, Ps2Reg_V0, base, offset, OP_LWL, 0, set_branch_delay ? ReadBitsDirectBD_u32 : ReadBitsDirect_u32 );
 
-	EPs2Reg	reg_dst( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg	reg_dst( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
 	SLL( Ps2Reg_A3, Ps2Reg_A3, 0x3 );    // shift *= 8
     NOR( Ps2Reg_A2, Ps2Reg_R0, Ps2Reg_R0 );    // Load 0xFFFFFFFF
@@ -3953,7 +3567,7 @@ inline void	CCodeGeneratorPS2::GenerateLWL( u32 address, bool set_branch_delay, 
     AND( reg_dst, reg_dst, Ps2Reg_A2 ); // reg_dst & mask
     OR( reg_dst, reg_dst, Ps2Reg_A3 );    // reg_dst | memory
 
-	UpdateRegister( rt, reg_dst, URO_HI_SIGN_EXTEND );
+	StoreRegister( rt, reg_dst );
 }
 
 
@@ -3964,7 +3578,7 @@ inline void	CCodeGeneratorPS2::GenerateLWR( u32 address, bool set_branch_delay, 
 	//Will return the value in Ps2Reg_V0 and the shift in Ps2Reg_A3
 	GenerateLoad( address, Ps2Reg_V0, base, offset, OP_LWL, 0, set_branch_delay ? ReadBitsDirectBD_u32 : ReadBitsDirect_u32 );
 
-	EPs2Reg	reg_dst( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
+	EPs2Reg	reg_dst( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
 	SLL( Ps2Reg_A3, Ps2Reg_A3, 0x3 );    // shift *= 8
     ADDIU( Ps2Reg_A2, Ps2Reg_R0, 0xFF00 );    // Load 0xFFFFFF00
@@ -3974,7 +3588,7 @@ inline void	CCodeGeneratorPS2::GenerateLWR( u32 address, bool set_branch_delay, 
     SRLV( Ps2Reg_A3, Ps2Reg_A3, Ps2Reg_V0 );    // memory >>= shift
     OR( reg_dst, reg_dst, Ps2Reg_A3 );    // reg_dst | memory
 
-	UpdateRegister( rt, reg_dst, URO_HI_SIGN_EXTEND );
+	StoreRegister( rt, reg_dst );
 }
 #endif
 
@@ -3983,7 +3597,7 @@ inline void	CCodeGeneratorPS2::GenerateLWR( u32 address, bool set_branch_delay, 
 
 inline void	CCodeGeneratorPS2::GenerateSB( u32 current_pc, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg		reg_value( GetRegisterAndLoadLo( rt, Ps2Reg_A1 ) );
+	EPs2Reg		reg_value( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
 	GenerateStore( current_pc, reg_value, base, offset, OP_SB, 3, set_branch_delay ? WriteBitsDirectBD_u8 : WriteBitsDirect_u8 );
 }
@@ -3993,7 +3607,7 @@ inline void	CCodeGeneratorPS2::GenerateSB( u32 current_pc, bool set_branch_delay
 
 inline void	CCodeGeneratorPS2::GenerateSH( u32 current_pc, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg		reg_value( GetRegisterAndLoadLo( rt, Ps2Reg_A1 ) );
+	EPs2Reg		reg_value( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
 	GenerateStore( current_pc, reg_value, base, offset, OP_SH, 2, set_branch_delay ? WriteBitsDirectBD_u16 : WriteBitsDirect_u16 );
 }
@@ -4003,7 +3617,7 @@ inline void	CCodeGeneratorPS2::GenerateSH( u32 current_pc, bool set_branch_delay
 
 inline void	CCodeGeneratorPS2::GenerateSW( u32 current_pc, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg		reg_value( GetRegisterAndLoadLo( rt, Ps2Reg_A1 ) );
+	EPs2Reg		reg_value( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
 	GenerateStore( current_pc, reg_value, base, offset, OP_SW, 0, set_branch_delay ? WriteBitsDirectBD_u32 : WriteBitsDirect_u32 );
 }
@@ -4013,12 +3627,11 @@ inline void	CCodeGeneratorPS2::GenerateSW( u32 current_pc, bool set_branch_delay
 
 inline void	CCodeGeneratorPS2::GenerateSD( u32 current_pc, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg		reg_value_hi( GetRegisterAndLoadHi( rt, Ps2Reg_A1 ) );
-	GenerateStore( current_pc, reg_value_hi, base, offset, OP_SW, 0, set_branch_delay ? WriteBitsDirectBD_u32 : WriteBitsDirect_u32 );
+	EPs2Reg		reg_value( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
-	//Adding 4 to offset should be quite safe //Corn
-	EPs2Reg		reg_value_lo( GetRegisterAndLoadLo( rt, Ps2Reg_A1 ) );
-	GenerateStore( current_pc, reg_value_lo, base, offset + 4, OP_SW, 0, set_branch_delay ? WriteBitsDirectBD_u32 : WriteBitsDirect_u32 );
+	Exchange64( reg_value );
+	GenerateStore( current_pc, reg_value, base, offset, OP_SD, 0, set_branch_delay ? WriteBitsDirectBD_u64 : WriteBitsDirect_u64 );
+	Exchange64( reg_value );
 }
 
 
@@ -4052,7 +3665,7 @@ inline void	CCodeGeneratorPS2::GenerateSDC1( u32 current_pc, bool set_branch_del
 
 	//GenerateStore( current_pc, (EPs2Reg)ps2_ft, base, offset, OP_SWC1, 0, set_branch_delay ? WriteBitsDirectBD_u32 : WriteBitsDirect_u32 );
 	//GenerateStore( current_pc, (EPs2Reg)ps2_ft_sig, base, offset + 4, OP_SWC1, 0, set_branch_delay ? WriteBitsDirectBD_u32 : WriteBitsDirect_u32 );
-	EPs2Reg		reg_base( GetRegisterAndLoadLo( base, Ps2Reg_A0 ) );
+	EPs2Reg		reg_base( GetRegisterAndLoad( base, Ps2Reg_A0 ) );
 	ADDU( Ps2Reg_A0, reg_base, gMemoryBaseReg );
 	SWC1( ps2_ft, Ps2Reg_A0, offset);
 	SWC1( ps2_ft_sig, Ps2Reg_A0, offset+4);
@@ -4065,7 +3678,7 @@ inline void	CCodeGeneratorPS2::GenerateSDC1( u32 current_pc, bool set_branch_del
 #ifdef ENABLE_SWR_SWL
 inline void	CCodeGeneratorPS2::GenerateSWL( u32 current_pc, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg		reg_value( GetRegisterAndLoadLo( rt, Ps2Reg_A1 ) );
+	EPs2Reg		reg_value( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
 	GenerateStore( current_pc, reg_value, base, offset, OP_SWL, 3, set_branch_delay ? WriteBitsDirectBD_u32 : WriteBitsDirect_u32 );
 }
@@ -4075,7 +3688,7 @@ inline void	CCodeGeneratorPS2::GenerateSWL( u32 current_pc, bool set_branch_dela
 
 inline void	CCodeGeneratorPS2::GenerateSWR( u32 current_pc, bool set_branch_delay, EN64Reg rt, EN64Reg base, s32 offset )
 {
-	EPs2Reg		reg_value( GetRegisterAndLoadLo( rt, Ps2Reg_A1 ) );
+	EPs2Reg		reg_value( GetRegisterAndLoad( rt, Ps2Reg_A1 ) );
 
 	GenerateStore( current_pc, reg_value, base, offset, OP_SWR, 3, set_branch_delay ? WriteBitsDirectBD_u32 : WriteBitsDirect_u32 );
 }
@@ -4088,14 +3701,14 @@ inline void	CCodeGeneratorPS2::GenerateMFC1( EN64Reg rt, u32 fs )
 {
 	//gGPR[ op_code.rt ]._s64 = (s64)(s32)gCPUState.FPU[fs]._s32_0
 
-	EPs2Reg			reg_dst( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg			reg_dst( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
 	EN64FloatReg	n64_fs = EN64FloatReg( fs );
 	EPs2FloatReg	ps2_fs( GetFloatRegisterAndLoad( n64_fs ) );
 
 	MFC1( reg_dst, ps2_fs );
 
 	//Needs to be sign extended(or breaks DKR)
-	UpdateRegister( rt, reg_dst, URO_HI_SIGN_EXTEND );
+	StoreRegister( rt, reg_dst );
 }
 
 
@@ -4105,7 +3718,7 @@ inline void	CCodeGeneratorPS2::GenerateMTC1( u32 fs, EN64Reg rt )
 {
 	//gCPUState.FPU[fs]._s32_0 = gGPR[ op_code.rt ]._s32_0;
 
-	EPs2Reg			ps2_rt( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg			ps2_rt( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 	EN64FloatReg	n64_fs = EN64FloatReg( fs );
 	EPs2FloatReg	ps2_fs = EPs2FloatReg( n64_fs );//1:1 Mapping
 
@@ -4120,14 +3733,10 @@ inline void	CCodeGeneratorPS2::GenerateCFC1( EN64Reg rt, u32 fs )
 {
 	if( (fs == 0) | (fs == 31) )
 	{
-		EPs2Reg			reg_dst( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
+		EPs2Reg			reg_dst( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
 
 		GetVar( reg_dst, &gCPUState.FPUControl[ fs ]._u32 );
-#ifdef ENABLE_64BIT
-		UpdateRegister( rt, reg_dst, URO_HI_SIGN_EXTEND );
-#else
-		StoreRegisterLo( rt, reg_dst );
-#endif
+		StoreRegister( rt, reg_dst );
 	}
 }
 
@@ -4142,7 +3751,7 @@ void	CCodeGeneratorPS2::GenerateCTC1( u32 fs, EN64Reg rt )
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT( fs == 31, "CTC1 register is invalid");
 	#endif
-	EPs2Reg			ps2_rt_lo( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg			ps2_rt_lo( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 	SetVar( &gCPUState.FPUControl[ fs ]._u32, ps2_rt_lo );
 
 	// Only the lo part is ever set - Salvy
@@ -4164,10 +3773,8 @@ inline void	CCodeGeneratorPS2::GenerateBEQ( EN64Reg rs, EN64Reg rt, const SBranc
 	#endif
 	// One or other of these may be r0 - we don't really care for optimisation purposes though
 	// as ultimately the register load regs factored out
-	EPs2Reg		reg_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg		reg_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-
-	// XXXX This may actually need to be a 64 bit compare, but this is what R4300.cpp does
+	EPs2Reg		reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg		reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
 	if( p_branch->ConditionalBranchTaken )
 	{
@@ -4191,10 +3798,8 @@ inline void	CCodeGeneratorPS2::GenerateBNE( EN64Reg rs, EN64Reg rt, const SBranc
 	#endif
 	// One or other of these may be r0 - we don't really care for optimisation purposes though
 	// as ultimately the register load regs factored out
-	EPs2Reg		reg_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-	EPs2Reg		reg_b( GetRegisterAndLoadLo( rt, Ps2Reg_A0 ) );
-
-	// XXXX This may actually need to be a 64 bit compare, but this is what R4300.cpp does
+	EPs2Reg		reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
+	EPs2Reg		reg_b( GetRegisterAndLoad( rt, Ps2Reg_A0 ) );
 
 	if( p_branch->ConditionalBranchTaken )
 	{
@@ -4216,9 +3821,7 @@ inline void	CCodeGeneratorPS2::GenerateBLEZ( EN64Reg rs, const SBranchDetails * 
 	DAEDALUS_ASSERT( p_branch != nullptr, "No branch details?" );
 	DAEDALUS_ASSERT( p_branch->Direct, "Indirect branch for BLEZ?" );
 	#endif
-	EPs2Reg		reg_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-
-	// XXXX This may actually need to be a 64 bit compare, but this is what R4300.cpp does
+	EPs2Reg		reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
 
 	if( p_branch->ConditionalBranchTaken )
 	{
@@ -4240,45 +3843,16 @@ inline void	CCodeGeneratorPS2::GenerateBGTZ( EN64Reg rs, const SBranchDetails * 
 	DAEDALUS_ASSERT( p_branch != nullptr, "No branch details?" );
 	DAEDALUS_ASSERT( p_branch->Direct, "Indirect branch for BGTZ?" );
 	#endif
-	EPs2Reg		reg_lo( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
+	EPs2Reg		reg_lo( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
 
-	//64bit compare is needed for DK64 or DK can walk trough walls
-	if(g_ROM.GameHacks == DK64)
+	if( p_branch->ConditionalBranchTaken )
 	{
-#if 0
-		//Do a full 64 bit compare //Corn
-		SRL( Ps2Reg_V0, reg_lo, 1);	//Free MSB sign bit
-		ANDI( Ps2Reg_V1, reg_lo, 1);	//Extract LSB bit
-		OR( Ps2Reg_V0, Ps2Reg_V0, Ps2Reg_V1);	//Merge with OR
-		EPs2Reg		reg_hi( GetRegisterAndLoadHi( rs, Ps2Reg_V1 ) );
-		OR( Ps2Reg_V1, Ps2Reg_V0, reg_hi);	//Merge lo with hi part of register with sign bit
-#else
-		//This takes some shortcuts //Corn
-		EPs2Reg		reg_hi( GetRegisterAndLoadHi( rs, Ps2Reg_V1 ) );
-		OR( Ps2Reg_V1, reg_lo, reg_hi);
-#endif
-		if( p_branch->ConditionalBranchTaken )
-		{
-			// Flip the sign of the test -
-			*p_branch_jump = BLEZ( Ps2Reg_V1, CCodeLabel(nullptr), true );
-		}
-		else
-		{
-			*p_branch_jump = BGTZ( Ps2Reg_V1, CCodeLabel(nullptr), true );
-		}
+		// Flip the sign of the test -
+		*p_branch_jump = BLEZ( reg_lo, CCodeLabel(nullptr), true );
 	}
 	else
 	{
-		//Do a fast 32 bit compare //Corn
-		if( p_branch->ConditionalBranchTaken )
-		{
-			// Flip the sign of the test -
-			*p_branch_jump = BLEZ( reg_lo, CCodeLabel(nullptr), true );
-		}
-		else
-		{
-			*p_branch_jump = BGTZ( reg_lo, CCodeLabel(nullptr), true );
-		}
+		*p_branch_jump = BGTZ( reg_lo, CCodeLabel(nullptr), true );
 	}
 }
 
@@ -4291,9 +3865,7 @@ inline void	CCodeGeneratorPS2::GenerateBLTZ( EN64Reg rs, const SBranchDetails * 
 	DAEDALUS_ASSERT( p_branch != nullptr, "No branch details?" );
 	DAEDALUS_ASSERT( p_branch->Direct, "Indirect branch for BLTZ?" );
 	#endif
-	EPs2Reg		reg_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-
-	// XXXX This should actually need to be a 64 bit compare???
+	EPs2Reg		reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
 
 	if( p_branch->ConditionalBranchTaken )
 	{
@@ -4315,9 +3887,7 @@ inline void	CCodeGeneratorPS2::GenerateBGEZ( EN64Reg rs, const SBranchDetails * 
 	DAEDALUS_ASSERT( p_branch != nullptr, "No branch details?" );
 	DAEDALUS_ASSERT( p_branch->Direct, "Indirect branch for BGEZ?" );
 	#endif
-	EPs2Reg		reg_a( GetRegisterAndLoadLo( rs, Ps2Reg_V0 ) );
-
-	// XXXX This should actually need to be a 64 bit compare???
+	EPs2Reg		reg_a( GetRegisterAndLoad( rs, Ps2Reg_V0 ) );
 
 	if( p_branch->ConditionalBranchTaken )
 	{
@@ -4355,12 +3925,9 @@ inline void	CCodeGeneratorPS2::GenerateBC1F( const SBranchDetails * p_branch, CJ
 	else
 	{
 		GetVar( Ps2Reg_V0, &gCPUState.FPUControl[31]._u32 );
-#if 0
-		EXT( Ps2Reg_V0, Ps2Reg_V0, 0, 23 );	//Extract condition bit (true/false)
-#else
 		LoadConstant( Ps2Reg_A0, FPCSR_C );
 		AND( Ps2Reg_V0, Ps2Reg_V0, Ps2Reg_A0 );
-#endif
+
 		if( p_branch->ConditionalBranchTaken )
 		{
 			// Flip the sign of the test -
@@ -4398,12 +3965,9 @@ inline void	CCodeGeneratorPS2::GenerateBC1T( const SBranchDetails * p_branch, CJ
 	else
 	{
 		GetVar( Ps2Reg_V0, &gCPUState.FPUControl[31]._u32 );
-#if 0
-		EXT( Ps2Reg_V0, Ps2Reg_V0, 0, 23 );	//Extract condition bit (true/false)
-#else
 		LoadConstant( Ps2Reg_A0, FPCSR_C );
 		AND( Ps2Reg_V0, Ps2Reg_V0, Ps2Reg_A0 );
-#endif
+
 		if( p_branch->ConditionalBranchTaken )
 		{
 			// Flip the sign of the test -
@@ -4603,16 +4167,12 @@ inline void	CCodeGeneratorPS2::GenerateTRUNC_W_D_Sim( u32 fd, u32 fs )
 	EN64FloatReg	n64_fs = EN64FloatReg( fs );
 	EN64FloatReg	n64_fd = EN64FloatReg( fd );
 
-	EPs2FloatReg	ps2_fd_sig = EPs2FloatReg( n64_fd );//1:1 Mapping
+	//EPs2FloatReg	ps2_fd_sig = EPs2FloatReg( n64_fd );//1:1 Mapping
 	//EPs2FloatReg	ps2_fd = EPs2FloatReg( n64_fd + 1 );//1:1 Mapping
-	EPs2FloatReg	ps2_fs( GetSimFloatRegisterAndLoad( n64_fs ) );
+	//EPs2FloatReg	ps2_fs( GetSimFloatRegisterAndLoad( n64_fs ) );
 
 	//Use float now instead of double :)
 	//TRUNC_W_S( ps2_fd_sig, ps2_fs );
-	printf("*******************************************************trunc2\n");
-	JAL(CCodeLabel((const void*)(truncf)), false);
-	MFC1(Ps2Reg_A0, ps2_fs);	//Get float to convert
-	MTC1(ps2_fd_sig, Ps2Reg_V0);	//Copy to FPU
 
 	UpdateFloatRegister( n64_fd );
 }
@@ -4855,11 +4415,8 @@ inline void	CCodeGeneratorPS2::GenerateTRUNC_W_S( u32 fd, u32 fs )
 	EPs2FloatReg	ps2_fs( GetFloatRegisterAndLoad( n64_fs ) );
 
 	//SET_ROUND_MODE( gRoundingMode );		//XXXX Is this needed?
-	printf("*******************************************************trunc\n");
+
 	//TRUNC_W_S( ps2_fd, ps2_fs );
-	JAL(CCodeLabel((const void*)(truncf)), false);
-	MFC1(Ps2Reg_A0, ps2_fs);	//Get float to convert
-	MTC1(ps2_fd, Ps2Reg_V0);	//Copy to FPU
 
 	UpdateFloatRegister( n64_fd );
 }
@@ -4877,11 +4434,7 @@ inline void	CCodeGeneratorPS2::GenerateFLOOR_W_S( u32 fd, u32 fs )
 
 	//SET_ROUND_MODE( gRoundingMode );		//XXXX Is this needed?
 
-	printf("*******************************************************floor\n");
 	//FLOOR_W_S( ps2_fd, ps2_fs );
-	JAL(CCodeLabel((const void*)(floorf)), false);
-	MFC1(Ps2Reg_A0, ps2_fs);	//Get float to convert
-	MTC1(ps2_fd, Ps2Reg_V0);	//Copy to FPU
 
 	UpdateFloatRegister( n64_fd );
 }
@@ -5104,10 +4657,10 @@ inline void	CCodeGeneratorPS2::GenerateMFC0( EN64Reg rt, u32 fs )
 	// Never seen this to happen, no reason to bother to handle it
 	DAEDALUS_ASSERT( fs != C0_RAND, "Reading MFC0 random register is unhandled");
 	#endif
-	EPs2Reg reg_dst( GetRegisterNoLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_dst( GetRegisterNoLoad( rt, Ps2Reg_V0 ) );
 
 	GetVar( reg_dst, &gCPUState.CPUControl[ fs ]._u32 );
-	UpdateRegister( rt, reg_dst, URO_HI_SIGN_EXTEND );
+	StoreRegister( rt, reg_dst );
 }
 
 
@@ -5115,7 +4668,7 @@ inline void	CCodeGeneratorPS2::GenerateMFC0( EN64Reg rt, u32 fs )
 
 inline void	CCodeGeneratorPS2::GenerateMTC0( EN64Reg rt, u32 fs )
 {
-	EPs2Reg reg_src( GetRegisterAndLoadLo( rt, Ps2Reg_V0 ) );
+	EPs2Reg reg_src( GetRegisterAndLoad( rt, Ps2Reg_V0 ) );
 
 	SetVar( &gCPUState.CPUControl[ fs ]._u32, reg_src );
 }

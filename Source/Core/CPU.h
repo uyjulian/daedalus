@@ -125,10 +125,10 @@ ALIGNED_TYPE(struct, SCPUState, CACHE_ALIGN)
 	REG64			MultLo;				// 0x290 ..
 	REG64			MultHi;				// 0x298
 
-	REG32			Temp1;				// 0x2A0	Temp storage Dynarec
-	REG32			Temp2;				// 0x2A4	Temp storage Dynarec
-	REG32			Temp3;				// 0x2A8	Temp storage Dynarec
-	REG32			Temp4;				// 0x2AC	Temp storage Dynarec
+	REG64			Temp1;				// 0x2A0	Temp storage Dynarec
+	REG64			Temp2;				// 0x2A8	Temp storage Dynarec
+	REG64			Temp3;				// 0x2B0	Temp storage Dynarec
+	REG64			Temp4;				// 0x2B8	Temp storage Dynarec
 
 	CPUEvent		Events[ MAX_CPU_EVENTS ];	// 0x2B0 //In practice there should only ever be 2 CPU_EVENTS
 	u32				NumEvents;
