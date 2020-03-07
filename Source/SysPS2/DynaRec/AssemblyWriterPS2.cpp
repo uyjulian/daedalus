@@ -817,7 +817,7 @@ void	CAssemblyWriterPS2::SRLV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
 
 void	CAssemblyWriterPS2::SRAV( EPs2Reg rd, EPs2Reg rs, EPs2Reg rt )
 {
-	SpecOpLogical( rd, rs, SpecOp_DSRAV, rt );
+	SpecOpLogical( rd, rs, SpecOp_SRAV, rt );
 }
 
 
