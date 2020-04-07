@@ -1914,7 +1914,7 @@ inline void FixUV(u32 * wrap, s16 * c0_, s16 * c1_, s16 offset, s32 size)
 		// Check if the coord is negative - if so, offset to the range [0,size]
 		if (c0 < 0)
 		{
-			s32 lowest {Min(c0, c1)};
+			s32 lowest {std::min(c0, c1)};
 
 			// Figure out by how much to translate so that the lowest of c0/c1 lies in the range [0,size]
 			// If we do lowest%size, we run the risk of implementation dependent behaviour for modulo of negative values.
@@ -2000,8 +2000,8 @@ void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 	ConvertN64ToScreen( n64_br, screen_br );
 
 	//Clamp TOP and LEFT values to 0 if < 0 , needed for zooming //Corn
-	s32 l {Max<s32>( s32(screen_tl.x), 0 )};
-	s32 t {Max<s32>( s32(screen_tl.y), 0 )};
+	s32 l {std::max( s32(screen_tl.x), 0 )};
+	s32 t {std::max( s32(screen_tl.y), 0 )};
 	s32 r {           s32(screen_br.x)};
 	s32 b {          s32(screen_br.y)};
 
