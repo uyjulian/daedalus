@@ -350,10 +350,10 @@ static inline void Draw_ObjSprite( const uObjSprite *sprite, ESpriteMode mode, c
 
 		// Used by Worms
 		if( sprite->imageFlags&1 )
-			Swap< f32 >( x0, x1 );
+			std::swap( x0, x1 );
 
 		if( sprite->imageFlags&0x10 )
-			Swap< f32 >( y0, y1 );
+			std::swap( y0, y1 );
 
 		gRenderer->Draw2DTexture(x0, y0, x1, y1, 0, 0, imageW, imageH, texture);
 		break;

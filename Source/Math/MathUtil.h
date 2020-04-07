@@ -24,13 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Math/Math.h"
 
 
-template< typename T >
-inline void Swap( T & a, T & b )
-{
-	T t = a;
-	a = b;
-	b = t;
-}
 
 inline float Interpolate( float a, float b, float r )
 {

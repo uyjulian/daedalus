@@ -109,10 +109,10 @@ void DLParser_Sprite2DDraw( MicroCodeCommand command, const Sprite2DInfo &info, 
 
 	// SSV uses this
 	if( info.flipX )
-		Swap< s32 >( frameX, frameW );
+		std::swap( frameX, frameW );
 
 	if( info.flipY )
-		Swap< s32 >( frameY, frameH );
+		std::swap(frameY, frameH );
 
 	gRenderer->Draw2DTexture( (f32)frameX, (f32)frameY, (f32)frameW, (f32)frameH,
 							  0.0f, 0.0f, (f32)sprite->width, (f32)sprite->height,
