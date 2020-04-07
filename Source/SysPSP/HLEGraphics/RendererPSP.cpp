@@ -368,7 +368,7 @@ inline void RendererPSP::RenderFog( DaedalusVtx * p_vertices, u32 num_vertices, 
 		u32 FogColor {mFogColour.GetColour()};
 
 		//Copy fog color to vertices
-		for(u32 i {} ; i < num_vertices ; i++)
+		for(auto i {0} ; i < num_vertices ; i++)
 		{
 			u32 alpha {p_vertices[i].Colour.GetColour() & 0xFF000000};
 			p_vertices[i].Colour = (c32)(alpha | FogColor);
@@ -584,7 +584,7 @@ void RendererPSP::RenderUsingRenderSettings( const CBlendStates * states, Daedal
 		memcpy( mVtx_Save, p_vertices, num_vertices * sizeof( DaedalusVtx ) );
 	}
 
-	for( u32 i {}; i < states->GetNumStates(); ++i )
+	for( auto i {0}; i < states->GetNumStates(); ++i )
 	{
 		const CRenderSettings *		settings( states->GetColourSettings( i ) );
 

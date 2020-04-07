@@ -127,6 +127,7 @@ void	IAdjustDeadzoneScreen::Update( float elapsed_time, const v2 & stick, u32 ol
 
 		if(new_buttons & (PSP_CTRL_TRIANGLE))
 		{
+
 			mStickMinDeadzone = DEFAULT_MIN_DEADZONE;
 			mStickMaxDeadzone = DEFAULT_MAX_DEADZONE;
 		}
@@ -169,7 +170,7 @@ void	IAdjustDeadzoneScreen::DrawCircle( s32 x, s32 y, s32 r, c32 colour )
 	s32		x0 = s32( sinf( 0 ) * radius ) + x;
 	s32		y0 = s32( cosf( 0 ) * radius ) + y;
 
-	for( u32 i = 0; i < NUM_POINTS; ++i )
+	for( auto i {0}; i < NUM_POINTS; ++i )
 	{
 		f32		angle( 2 * PI * f32( i+1 ) / f32( NUM_POINTS ) );
 		s32		x1 = s32( sinf( angle ) * radius ) + x;

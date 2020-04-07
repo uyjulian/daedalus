@@ -69,7 +69,7 @@ public:
 
 	void Reset()
 	{
-		for (u32 i = 0; i < NUM_REGISTERS; i++)
+		for (auto i {0}; i < NUM_REGISTERS; i++)
 		{
 			SetCachedReg( i, INVALID_CODE );
 			MarkAsValid( i, false );
@@ -519,7 +519,7 @@ CJumpLocation	CCodeGeneratorX86::GenerateOpCode( const STraceEntry& ti, bool bra
 		case OP_J:			handled = true; break;
 		case OP_JAL:		GenerateJAL( address ); handled = true; break;
 		case OP_CACHE:		GenerateCACHE( base, op_code.immediate, rt ); handled = true; break;
-			
+
 		// For LW, SW, SWC1, LB etc, only generate an exception handler if access wasn't done through the stack (handle = false)
 		// This will have to be reworked once we handle accesses other than the stack!
 		case OP_LW:
@@ -866,7 +866,6 @@ void	CCodeGeneratorX86::GenerateJR( EN64Reg rs)
 
 void R4300_CALL_TYPE _EnterDynaRec( const void * p_function, const void * p_base_pointer, const void * p_rebased_mem, u32 mem_limit )
 {
-	typedef void (* FragmentFunction)();
-
+	using FragmentFunction  =void (*)();
 	reinterpret_cast< FragmentFunction >( p_function )();
 }

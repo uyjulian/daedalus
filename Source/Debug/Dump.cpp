@@ -204,7 +204,7 @@ void Dump_MemoryRange(FILE * fh, u32 address_offset, const u32 * b, const u32 * 
 		fprintf(fh, "0x%08x: %08x %08x %08x %08x ", address, p[0], p[1], p[2], p[3]);
 
 		const u8 * p8( reinterpret_cast< const u8 * >( p ) );
-		for (u32 i = 0; i < 16; i++)
+		for (auto i {0}; i < 16; i++)
 		{
 			u8 c( p8[i ^ U8_TWIDDLE] );
 			if (c >= 32 && c < 128)
@@ -329,7 +329,7 @@ void Dump_Strings( const char * p_file_name )
 			{
 				fprintf( fp, "0x%08x: ", ascii_start );
 
-				for ( u32 j = 0; j < ascii_count; j++ )
+				for ( auto j {0}; j < ascii_count; j++ )
 				{
 					fprintf( fp, "%c", RomBuffer::ReadValueRaw< u8 >( (ascii_start + j ) ^ 0x3 ) );
 				}

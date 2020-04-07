@@ -48,7 +48,7 @@ template<int x> struct static_assert_test{};
 // NB! This should be enabled across all builds regardless of whether DAEDALUS_ENABLE_ASSERTS is set!
 // It's a compile-time assert and has no runtime cost!
 #define DAEDALUS_STATIC_ASSERT( x )								\
-   typedef static_assert_test<sizeof(STATIC_ASSERTION_FAILURE< (bool)( x ) >)>	static_assert_typedef_##__COUNTER__
+using static_assert_typedef_##__COUNTER__ = static_assert_test<sizeof(STATIC_ASSERTION_FAILURE< (bool)( x ) >)>;
 
 #endif
 
@@ -70,7 +70,8 @@ EAssertResult DAEDALUS_VARARG_CALL_TYPE DaedalusAssert( const char * expression,
 //
 //	Use this api to override the default assert handler, e.g. for logging asserts during a batch process
 //
-typedef EAssertResult (*DaedalusAssertHook)( const char * expression, const char * file, unsigned int line, const char * formatted_msg, ... );
+using DaedalusAssertHook = EAssertResult (*)( const char * expression, const char * file, unsigned int line, const char * formatted_msg, ... );
+
 
 extern DaedalusAssertHook gAssertHook;
 

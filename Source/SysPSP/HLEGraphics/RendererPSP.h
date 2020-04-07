@@ -71,7 +71,7 @@ private:
 	CBlendStates *		mCopyBlendStates;
 	CBlendStates *		mFillBlendStates;
 
-	typedef std::map< u64, SBlendStateEntry > BlendStatesMap;
+	using BlendStatesMap = std::map< u64, SBlendStateEntry >;
 	BlendStatesMap		mBlendStatesMap;
 
 

@@ -18,7 +18,7 @@ class MemcpyByteSwapTest : public ::testing::TestWithParam< ::std::tr1::tuple<u3
 protected:
 	virtual void SetUp()
 	{
-		for (u32 i = 0; i < 64; ++i)
+		for (auto i {0}; i < 64; ++i)
 			mSrc[i] = i;
 	memset(mDst, 0, sizeof(mDst));
 	memset(mExpected, 0, sizeof(mExpected));
@@ -50,7 +50,7 @@ TEST_P(MemcpyByteSwapTest, WorksWithSmallCopies)
 
 	memcpy_byteswap(&mDst[dst_off], &mSrc[src_off], len);
 	memcpy_byteswap_reference(mExpected, dst_off, mSrc, src_off, len);
-	for (u32 i = 0; i < 64; ++i)
+	for (auto i {0}; i < 64; ++i)
 		EXPECT_EQ(mExpected[i], mDst[i]);
 }
 

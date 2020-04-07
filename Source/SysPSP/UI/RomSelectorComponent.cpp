@@ -166,8 +166,8 @@ static u32 mCurrentSelection = 0;
 
 class IRomSelectorComponent : public CRomSelectorComponent
 {
-		typedef std::vector<SRomInfo*>	RomInfoList;
-		typedef std::map< ECategory, u32 >	AlphaMap;
+		using RomInfoList = std::vector<SRomInfo*>;
+		using AlphaMap = std::map< ECategory, u32>;
 	public:
 
 		IRomSelectorComponent( CUIContext * p_context, CFunctor1< const char * > * on_rom_selected );
@@ -242,7 +242,7 @@ IRomSelectorComponent::IRomSelectorComponent( CUIContext * p_context, CFunctor1<
 ,	mQuitTriggered(false)
 ,	mQuitInit(false)
 {
-	for( u32 i = 0; i < ARRAYSIZE( gRomsDirectories ); ++i )
+	for( auto i {0}; i < ARRAYSIZE( gRomsDirectories ); ++i )
 	{
 		AddRomDirectory( gRomsDirectories[ i ], mRomsList );
 	}
@@ -250,7 +250,7 @@ IRomSelectorComponent::IRomSelectorComponent( CUIContext * p_context, CFunctor1<
 	stable_sort( mRomsList.begin(), mRomsList.end(), SortByGameName );
 
 	// Build up a map of the first location for each initial letter
-	for( u32 i = 0; i < mRomsList.size(); ++i )
+	for( auto i {0}; i < mRomsList.size(); ++i )
 	{
 		const char *	p_gamename( mRomsList[ i ]->mSettings.GameName.c_str() );
 		ECategory		category( Categorise( p_gamename ) );
@@ -296,7 +296,7 @@ void	IRomSelectorComponent::UpdateROMList()
 	mpPreviewTexture = NULL;
 	mPreviewIdx= u32(-1);
 
-	for( u32 i = 0; i < ARRAYSIZE( gRomsDirectories ); ++i )
+	for( auto i {0}; i < ARRAYSIZE( gRomsDirectories ); ++i )
 	{
 		AddRomDirectory( gRomsDirectories[ i ], mRomsList );
 	}
@@ -304,7 +304,7 @@ void	IRomSelectorComponent::UpdateROMList()
 	stable_sort( mRomsList.begin(), mRomsList.end(), SortByGameName );
 
 	// Build up a map of the first location for each initial letter
-	for( u32 i = 0; i < mRomsList.size(); ++i )
+	for( auto i {0}; i < mRomsList.size(); ++i )
 	{
 		const char *	p_gamename( mRomsList[ i ]->mSettings.GameName.c_str() );
 		ECategory		category( Categorise( p_gamename ) );
@@ -496,7 +496,7 @@ void IRomSelectorComponent::RenderCategoryList()
 
 	ECategory current_category( GetCurrentCategory() );
 
-	for( u32 i = 0; i < NUM_CATEGORIES; ++i )
+	for( auto i {0}; i < NUM_CATEGORIES; ++i )
 	{
 		ECategory	category = ECategory( i );
 		c32			colour;
@@ -541,7 +541,7 @@ void IRomSelectorComponent::Render()
 	if( mRomsList.empty() )
 	{
 		s32 offset( 0 );
-		for( u32 i = 0; i < ARRAYSIZE( gNoRomsText ); ++i )
+		for( auto i {0}; i < ARRAYSIZE( gNoRomsText ); ++i )
 		{
 			offset += mpContext->DrawTextArea( LIST_TEXT_LEFT, BELOW_MENU_MIN + offset, LIST_TEXT_WIDTH, LIST_TEXT_HEIGHT - offset, gNoRomsText[ i ], DrawTextUtilities::TextWhite, VA_TOP );
 			offset += 4;

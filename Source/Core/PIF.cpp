@@ -241,7 +241,7 @@ IController::IController() :
 #ifdef DAEDALUS_DEBUG_PIF
 	mDebugFile = fopen( "controller.txt", "w" );
 #endif
-	for ( u32 i {}; i < NUM_CONTROLLERS; i++ )
+	for ( auto i {0}; i < NUM_CONTROLLERS; i++ )
 	{
 		mContPresent[ i ] = false;
 		mContMemPackPresent[ i ] = false;
@@ -585,7 +585,7 @@ void	IController::CommandWriteEeprom(u8* cmd)
 u8 IController::CalculateDataCrc(const u8 * pBuf)
 {
 	u32 c {};
-	for (u32 i {}; i < 32; i++)
+	for (auto i {0}; i < 32; i++)
 	{
 		u32 s {pBuf[i]};
 
@@ -793,7 +793,7 @@ void IController::n64_cic_nus_6105()
 		0xC, 0x9, 0x8, 0x5, 0x6, 0x3, 0xC, 0x9
 	};
 	char challenge[30] {}, response[30] {};
-	u32 i {};
+	auto i {0};
 	switch (mpPifRam[0x3F])
 	{
 	case 0x02:

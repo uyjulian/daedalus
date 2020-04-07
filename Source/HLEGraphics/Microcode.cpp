@@ -65,7 +65,7 @@ static bool	GBIMicrocode_DetectVersionString( u32 data_base, u32 data_size, char
 	#endif
 	const s8 * ram( g_ps8RamBase );
 
-	for ( u32 i {}; i+2 < data_size; i++ )
+	for ( auto i {0}; i+2 < data_size; i++ )
 	{
 		if ( ram[ (data_base + i+0) ^ 3 ] == 'R' &&
 			 ram[ (data_base + i+1) ^ 3 ] == 'S' &&
@@ -99,7 +99,7 @@ static u32 GBIMicrocode_MicrocodeHash(u32 code_base, u32 code_size)
 	const u8 * ram( g_pu8RamBase );
 
 	u32 hash {};
-	for (u32 i = 0; i < code_size; ++i)
+	for (auto i {0}; i < code_size; ++i)
 	{
 		hash = (hash << 4) + hash + ram[ (code_base+i) ^ U8_TWIDDLE ];   // Best hash ever!
 	}
@@ -198,7 +198,7 @@ u32	GBIMicrocode_DetectVersion( u32 code_base, u32 code_size, u32 data_base, u32
 		const char  *ucodes[] { "F3", "L3", "S2DEX" };
 		char 		*match {};
 
-		for(u32 j {}; j<3;j++)
+		for(u32 j {0}; j<3;j++)
 		{
 			if( (match = strstr(str, ucodes[j])) )
 				break;

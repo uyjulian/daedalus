@@ -623,7 +623,7 @@ void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address )
 
 	s16 hi {};
 	s32 tmp {};
-	for (u32 i {}; i < 4; i++)
+	for (auto i {0}; i < 4; i++)
 	{
 #if 1	// Crappy compiler.. reordering is to optimize the ASM // Corn
 		tmp = ((Imat->h[i].x << 16) | Imat->l[i].x);

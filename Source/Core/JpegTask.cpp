@@ -38,8 +38,8 @@
 #include "OSHLE/ultra_sptask.h"
 
 #define SUBBLOCK_SIZE 64
+using tile_line_emitter_t = void (*)(const s16 *y, const s16 *u, u32 address);
 
-typedef void (*tile_line_emitter_t)(const s16 *y, const s16 *u, u32 address);
 
 /* rdram operations */
 // FIXME: these functions deserve their own module
@@ -363,7 +363,7 @@ static void EmitTilesMode2(const tile_line_emitter_t emit_line, const s16 *macro
     u32 y_offset {0};
     u32 u_offset {4*SUBBLOCK_SIZE};
 
-    for (u32 i = 0; i < 8; ++i)
+    for (auto i {0}; i < 8; ++i)
     {
         emit_line(&macroblock[y_offset],     &macroblock[u_offset], address);
         emit_line(&macroblock[y_offset + 8], &macroblock[u_offset], address + 32);
@@ -465,7 +465,7 @@ static void ReorderSubBlock(s16 *dst, const s16 *src, const u32 *table)
     /* source and destination sublocks cannot overlap */
     //assert(abs(dst - src) > SUBBLOCK_SIZE);
 
-    for (u32 i {}; i < SUBBLOCK_SIZE; ++i)
+    for (auto i {0}; i < SUBBLOCK_SIZE; ++i)
     {
         dst[i] = src[table[i]];
     }
@@ -474,7 +474,7 @@ static void ReorderSubBlock(s16 *dst, const s16 *src, const u32 *table)
 static void MultSubBlocks(s16 *dst, const s16 *src1, const s16 *src2, u32 shift)
 {
 
-    for (u32 i {}; i < SUBBLOCK_SIZE; ++i)
+    for (auto i {0}; i < SUBBLOCK_SIZE; ++i)
     {
         s32 v {src1[i] * src2[i]};
         dst[i] = clamp_s16(v) << shift;
@@ -483,7 +483,7 @@ static void MultSubBlocks(s16 *dst, const s16 *src1, const s16 *src2, u32 shift)
 
 static void ScaleSubBlock(s16 *dst, const s16 *src, s16 scale)
 {
-    for (u32 i {}; i < SUBBLOCK_SIZE; ++i)
+    for (auto i {0}; i < SUBBLOCK_SIZE; ++i)
     {
         s32 v {src[i] * scale};
         dst[i] = clamp_s16(v);
@@ -493,7 +493,7 @@ static void ScaleSubBlock(s16 *dst, const s16 *src, s16 scale)
 static void RShiftSubBlock(s16 *dst, const s16 *src, u32 shift)
 {
 
-    for (u32 i {}; i < SUBBLOCK_SIZE; ++i)
+    for (auto i {0}; i < SUBBLOCK_SIZE; ++i)
     {
         dst[i] = src[i] >> shift;
     }
@@ -568,7 +568,7 @@ static void InverseDCTSubBlock(s16 *dst, const s16 *src)
 {
     float x[8] {};
     float block[SUBBLOCK_SIZE] {};
-    u32 i {}, j {};
+    auto i {0}, j {0};
 
     /* idct 1d on rows (+transposition) */
     for (i = 0; i < 8; ++i)

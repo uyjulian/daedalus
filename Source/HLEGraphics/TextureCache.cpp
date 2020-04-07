@@ -109,12 +109,12 @@ void CTextureCache::DropTextures()
 {
 	MutexLock lock(GetDebugMutex());
 
-	for( u32 i {}; i < mTextures.size(); ++i)
+	for( auto i {0}; i < mTextures.size(); ++i)
 	{
 		delete mTextures[i];
 	}
 	mTextures.clear();
-	for( u32 i {}; i < HASH_TABLE_SIZE; ++i )
+	for( auto i {0}; i < HASH_TABLE_SIZE; ++i )
 	{
 		mpCacheHashTable[i] = nullptr;
 	}

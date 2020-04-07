@@ -207,7 +207,7 @@ void DLParser_DMA_Tri_DKR( MicroCodeCommand command )
 
 	bool tris_added = false;
 
-	for (u32 i = 0; i < count; i++)
+	for (auto i {0}; i < count; i++)
 	{
 		u32 v0_idx = tri->v0;
 		u32 v1_idx = tri->v1;

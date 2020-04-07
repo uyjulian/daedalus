@@ -325,8 +325,8 @@ struct SDescendingCyclesSort
 //*************************************************************************************
 void CFragmentCache::DumpStats( const char * outputdir ) const
 {
-	typedef std::vector< CFragment * >		FragmentList;
-	FragmentList		all_fragments;
+	using FragmentList = std::vector< CFragment *>;
+		FragmentList		all_fragments;
 
 	all_fragments.reserve( mFragments.size() );
 

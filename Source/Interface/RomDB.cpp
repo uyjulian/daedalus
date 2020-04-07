@@ -157,10 +157,9 @@ class IRomDB : public CRomDB
 				return a.ID < b;
 			}
 		};
-
-		typedef std::vector< RomFilesKeyValue >	FilenameVec;
-		typedef std::vector< RomDetails >		DetailsVec;
-
+		using FilenameVec = std::vector< RomFilesKeyValue>;
+		using DetailsVec = std::vector< RomDetails>;
+		
 		IO::Filename					mRomDBFileName;
 		FilenameVec						mRomFiles;
 		DetailsVec						mRomDetails;
@@ -520,7 +519,7 @@ bool IRomDB::QueryByID( const RomID & id, u32 * rom_size, ECicType * cic_type ) 
 
 const char * IRomDB::QueryFilenameFromID( const RomID & id ) const
 {
-	for( u32 i = 0; i < mRomFiles.size(); ++i )
+	for( auto i {0}; i < mRomFiles.size(); ++i )
 	{
 		if( mRomFiles[ i ].ID == id )
 		{

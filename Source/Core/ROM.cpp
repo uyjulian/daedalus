@@ -621,7 +621,7 @@ static const CountryIDInfo g_CountryCodeInfo[] =
 // Get a string representing the country name from an ID value
 const char * ROM_GetCountryNameFromID( u8 country_id )
 {
-	for (u32 i {}; i < ARRAYSIZE( g_CountryCodeInfo ); i++)
+	for (auto i {0}; i < ARRAYSIZE( g_CountryCodeInfo ); i++)
 	{
 		if (g_CountryCodeInfo[i].CountryID == country_id)
 		{
@@ -634,7 +634,7 @@ const char * ROM_GetCountryNameFromID( u8 country_id )
 
 u32 ROM_GetTvTypeFromID( u8 country_id )
 {
-	for (u32 i {}; i < ARRAYSIZE( g_CountryCodeInfo ); i++)
+	for (auto i {0}; i < ARRAYSIZE( g_CountryCodeInfo ); i++)
 	{
 		if (g_CountryCodeInfo[i].CountryID == country_id)
 		{

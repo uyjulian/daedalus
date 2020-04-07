@@ -430,7 +430,7 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 		DAEDALUS_ASSERT(qwords_per_line == (u32)ceilf(2048.f / (float)dxt), "Broken DXT calc");
 
 		u32 odd_row {};
-		for (u32 i {}; i < qwords; /* updated in loop */)
+		for (auto i {0}; i < qwords; /* updated in loop */)
 		{
 			u32 qwords_to_copy {Min(qwords-i, qwords_per_line)};
 
@@ -527,7 +527,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	u8* dst {gTMEM + tmem_offset};
 	u8* src {g_pu8RamBase + ram_offset};
 
-	for (u32 y {}; y < h; ++y)
+	for (auto y {0}; y < h; ++y)
 	{
 		if (y&1)
 		{

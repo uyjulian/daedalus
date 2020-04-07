@@ -215,7 +215,7 @@ class CControllerConfig
 
 CControllerConfig::CControllerConfig()
 {
-	for( u32 i = 0; i < NUM_N64_BUTTONS; ++i )
+	for( auto i {0}; i < NUM_N64_BUTTONS; ++i )
 	{
 		mButtonMappings[ i ] = NULL;
 	}
@@ -223,7 +223,7 @@ CControllerConfig::CControllerConfig()
 
 CControllerConfig::~CControllerConfig()
 {
-	for( u32 i = 0; i < NUM_N64_BUTTONS; ++i )
+	for( auto i {0}; i < NUM_N64_BUTTONS; ++i )
 	{
 		delete mButtonMappings[ i ];
 	}
@@ -239,7 +239,7 @@ u32		CControllerConfig::GetN64ButtonsState( u32 psp_button_mask ) const
 {
 	u32	state = 0;
 
-	for( u32 i = 0; i < NUM_N64_BUTTONS; ++i )
+	for( auto i {0}; i < NUM_N64_BUTTONS; ++i )
 	{
 		if( mButtonMappings[ i ] != NULL )
 		{
@@ -301,7 +301,7 @@ IInputManager::IInputManager()
 //*****************************************************************************
 IInputManager::~IInputManager()
 {
-	for( u32 i = 0; i < mControllerConfigs.size(); ++i )
+	for( auto i {0}; i < mControllerConfigs.size(); ++i )
 	{
 		delete mControllerConfigs[ i ];
 		mControllerConfigs[ i ] = NULL;
@@ -524,7 +524,7 @@ bool IsIdentifierChar( char c )
 
 u32 GetMaskFromIdentifier( const char * identifier )
 {
-	for( u32 i = 0; i < ARRAYSIZE( gButtonNameMappings ); ++i )
+	for( auto i {0}; i < ARRAYSIZE( gButtonNameMappings ); ++i )
 	{
 		if( strcmp( gButtonNameMappings[ i ].ButtonName, identifier ) == 0 )
 		{
@@ -879,7 +879,7 @@ CControllerConfig *	IInputManager::BuildControllerConfig( const char * filename 
 	{
 		CButtonMappingExpressionEvaluator	eval;
 
-		for( u32 i = 0; i < NUM_N64_BUTTONS; ++i )
+		for( auto i {0}; i < NUM_N64_BUTTONS; ++i )
 		{
 			EN64Button		button = EN64Button( i );
 			const char *	button_name( GetN64ButtonName( button ) );
@@ -973,7 +973,7 @@ void			IInputManager::SetConfiguration( u32 configuration_idx )
 //*****************************************************************************
 u32		IInputManager::GetConfigurationFromName( const char * name ) const
 {
-	for( u32 i = 0; i < mControllerConfigs.size(); ++i )
+	for( auto i {0}; i < mControllerConfigs.size(); ++i )
 	{
 		if( _strcmpi( mControllerConfigs[ i ]->GetName(), name ) == 0 )
 		{

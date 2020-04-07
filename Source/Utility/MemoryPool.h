@@ -121,25 +121,25 @@ template <typename T> class CMemoryPoolAllocator;
 template <> class CMemoryPoolAllocator<void>
 {
 public:
-	typedef void *			pointer;
-	typedef const void *	const_pointer;
-	typedef void			value_type;
-	template < class U > 	struct rebind { typedef CMemoryPoolAllocator<U> other; };
+	using pointer = void *;
+	using const_pointer = const void *;
+	using value_type = void;
+
+	template < class U > 	struct rebind { using other = CMemoryPoolAllocator<U>; };
 };
 
 template< typename T >
 class CMemoryPoolAllocator
 {
 public:
-	typedef size_t		size_type;
-	typedef ptrdiff_t	difference_type;
-	typedef T *			pointer;
-	typedef const T *	const_pointer;
-	typedef T &			reference;
-	typedef const T &	const_reference;
-	typedef T			value_type;
-
-	template< class U > struct rebind { typedef CMemoryPoolAllocator< U > other; };
+	using size_type = size_t;
+	using difference_type = ptrdiff_t;
+	using pointer = T *;
+	using const_pointer = const T *
+	using reference = T&;
+	using const_reference = const T&;
+	using value_type = T;
+	template< class U > struct rebind {using other = CMemoryPoolAllocator< U >; };
 
 	CMemoryPoolAllocator() {}
 	CMemoryPoolAllocator( const CMemoryPoolAllocator< T > & ) {}
@@ -164,7 +164,7 @@ public:
 	void deallocate( pointer p, size_type n ) const
 	{
 		DAEDALUS_ASSERT( n == 1, "Deallocating multiple items?" );
-		for( u32 i = 0; i < n; ++i )
+		for( auto i {0}; i < n; ++i )
 		{
 			mPool.Deallocate( p );
 		}

@@ -57,7 +57,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 namespace
 {
 
-	typedef std::vector<STraceEntry> TraceBuffer;
+using TraceBuffer = std::vector<STraceEntry>;
 
 	const u32	INVALID_IDX( u32(~0) );
 
@@ -615,7 +615,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 	std::vector< SBranchHandlerInfo >	branch_handler_info( branch_details.size() );
 //	bool								checked_cop1_usable( false );
 
-	for( u32 i {}; i < trace.size(); ++i )
+	for( auto i {0}; i < trace.size(); ++i )
 	{
 		const STraceEntry & ti( trace[ i ] );
 		u32	branch_idx( ti.BranchIdx );
@@ -737,7 +737,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 	//
 	//	Generate handlers for each exit branch
 	//
-	for( u32 i {}; i < branch_details.size(); ++i )
+	for( auto i {0}; i < branch_details.size(); ++i )
 	{
 		const SBranchDetails &	details( branch_details[ i ] );
 		u32						instruction_idx( branch_handler_info[ i ].Index );
@@ -1064,7 +1064,7 @@ void CFragment::DumpFragmentInfoHtml( FILE * fh, u64 total_cycles ) const
 		fputs( "<h2>Input Disassembly</h2>\n", fh );
 		fputs( "<div align=\"center\"><table><tr><th>Address</th><th>Instruction</th><th>Exit Target</th></tr>\n", fh );
 		u32			last_address( mTraceBuffer.size() > 0 ? mTraceBuffer[ 0 ].Address-4 : 0 );
-		for( u32 i = 0; i < mTraceBuffer.size(); ++i )
+		for( auto i {0}; i < mTraceBuffer.size(); ++i )
 		{
 			const STraceEntry &	entry( mTraceBuffer[ i ] );
 			u32					address( entry.Address );
@@ -1117,7 +1117,7 @@ void CFragment::DumpFragmentInfoHtml( FILE * fh, u64 total_cycles ) const
 		//
 		//	Trace
 		//
-		for( u32 i = 0; i < mTraceBuffer.size(); ++i )
+		for( auto i {0}; i < mTraceBuffer.size(); ++i )
 		{
 			const STraceEntry &	entry( mTraceBuffer[ i ] );
 			const u8 *			output_end( i+1 < mInstructionStartLocations.size() ? mInstructionStartLocations[ i+1 ] : buffer_end );

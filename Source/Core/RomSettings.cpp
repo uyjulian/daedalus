@@ -42,7 +42,7 @@ namespace
 
 EExpansionPakUsage	ExpansionPakUsageFromString( const char * str )
 {
-	for( u32 i {}; i < NUM_EXPANSIONPAK_USAGE_TYPES; ++i )
+	for( auto i {0}; i < NUM_EXPANSIONPAK_USAGE_TYPES; ++i )
 	{
 		EExpansionPakUsage	pak_usage = EExpansionPakUsage( i );
 
@@ -57,7 +57,7 @@ EExpansionPakUsage	ExpansionPakUsageFromString( const char * str )
 
 ESaveType	SaveTypeFromString( const char * str )
 {
-	for( u32 i {}; i < NUM_SAVE_TYPES; ++i )
+	for( auto i {0}; i < NUM_SAVE_TYPES; ++i )
 	{
 		ESaveType	save_type = ESaveType( i );
 
@@ -133,7 +133,7 @@ class IRomSettingsDB : public CRomSettingsDB
 		void			OutputSectionDetails( const RomID & id, const RomSettings & settings, FILE * fh );
 
 	private:
-		typedef std::map<RomID, RomSettings>		SettingsMap;
+		using SettingsMap = std::map<RomID, RomSettings>;
 
 		SettingsMap				mSettings;
 

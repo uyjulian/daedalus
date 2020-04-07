@@ -785,7 +785,7 @@ void	AudioHLEState::DmemMove( u32 dst, u32 src, u16 count )
 	//Can't use fast_memcpy_swizzle, since this code can run on the ME, and VFPU is not accessible
 	memcpy_swizzle(Buffer + dst, Buffer + src, count);
 #else
-	for (u32 i = 0; i < count; i++)
+	for (auto i {0}; i < count; i++)
 	{
 		*(u8 *)(Buffer+((i+dst)^3)) = *(u8 *)(Buffer+((i+src)^3));
 	}
@@ -797,7 +797,7 @@ void	AudioHLEState::LoadADPCM( u32 address, u16 count )
 	u32	loops( count / 16 );
 
 	const u16 *table( (const u16 *)(rdram + address) );
-	for (u32 x = 0; x < loops; x++)
+	for (auto x {0}; x < loops; x++)
 	{
 		ADPCMTable[0x1+(x<<3)] = table[0];
 		ADPCMTable[0x0+(x<<3)] = table[1];

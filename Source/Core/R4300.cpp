@@ -147,9 +147,9 @@ void SET_ROUND_MODE( ERoundingMode mode )
 
 // If the hardware doesn't support doubles in hardware - use 32 bits floats and accept the loss in precision
 #ifdef SIM_DOUBLES
-typedef f32 d64;
+using d64 = f32;
 #else
-typedef f64 d64;
+using d64 = f64;
 #endif
 
 
@@ -2064,7 +2064,7 @@ static void R4300_CALL_TYPE R4300_TLB_TLBP( R4300_CALL_SIGNATURE ) 				// TLB Pr
 	DPF( DEBUG_TLB, "TLBP: ENTRYHI: 0x%08x", entryH );
 	#endif
 
-    for( u32 i {}; i < 32; i++ )
+    for( auto i {0}; i < 32; i++ )
 	{
 		if( ((g_TLBs[i].hi & TLBHI_VPN2MASK) == (entryH & TLBHI_VPN2MASK)) && ( (g_TLBs[i].g)
 			|| ((g_TLBs[i].hi & TLBHI_PIDMASK) ==  (entryH    & TLBHI_PIDMASK))) )

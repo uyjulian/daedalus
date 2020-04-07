@@ -31,12 +31,6 @@ inline float Interpolate( float a, float b, float r )
 }
 
 template< typename T >
-inline T Square( T x )
-{
-	return x * x;
-}
-
-template< typename T >
 inline T Saturate( s32 x );
 
 template<> inline s16 Saturate( s32 x )
@@ -53,8 +47,11 @@ template<> inline s8 Saturate( s32 x )
 template< typename T >
 inline const T * RoundPointerDown( const T * p, uintptr_t r )
 {
+	// take pointer
 	const uintptr_t mask = r-1;
 	return reinterpret_cast< const T * >( reinterpret_cast< uintptr_t >( p ) & ~mask );
+	//		const u8 * p_lower( RoundPointerDown( jump.GetTargetU8P(), 64 ) );
+
 }
 
 template< typename T >
@@ -88,15 +85,7 @@ inline u32 GetNextPowerOf2( u32 x )
 		n = n<<1;
 	}
 
-/*
-	v--;
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
-	v++;
-*/
+
 
 	return n;
 }

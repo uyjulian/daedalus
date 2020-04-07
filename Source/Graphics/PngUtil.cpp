@@ -31,11 +31,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 template< typename T >
 static void WritePngRow( u8 * line, const void * src, u32 width )
 {
-	u32 i {};
+	auto i {0};
 
 	const T *	p_src( reinterpret_cast< const T * >( src ) );
 
-	for ( u32 x = 0; x < width; x++ )
+	for ( auto x {0}; x < width; x++ )
 	{
 		T	color( p_src[ x ] );
 
@@ -52,7 +52,7 @@ static void WritePngRowPal4( u8 * line, const void * src, u32 width, const Nativ
 
 	const NativePfCI44 * p_src = reinterpret_cast< const NativePfCI44 * >( src );
 
-	for ( u32 x = 0; x < width; x++ )
+	for ( auto x {0}; x < width; x++ )
 	{
 		NativePfCI44	colors( p_src[ x / 2 ] );
 		u8				color_idx( (x&1) ? colors.GetIdxB() : colors.GetIdxA() );	// FIXME(strmnnrmn): A/B should be swapped? NativeTextureOSX is broken with this ordering.
@@ -71,7 +71,7 @@ static void WritePngRowPal8( u8 * line, const void * src, u32 width, const Nativ
 
 	const NativePfCI8 * p_src = reinterpret_cast< const NativePfCI8 * >( src );
 
-	for ( u32 x = 0; x < width; x++ )
+	for ( auto x {0}; x < width; x++ )
 	{
 		u8				color_idx( p_src[ x ].Bits );
 		NativePf8888	color( palette[ color_idx ] );

@@ -210,7 +210,7 @@ static void CopyRow( T * dst, const T * src, u32 pixels )
 template<>
 void CopyRow( NativePfCI44 * dst, const NativePfCI44 * src, u32 pixels )
 {
-	for( u32 i {}; i+1 < pixels; i += 2 )
+	for( auto i {0}; i+1 < pixels; i += 2 )
 	{
 		dst[ i/2 ] = src[ i/2 ];
 	}
@@ -230,7 +230,7 @@ static void CopyRowReverse( T * dst, const T * src, u32 pixels )
 {
 	u32 last_pixel {pixels * 2 - 1};
 
-	for( u32 i {}; i < pixels; ++i )
+	for( auto i {0}; i < pixels; ++i )
 	{
 		dst[ last_pixel - i ] = src[ i ];
 	}
@@ -255,7 +255,7 @@ void CopyRowReverse( NativePfCI44 * dst, const NativePfCI44 * src, u32 pixels )
 		const u32	first_pair_idx( 0 );
 		const u32	last_pair_idx( pixels * 2 - 2 );
 
-		for( u32 i {}; i < pixels; i += 2 )
+		for( auto i {0}; i < pixels; i += 2 )
 		{
 			u8		s( src[ (first_pair_idx + i) / 2 ].Bits );
 			u8		d( (s>>4) | (s<<4) );		// Swap

@@ -55,7 +55,7 @@ static void RDP_DumpRSPCode(char * name, u32 crc, u32 * mem_base, u32 pc_base, u
 	if (fp == nullptr)
 		return;
 
-	for (u32 i = 0; i < len; i+=4)
+	for (auto i {0}; i < len; i+=4)
 	{
 		OpCode op;
 		u32 pc = i & 0x0FFF;
@@ -86,7 +86,7 @@ static void RDP_DumpRSPData(char * name, u32 crc, u32 * mem_base, u32 pc_base, u
 	if (fp == nullptr)
 		return;
 
-	for (u32 i = 0; i < len; i+=4)
+	for (auto i {0}; i < len; i+=4)
 	{
 		u32 pc = i & 0x0FFF;
 		u32 data = mem_base[i/4];

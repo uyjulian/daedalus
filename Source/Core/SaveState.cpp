@@ -147,7 +147,7 @@ public:
 
 	inline void read_memory_buffer_write_value(int buffernum, int address)
 	{
-		for( u32 i = 0; i < MemoryRegionSizes[buffernum]; i += 4 )
+		for( auto i {0}; i < MemoryRegionSizes[buffernum]; i += 4 )
 		{
 			u32 value;
 			*this >> value;
@@ -266,7 +266,7 @@ static void Swap_PIF()
 	u8 temp[64];
 	memcpy( temp, pPIFRam, 64 );
 
-	for (u32 i = 0; i < 64; i++)
+	for (auto i {0}; i < 64; i++)
 	{
 		pPIFRam[i] = temp[ i ^ U8_TWIDDLE ];
 	}

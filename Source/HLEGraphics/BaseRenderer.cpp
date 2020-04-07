@@ -164,7 +164,7 @@ BaseRenderer::BaseRenderer()
 #ifdef DAEDALUS_DEBUG_CONSOLE && DAEDALUS_PSP
 	DAEDALUS_ASSERT( IsPointerAligned( &mTnL, 16 ), "Oops, mTnL should be 16-byte aligned" );
 #endif
-	for ( u32 i {}; i < kNumBoundTextures; i++ )
+	for ( auto i {0}; i < kNumBoundTextures; i++ )
 	{
 		mTileTopLeft[i].s = 0;
 		mTileTopLeft[i].t = 0;
@@ -272,7 +272,7 @@ void BaseRenderer::EndScene()
 
 	//
 	//	Clear this, to ensure we're force to check for updates to it on the next frame
-	for( u32 i {}; i < kNumBoundTextures; i++ )
+	for( auto i {0}; i < kNumBoundTextures; i++ )
 	{
 		mBoundTextureInfo[ i ] = TextureInfo();
 		mBoundTexture[ i ]     = nullptr;
@@ -611,7 +611,7 @@ static u32 clipToHyperPlane( DaedalusVtx4 * dest, const DaedalusVtx4 * source, u
 
 	f32 bDotPlane = b->ProjectedPos.Dot( plane );
 
-	for( u32 i {}; i < inCount + 1; ++i)
+	for( auto i {0}; i < inCount + 1; ++i)
 	{
 		//a = &source[i%inCount];
 		const s32 condition {i - inCount};
@@ -708,7 +708,7 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 	//
 	u32 num_vertices {};
 
-	for(u32 i {}; i < (mNumIndices - 2);)
+	for(auto i {0}; i < (mNumIndices - 2);)
 	{
 		const u32 & idx0 {mIndexBuffer[ i++ ]};
 		const u32 & idx1 {mIndexBuffer[ i++ ]};
@@ -744,7 +744,7 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 			}
 					#endif
 			//Make new triangles from the vertices we got back from clipping the original triangle
-			for( u32 j {}; j <= out - 3; ++j)
+			for( u32 j {0}; j <= out - 3; ++j)
 			{
 #ifdef DAEDALUS_PSP_USE_VFPU
 				_ConvertVertice( &clip_vtx[ num_vertices++ ], &temp_a[ 0 ]);
@@ -846,7 +846,7 @@ void BaseRenderer::PrepareTrisUnclipped( TempVerts * temp_verts ) const
 	//
 	//	Now we just shuffle all the data across directly (potentially duplicating verts)
 	//
-	for( u32 i {}; i < num_vertices; ++i )
+	for( auto i {0}; i < num_vertices; ++i )
 	{
 		u32 index = mIndexBuffer[ i ];
 
@@ -1762,7 +1762,7 @@ static void T1Hack(const TextureInfo & ti0, CNativeTexture * texture0,
 			//Merge RGB + I -> RGBA in texture 1
 			//We do two pixels in one go since its 16bit (RGBA_4444) //Corn
 			u32 size {texture1->GetWidth() * texture1->GetHeight() >> 1};
-			for(u32 i {}; i < size ; i++)
+			for(auto i {0}; i < size ; i++)
 			{
 				*dst = (*dst & 0xF000F000) | (*src & 0x0FFF0FFF);
 				dst++;
@@ -1777,7 +1777,7 @@ static void T1Hack(const TextureInfo & ti0, CNativeTexture * texture0,
 			//Merge RGB + I -> RGBA in texture 0
 			//We do two pixels in one go since its 16bit (RGBA_4444) //Corn
 			u32 size {texture1->GetWidth() * texture1->GetHeight() >> 1};
-			for(u32 i {}; i < size ; i++)
+			for(auto i {0}; i < size ; i++)
 			{
 				*dst = (*dst & 0x0FFF0FFF) | (*src & 0xF000F000);
 				dst++;

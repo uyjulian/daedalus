@@ -118,7 +118,7 @@ void TLBEntry::Reset()
 //*****************************************************************************
 inline bool	TLBEntry::FindTLBEntry( u32 address, u32 * p_idx )
 {
-	static u32 i {};
+	static auto i {0};
 
 	u8 mask {(u8)(gCPUState.CPUControl[C0_ENTRYHI]._u32 & TLBHI_PIDMASK)};
 	for ( u32 count {}; count < 32; count++ )

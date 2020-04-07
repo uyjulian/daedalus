@@ -25,7 +25,7 @@ ECicType ROM_GenerateCICType( const u8 * p_rom_base )
 {
 	u32	cic {};
 
-	for(u32 i {}; i < 0xFC0; i++)
+	for(auto i {0}; i < 0xFC0; i++)
 	{
 		cic = cic + (u8) p_rom_base[0x40 + i];
 	}

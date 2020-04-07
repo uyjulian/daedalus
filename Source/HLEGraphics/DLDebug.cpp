@@ -292,7 +292,7 @@ static void DumpOtherMode(const OtherModeData * table, u32 table_len, u32 * mask
 
 	const char padstr[] = "                    ";
 
-	for (u32 i = 0; i < table_len; ++i)
+	for (auto i {0}; i < table_len; ++i)
 	{
 		const OtherModeData & e = table[i];
 

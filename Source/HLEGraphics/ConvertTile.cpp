@@ -147,7 +147,7 @@ static void ConvertRGBA32(const TileDestInfo & dsti, const TextureInfo & ti)
 	{
 		u32 src_offset {src_row_offset};
 		u32 dst_offset {dst_row_offset};
-		for (u32 x {}; x < width; ++x)
+		for (auto x {0}; x < width; ++x)
 		{
 			u32 o {src_offset^row_swizzle};
 
@@ -180,11 +180,11 @@ static void ConvertRGBA16(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 src_row_offset {ti.GetTmemAddress()<<2};
 
 	u32 row_swizzle {};
-	for (u32 y {}; y < height; ++y)
+	for (auto y {0}; y < height; ++y)
 	{
 		u32 src_offset {src_row_offset};
 		u32 dst_offset {dst_row_offset};
-		for (u32 x {}; x < width; ++x)
+		for (auto x {0}; x < width; ++x)
 		{
 			u16 src_pixel {BSWAP16( src[src_offset^row_swizzle] )};
 
@@ -218,18 +218,18 @@ static void ConvertCI8T(const TileDestInfo & dsti, const TextureInfo & ti)
 
 	// Convert the palette once, here.
 	u32 palette[256] {};
-	for (u32 i {}; i < 256; ++i)
+	for (auto i {0}; i < 256; ++i)
 	{
 		u16 src_pixel {src16[0x400+(i<<2)]};
 		palette[i] = PalConvertFn(src_pixel);
 	}
 
 	u32 row_swizzle {};
-	for (u32 y {}; y < height; ++y)
+	for (auto y {0}; y < height; ++y)
 	{
 		u32 src_offset {src_row_offset};
 		u32 dst_offset {dst_row_offset};
-		for (u32 x {}; x < width; ++x)
+		for (auto x {0}; x < width; ++x)
 		{
 			u8 src_pixel {src[src_offset^row_swizzle]};
 
@@ -264,7 +264,7 @@ static void ConvertCI4T(const TileDestInfo & dsti, const TextureInfo & ti)
 	// Convert the palette once, here.
 	u32 pal_address {0x400 + (ti.GetPalette()<<6)};
 	u32 palette[16] {};
-	for (u32 i {}; i < 16; ++i)
+	for (auto i {0}; i < 16; ++i)
 	{
 		u16 src_pixel {src16[pal_address+(i<<2)]};
 		palette[i] = PalConvertFn(src_pixel);
@@ -272,13 +272,13 @@ static void ConvertCI4T(const TileDestInfo & dsti, const TextureInfo & ti)
 
 
 	u32 row_swizzle {};
-	for (u32 y {}; y < height; ++y)
+	for (auto y {0}; y < height; ++y)
 	{
 		u32 src_offset {src_row_offset};
 		u32 dst_offset {dst_row_offset};
 
 		// Process 2 pixels at a time
-		for (u32 x {}; x+1 < width; x += 2)
+		for (auto x {0}; x+1 < width; x += 2)
 		{
 			u16 src_pixel {src[src_offset^row_swizzle]};
 
@@ -355,11 +355,11 @@ static void ConvertIA16(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 src_row_offset {ti.GetTmemAddress()<<3};
 
 	u32 row_swizzle = {};
-	for (u32 y {}; y < height; ++y)
+	for (auto y {0}; y < height; ++y)
 	{
 		u32 src_offset {src_row_offset};
 		u32 dst_offset {dst_row_offset};
-		for (u32 x {}; x < width; ++x)
+		for (auto x {0}; x < width; ++x)
 		{
 			u32 o        {src_offset^row_swizzle};
 
@@ -395,11 +395,11 @@ static void ConvertIA8(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 src_row_offset {ti.GetTmemAddress()<<3};
 
 	u32 row_swizzle {};
-	for (u32 y {}; y < height; ++y)
+	for (auto y {0}; y < height; ++y)
 	{
 		u32 src_offset {src_row_offset};
 		u32 dst_offset {dst_row_offset};
-		for (u32 x {}; x < width; ++x)
+		for (auto x {0}; x < width; ++x)
 		{
 			u8 src_pixel {src[src_offset^row_swizzle]};
 
@@ -435,13 +435,13 @@ static void ConvertIA4(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 src_row_offset {ti.GetTmemAddress()<<3};
 
 	u32 row_swizzle {};
-	for (u32 y {}; y < height; ++y)
+	for (auto y {0}; y < height; ++y)
 	{
 		u32 src_offset {src_row_offset};
 		u32 dst_offset {dst_row_offset};
 
 		// Process 2 pixels at a time
-		for (u32 x {}; x+1 < width; x += 2)
+		for (auto x {0}; x+1 < width; x += 2)
 		{
 			u8 src_pixel {src[src_offset^row_swizzle]};
 
@@ -484,11 +484,11 @@ static void ConvertI8(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 src_row_offset {ti.GetTmemAddress()<<3};
 
 	u32 row_swizzle = {};
-	for (u32 y {}; y < height; ++y)
+	for (auto y {0}; y < height; ++y)
 	{
 		u32 src_offset {src_row_offset};
 		u32 dst_offset {dst_row_offset};
-		for (u32 x {}; x < width; ++x)
+		for (auto x {0}; x < width; ++x)
 		{
 			u8 i = src[src_offset^row_swizzle];
 
@@ -522,13 +522,13 @@ static void ConvertI4(const TileDestInfo & dsti, const TextureInfo & ti)
 	u32 src_row_offset {ti.GetTmemAddress()<<3};
 
 	u32 row_swizzle {};
-	for (u32 y {}; y < height; ++y)
+	for (auto y {0}; y < height; ++y)
 	{
 		u32 src_offset {src_row_offset};
 		u32 dst_offset {dst_row_offset};
 
 		// Process 2 pixels at a time
-		for (u32 x {}; x+1 < width; x += 2)
+		for (auto x {0}; x+1 < width; x += 2)
 		{
 			u8 src_pixel {src[src_offset^row_swizzle]};
 
@@ -556,8 +556,7 @@ static void ConvertI4(const TileDestInfo & dsti, const TextureInfo & ti)
 		row_swizzle ^= 0x4;   // Alternate lines are word-swapped
 	}
 }
-
-typedef void ( *ConvertFunction )(const TileDestInfo & dsti, const TextureInfo & ti);
+using ConvertFunction = void (*)(const TileDestInfo &dsti, const TextureInfo &ti);
 static const ConvertFunction gConvertFunctions[ 32 ] =
 {
 	// 4bpp				8bpp			16bpp				32bpp

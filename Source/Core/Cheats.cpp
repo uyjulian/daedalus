@@ -196,7 +196,7 @@ static void CheatCodes_Apply(u32 index, u32 mode)
 //*****************************************************************************
 void CheatCodes_Activate( CHEAT_MODE mode )
 {
-	for(u32 i {}; i < codegroupcount; i++)
+	for(auto i {0}; i < codegroupcount; i++)
 	{
 		// Apply only activated cheats
 		if(codegrouplist[i].active)

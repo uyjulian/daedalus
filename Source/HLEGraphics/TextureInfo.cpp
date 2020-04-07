@@ -102,7 +102,7 @@ u32 TextureInfo::GenerateHashValue() const
 	else	//if texture is big, hash only some parts inside it
 	{
 		step = (step - 4) / CHK_ROW;
-		for (u32 y {}; y < CHK_ROW; y++)
+		for (auto y {0}; y < CHK_ROW; y++)
 		{
 			hash_value = ((hash_value << 1) | (hash_value >> 0x1F)) ^ ptr_u32[0];
 			hash_value = ((hash_value << 1) | (hash_value >> 0x1F)) ^ ptr_u32[1];

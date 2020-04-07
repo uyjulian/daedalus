@@ -260,7 +260,7 @@ Matrix4x4	Matrix4x4::Inverse() const
 		}
 	}
 
-	for ( u32 j = 0; j < 4; ++j )
+	for ( auto j {0}; j < 4; ++j )
 	{
 		bool	found( false );
 		for ( u32 i = j; i < 4; ++i )
@@ -318,7 +318,7 @@ void myMulMatrixCPU(Matrix4x4 * m_out, const Matrix4x4 *mat_a, const Matrix4x4 *
 {
 	for ( u32 i = 0; i < 4; ++i )
 	{
-		for ( u32 j = 0; j < 4; ++j )
+		for ( auto j {0}; j < 4; ++j )
 		{
 			m_out->m[ i ][ j ] = mat_a->m[ i ][ 0 ] * mat_b->m[ 0 ][ j ] +
 							mat_a->m[ i ][ 1 ] * mat_b->m[ 1 ][ j ] +
@@ -343,7 +343,7 @@ Matrix4x4 Matrix4x4::operator*( const Matrix4x4 & rhs ) const
 #else
 	for ( u32 i = 0; i < 4; ++i )
 	{
-		for ( u32 j = 0; j < 4; ++j )
+		for ( auto j {0}; j < 4; ++j )
 		{
 			r.m[ i ][ j ] = m[ i ][ 0 ] * rhs.m[ 0 ][ j ] +
 							m[ i ][ 1 ] * rhs.m[ 1 ][ j ] +

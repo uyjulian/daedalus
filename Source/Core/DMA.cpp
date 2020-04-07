@@ -148,7 +148,7 @@ void DMA_SI_CopyFromDRAM( )
 	DPF( DEBUG_MEMORY_PIF, "DRAM (0x%08x) -> PIF Transfer ", mem );
 #endif
 	// Fuse 4 reads and 4 writes to just one which is a lot faster - Corn
-	for(u32 i {}; i < 16; i++)
+	for(auto i {0}; i < 16; i++)
 	{
 		p_dst[i] = BSWAP32(p_src[i]);
 	}
@@ -174,7 +174,7 @@ void DMA_SI_CopyToDRAM( )
 	DPF( DEBUG_MEMORY_PIF, "PIF -> DRAM (0x%08x) Transfer ", mem );
 #endif
 	// Fuse 4 reads and 4 writes to just one which is a lot faster - Corn
-	for(u32 i {}; i < 16; i++)
+	for(auto i {0}; i < 16; i++)
 	{
 		p_dst[i] = BSWAP32(p_src[i]);
 	}
