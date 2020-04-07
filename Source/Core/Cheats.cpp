@@ -42,7 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define CHEAT_CODE_MAGIC_VALUE 0xDEAD
 
 CODEGROUP *codegrouplist;
-u32		codegroupcount		{};
+u32		codegroupcount		{0};
 //*****************************************************************************
 //
 //*****************************************************************************
@@ -266,7 +266,7 @@ bool CheatCodes_Read(const char *rom_name, const char *file, u8 countryID)
 
 	char			line[2048] {}, romname[256] {}/*, errormessage[400]*/;	//changed line length to 2048 previous was 256
 	bool			bfound;
-	u32				c1 {}, c2 {};
+	u32				c1 {0}, c2 {0};
 	FILE			*stream {};
 
 	// Add country ID to this ROM name, to avoid mixing cheat code of different region in the same entry

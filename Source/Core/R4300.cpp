@@ -541,11 +541,11 @@ void R4300_CALL_TYPE R4300_SetSR( u32 new_value )
 	}
 #endif
 
-	bool interrupts_enabled_before =(gCPUState.CPUControl[C0_SR]._u32 & SR_IE) != 0;
+	bool interrupts_enabled_before {(gCPUState.CPUControl[C0_SR]._u32 & SR_IE) != 0};
 
 	gCPUState.CPUControl[C0_SR]._u32 = new_value;
 
-	bool interrupts_enabled_after = (gCPUState.CPUControl[C0_SR]._u32 & SR_IE) != 0;
+	bool interrupts_enabled_after {(gCPUState.CPUControl[C0_SR]._u32 & SR_IE) != 0};
 
 	// CHECK COP1 UNUSUABLE
 	if( (gCPUState.CPUControl[C0_SR]._u32 & SR_CU1) == 0 )
@@ -826,9 +826,9 @@ static void R4300_CALL_TYPE R4300_BEQL( R4300_CALL_SIGNATURE ) 			// Branch on E
 	//branch if rs == rt
 	if ( gGPR[op_code.rs]._u64 == gGPR[op_code.rt]._u64 )
 	{
-		s16 offset( (s16)op_code.immediate );
-		u32 pc( gCPUState.CurrentPC );
-		u32 new_pc( pc + ((s32)offset<<2) + 4 );
+		s16 offset {(s16)op_code.immediate};
+		u32 pc {gCPUState.CurrentPC};
+		u32 new_pc {pc + ((s32)offset<<2) + 4};
 
 		SpeedHack(pc, new_pc);
 		CPU_TakeBranch( new_pc );
@@ -1031,21 +1031,7 @@ static void R4300_CALL_TYPE R4300_LDR( R4300_CALL_SIGNATURE )
 	u64 nMem {Read64Bits(address & ~0x7)};
 	u64 nReg = gGPR[op_code.rt]._u64;
 
-#if 1 //1-> tighter code, 0->old way //Corn
 	nReg = (nReg & (~0LL << ( ((address & 0x7) + 1) << 3))) | (nMem >> ((~address & 0x7) << 3));
-#else
-	switch (address % 8)
-	{
-        case 0: nReg = (nReg & 0xFFFFFFFFFFFFFF00LL) | (nMem >> 56); break;
-        case 1: nReg = (nReg & 0xFFFFFFFFFFFF0000LL) | (nMem >> 48); break;
-        case 2: nReg = (nReg & 0xFFFFFFFFFF000000LL) | (nMem >> 40); break;
-        case 3: nReg = (nReg & 0xFFFFFFFF00000000LL) | (nMem >> 32); break;
-        case 4: nReg = (nReg & 0xFFFFFF0000000000LL) | (nMem >> 24); break;
-        case 5: nReg = (nReg & 0xFFFF000000000000LL) | (nMem >> 16); break;
-        case 6: nReg = (nReg & 0xFF00000000000000LL) | (nMem >>  8); break;
-        case 7: nReg = nMem; break;
-    }
-#endif
 
 	gGPR[op_code.rt]._s64 = nReg;
 }
@@ -1100,18 +1086,9 @@ static void R4300_CALL_TYPE R4300_SWL( R4300_CALL_SIGNATURE ) 			// Store Word L
 	u32 dMem {QuickRead32Bits(base, 0x0)};
 	u32 dReg {gGPR[op_code.rt]._u32_0};
 
-#if 1 //1-> tighter code, 0->old way //Corn
+
 	u32 dNew {(dMem & ~(((u32)~0 >> ((address & 0x3) << 3)))) | (dReg >> ((address & 0x3) << 3))};
-#else
-	u32 dNew {};
-	switch (address % 4)
-	{
-	case 0:	dNew = dReg; break;			// Aligned
-	case 1:	dNew = (dMem & 0xFF000000) | (dReg >> 8 ); break;
-	case 2:	dNew = (dMem & 0xFFFF0000) | (dReg >> 16); break;
-	default:dNew = (dMem & 0xFFFFFF00) | (dReg >> 24); break;
-	}
-#endif
+
 
 	QuickWrite32Bits(base, 0x0, dNew);
 }
@@ -1125,18 +1102,8 @@ static void R4300_CALL_TYPE R4300_SWR( R4300_CALL_SIGNATURE ) 			// Store Word R
 	u32 dMem {QuickRead32Bits(base, 0x0)};
 	u32 dReg {gGPR[op_code.rt]._u32_0};
 
-#if 1 //1-> tighter code, 0->old way //Corn
 	u32 dNew {(dMem & ~(~0 << ((~address & 0x3) << 3))) | (dReg << ((~address & 0x3) << 3))};
-#else
-	u32 dNew {};
-	switch (address % 4)
-	{
-	case 0:	dNew = (dMem & 0x00FFFFFF) | (dReg << 24); break;
-	case 1:	dNew = (dMem & 0x0000FFFF) | (dReg << 16); break;
-	case 2:	dNew = (dMem & 0x000000FF) | (dReg << 8); break;
-	default:dNew = dReg; break;			// Aligned
-	}
-#endif
+
 
 	QuickWrite32Bits(base, 0x0, dNew);
 
@@ -1288,8 +1255,8 @@ static void R4300_CALL_TYPE R4300_Special_SRAV( R4300_CALL_SIGNATURE ) 		// Shif
 static void R4300_CALL_TYPE R4300_Special_JR( R4300_CALL_SIGNATURE ) 			// Jump Register
 {
 	R4300_CALL_MAKE_OP( op_code );
+	u32	new_pc {gGPR[ op_code.rs ]._u32_0};
 
-	u32	new_pc( gGPR[ op_code.rs ]._u32_0 );
 	CPU_TakeBranch( new_pc );
 }
 
@@ -1299,7 +1266,7 @@ static void R4300_CALL_TYPE R4300_Special_JALR( R4300_CALL_SIGNATURE ) 		// Jump
 	R4300_CALL_MAKE_OP( op_code );
 
 	// Jump And Link
-	u32	new_pc( gGPR[ op_code.rs ]._u32_0 );
+	u32	new_pc {gGPR[ op_code.rs ]._u32_0};
 	gGPR[ op_code.rd ]._s64 = (s64)(s32)(gCPUState.CurrentPC + 8);		// Store return address;
 	CPU_TakeBranch( new_pc );
 }
@@ -1450,7 +1417,7 @@ static void R4300_CALL_TYPE R4300_Special_DMULT( R4300_CALL_SIGNATURE ) 		// Dou
 	u64 op1 {rrs & 0xFFFFFFFF};
 	u64 op2 {(rrs >> 32) & 0xFFFFFFFF};
 	u64 op3 {rrt & 0xFFFFFFFF};
-	u64 op4 ={(rrt >> 32) & 0xFFFFFFFF};
+	u64 op4 {(rrt >> 32) & 0xFFFFFFFF};
 
 u64 temp1 {op1 * op3};
 u64	temp2 {(temp1 >> 32) + op1 * op4};
@@ -1487,8 +1454,8 @@ static void R4300_CALL_TYPE R4300_Special_DMULTU( R4300_CALL_SIGNATURE ) 			// D
 	gCPUState.MultLo._u64 = gGPR[ op_code.rs ]._u64 * gGPR[ op_code.rt ]._u64;
 	gCPUState.MultHi._u64 = 0;
 #else
-	s64 rrs = gGPR[ op_code.rs ]._s64;
-	s64 rrt = gGPR[ op_code.rt ]._s64;
+	s64 rrs {gGPR[ op_code.rs ]._s64};
+	s64 rrt {gGPR[ op_code.rt ]._s64};
 
 u64	op1 {rrs & 0xFFFFFFFF};
 u64	op2 {(rrs >> 32) & 0xFFFFFFFF};
@@ -1561,8 +1528,8 @@ static void R4300_CALL_TYPE R4300_Special_DDIVU( R4300_CALL_SIGNATURE ) 			// Do
 	}
 	else
 	{	//64bit
-		u64 qwDividend = gGPR[ op_code.rs ]._u64;
-		u64 qwDivisor = gGPR[ op_code.rt ]._u64;
+		u64 qwDividend {gGPR[ op_code.rs ]._u64};
+		u64 qwDivisor {gGPR[ op_code.rt ]._u64};
 
 		// Reserved Instruction exception
 		if (qwDivisor)
@@ -1848,7 +1815,7 @@ static void R4300_CALL_TYPE R4300_RegImm_BGEZAL( R4300_CALL_SIGNATURE ) 		// Bra
 	if ( gGPR[ op_code.rs ]._s64 >= 0 )
 	{
 		//ToDo: SpeedHack?
-		u32	new_pc( gCPUState.CurrentPC + ((s32)(s16)op_code.immediate<<2) + 4 );
+		u32	new_pc {gCPUState.CurrentPC + ((s32)(s16)op_code.immediate<<2) + 4};
 		CPU_TakeBranch( new_pc );
 	}
 }
@@ -1891,7 +1858,7 @@ static void R4300_CALL_TYPE R4300_Cop0_MFC0( R4300_CALL_SIGNATURE )
 }
 
 // Move Word To CopReg
-static const u32 kCauseSW = CAUSE_SW1|CAUSE_SW2;
+static const u32 kCauseSW {CAUSE_SW1|CAUSE_SW2};
 
 static void R4300_CALL_TYPE R4300_Cop0_MTC0( R4300_CALL_SIGNATURE )
 {
@@ -2181,7 +2148,7 @@ static void R4300_CALL_TYPE R4300_Cop1_CTC1( R4300_CALL_SIGNATURE ) 		// move Co
 	{
 		gCPUState.FPUControl[ 31 ]._u32 = gGPR[ op_code.rt ]._u32_0;
 
-		u32		fpcr( gCPUState.FPUControl[ 31 ]._u32 );
+		u32		fpcr {gCPUState.FPUControl[ 31 ]._u32};
 		gRoundingMode = (ERoundingMode)( fpcr & FPCSR_RM_MASK );
 		SET_ROUND_MODE(gRoundingMode);
 	}
@@ -2214,7 +2181,7 @@ static void R4300_CALL_TYPE R4300_Cop1_CTC1_2( R4300_CALL_SIGNATURE )
 	{
 		gCPUState.FPUControl[ 31 ]._u32 = gGPR[ op_code.rt ]._u32_0;
 
-		u32		fpcr( gCPUState.FPUControl[ 31 ]._u32 );
+		u32		fpcr {gCPUState.FPUControl[ 31 ]._u32};
 		gRoundingMode = (ERoundingMode)( fpcr & FPCSR_RM_MASK );
 		pspFpuSetRoundmode( gNativeRoundingModes[ gRoundingMode ] );
 	}
@@ -2419,7 +2386,7 @@ static void R4300_CALL_TYPE R4300_Cop1_S_MOV( R4300_CALL_SIGNATURE )
 	R4300_CALL_MAKE_OP( op_code );
 
 	// fd = fs
-	f32 fValue = LoadFPR_Single( op_code.fs );
+	f32 fValue {LoadFPR_Single( op_code.fs )};
 
 // 	SET_ROUND_MODE( gRoundingMode );		//XXXX Is this needed?
 	StoreFPR_Single( op_code.fd, fValue );// Just copy bits directly?
@@ -2526,7 +2493,7 @@ static void R4300_CALL_TYPE R4300_Cop1_S_CVT_W( R4300_CALL_SIGNATURE )
 
 	// XXXX On the PSP, this seem sto be doing trunc.w.s rather than cvt.w.s
 	f32 fX {LoadFPR_Single( op_code.fs )};
-	s32	sX = f32_to_s32( fX );
+	s32	sX {f32_to_s32( fX )};
 
 	StoreFPR_Word( op_code.fd, sX );
 }
@@ -2554,7 +2521,7 @@ static void R4300_CALL_TYPE R4300_Cop1_S_CVT_D_2( R4300_CALL_SIGNATURE )
 
 	f32 fX {LoadFPR_Single( op_code.fs )};
 
-	REG64 r {};
+	REG64 r;
 
 	r._f64 = (f64)fX;
 
@@ -2813,7 +2780,7 @@ static void R4300_CALL_TYPE R4300_Cop1_D_ADD_2( R4300_CALL_SIGNATURE )
 
 // 	SET_ROUND_MODE( gRoundingMode );		//XXXX Is this needed?
 
-	REG64	r {};
+	REG64	r;
 
 	// Use double, float won't work for buck bumble
 	r._f64 = f64( (f64)fX + (f64)fY );
@@ -2867,8 +2834,8 @@ static void R4300_CALL_TYPE R4300_Cop1_D_DIV( R4300_CALL_SIGNATURE )
 	R4300_CALL_MAKE_OP( op_code );
 
 	// fd = fs/ft
-	d64 fDividend = LoadFPR_Double( op_code.fs );
-	d64 fDivisor = LoadFPR_Double( op_code.ft );
+	d64 fDividend {LoadFPR_Double( op_code.fs )};
+	d64 fDivisor {LoadFPR_Double( op_code.ft )};
 
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT(fDivisor != 0, "Double divide by zero");

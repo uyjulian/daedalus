@@ -316,7 +316,7 @@ Matrix4x4	Matrix4x4::Inverse() const
 
 void myMulMatrixCPU(Matrix4x4 * m_out, const Matrix4x4 *mat_a, const Matrix4x4 *mat_b)
 {
-	for ( u32 i = 0; i < 4; ++i )
+	for (auto i {0}; i < 4; ++i )
 	{
 		for ( auto j {0}; j < 4; ++j )
 		{
@@ -341,7 +341,7 @@ Matrix4x4 Matrix4x4::operator*( const Matrix4x4 & rhs ) const
 	MatrixMultiplyUnaligned( &r, this, &rhs );
 //CPU
 #else
-	for ( u32 i = 0; i < 4; ++i )
+	for (auto i {0}; i < 4; ++i )
 	{
 		for ( auto j {0}; j < 4; ++j )
 		{

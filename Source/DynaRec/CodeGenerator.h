@@ -45,7 +45,7 @@ class CCodeGenerator
 {
 	public:
 		using ExceptionHandlerFn = void (*)();
-		// typedef void (*ExceptionHandlerFn)();
+
 
 									CCodeGenerator() {}
 		virtual						~CCodeGenerator() {}

@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Find out the CIC type
 ECicType ROM_GenerateCICType( const u8 * p_rom_base )
 {
-	u32	cic {};
+	u32	cic {0};
 
 	for(auto i {0}; i < 0xFC0; i++)
 	{

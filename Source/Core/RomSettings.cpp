@@ -185,7 +185,7 @@ static bool	trim( char * p_string, const char * p_trim_chars )
 		char c {*pin};
 
 		found = false;
-		for ( u32 i = 0; i < num_trims; i++ )
+		for (auto i {0}; i < num_trims; i++ )
 		{
 			if ( p_trim_chars[ i ] == c )
 			{
@@ -214,7 +214,7 @@ static bool	trim( char * p_string, const char * p_trim_chars )
 
 static RomID	RomIDFromString( const char * str )
 {
-	u32 crc1, crc2, country;
+	u32 crc1 {0}, crc2 {0}, country {0};
 	sscanf( str, "%08x%08x-%02x", &crc1, &crc2, &country );
 	return RomID( crc1, crc2, (u8)country );
 }
@@ -233,9 +233,9 @@ bool IRomSettingsDB::OpenSettingsFile( const char * filename )
 		return false;
 	}
 
-	for( u32 section_idx = 0; section_idx < p_ini_file->GetNumSections(); ++section_idx )
+	for( auto section_idx {0}; section_idx < p_ini_file->GetNumSections(); ++section_idx )
 	{
-		const CIniFileSection * p_section( p_ini_file->GetSection( section_idx ) );
+		const CIniFileSection * p_section {p_ini_file->GetSection( section_idx )};
 
 		RomID			id( RomIDFromString( p_section->GetName() ) );
 		RomSettings	settings;
@@ -337,13 +337,13 @@ void IRomSettingsDB::Commit()
 	sprintf(filename_tmp, "%s.tmp", mFilename);
 	sprintf(filename_del, "%s.del", mFilename);
 
-	FILE * fh_src = fopen(mFilename, "r");
+	FILE * fh_src  {fopen(mFilename, "r")};
 	if (fh_src == nullptr)
 	{
 		return;
 	}
 
-	FILE * fh_dst = fopen(filename_tmp, "w");
+	FILE * fh_dst {fopen(filename_tmp, "w")};
 	if (fh_dst == nullptr)
 	{
 		fclose(fh_src);
@@ -355,7 +355,7 @@ void IRomSettingsDB::Commit()
 	//
 	std::set<RomID>		visited;
 
-	char buffer[1024+1];
+	char buffer[1024+1] {0};
 	while (fgets(buffer, 1024, fh_src))
 	{
 		if (buffer[0] == '{')

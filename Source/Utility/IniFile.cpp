@@ -264,7 +264,7 @@ static bool	trim( char * p_string, const char * p_trim_chars )
 		char c = *pin;
 
 		found = false;
-		for ( u32 i = 0; i < num_trims; i++ )
+		for (auto i {0}; i < num_trims; i++ )
 		{
 			if ( p_trim_chars[ i ] == c )
 			{

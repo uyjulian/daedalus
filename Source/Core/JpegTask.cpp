@@ -129,9 +129,8 @@ const u32 TRANSPOSE_TABLE[SUBBLOCK_SIZE] =
  **************************************************************************/
 void jpeg_decode_PS(OSTask *task)
 {
-	s16 *macroblock {};
-    s16 qtables[3][SUBBLOCK_SIZE];
-    u32 mb {};
+
+    s16 qtables[3][SUBBLOCK_SIZE] {0};
 
     #ifdef DAEDALUS_DEBUG_CONSOLE
     if (task->t.flags & 0x1)
@@ -172,6 +171,7 @@ void jpeg_decode_PS(OSTask *task)
 
 	const u32 subblock_count {mode + 4};
 	const u32 macroblock_size {2*subblock_count*SUBBLOCK_SIZE};
+	s16 *macroblock {0};
 
 	macroblock = (s16 *)malloc(sizeof(*macroblock) * macroblock_size);
   #ifdef DAEDALUS_DEBUG_CONSOLE
@@ -182,7 +182,7 @@ void jpeg_decode_PS(OSTask *task)
 	}
   #endif
 
-    for (mb = 0; mb < macroblock_count; ++mb)
+    for (u32 mb {0}; mb < macroblock_count; ++mb)
     {
         rdram_read_many_u16((u16*)macroblock, address, macroblock_size >> 1);
         DecodeMacroblock2(macroblock, subblock_count, (const s16 (*)[SUBBLOCK_SIZE])qtables);
@@ -198,10 +198,9 @@ void jpeg_decode_PS(OSTask *task)
  **************************************************************************/
 void jpeg_decode_OB(OSTask *task)
 {
-    s16 qtable[SUBBLOCK_SIZE] {};
-    u32 mb {};
+    s16 qtable[SUBBLOCK_SIZE] {0};
 
-    s32 y_dc {}, u_dc {}, v_dc {};
+    s32 y_dc {0}, u_dc {0}, v_dc {0};
 
 	u32  address  {(u32)task->t.data_ptr};
 	const u32 macroblock_count {task->t.data_size};
@@ -219,9 +218,9 @@ void jpeg_decode_OB(OSTask *task)
         }
     }
 
-    for (mb = 0; mb < macroblock_count; ++mb)
+    for (u32 mb {0}; mb < macroblock_count; ++mb)
     {
-        s16 macroblock[6*SUBBLOCK_SIZE];
+        s16 macroblock[6*SUBBLOCK_SIZE] {0};
 
         rdram_read_many_u16((u16*)macroblock, address, 6*SUBBLOCK_SIZE);
         DecodeMacroblock1(macroblock, &y_dc, &u_dc, &v_dc, (qscale != 0) ? qtable : nullptr);
@@ -264,23 +263,23 @@ static u32 GetUYVY(s16 y1, s16 y2, s16 u, s16 v)
 
 static u16 GetRGBA(s16 y, s16 u, s16 v)
 {
-    const float fY = (float)y + 2048.0f;
-    const float fU = (float)u;
-    const float fV = (float)v;
+    const float fY {(float)y + 2048.0f};
+    const float fU {(float)u};
+    const float fV {(float)v};
 
-    const u16 r = clamp_RGBA_component((s16)(fY             + 1.4025*fV));
-    const u16 g = clamp_RGBA_component((s16)(fY - 0.3443*fU - 0.7144*fV));
-    const u16 b = clamp_RGBA_component((s16)(fY + 1.7729*fU            ));
+    const u16 r {clamp_RGBA_component((s16)(fY             + 1.4025*fV))};
+    const u16 g {clamp_RGBA_component((s16)(fY - 0.3443*fU - 0.7144*fV))};
+    const u16 b {clamp_RGBA_component((s16)(fY + 1.7729*fU            ))};
 
     return (r << 4) | (g >> 1) | (b >> 6) | 1;
 }
 
 static void EmitYUVTileLine(const s16 *y, const s16 *u, u32 address)
 {
-    u32 uyvy[8] {};
+    u32 uyvy[8] {0};
 
-    const s16 * const v  = u + SUBBLOCK_SIZE;
-    const s16 * const y2 = y + SUBBLOCK_SIZE;
+    const s16 * const v  {u + SUBBLOCK_SIZE};
+    const s16 * const y2 {y + SUBBLOCK_SIZE};
 
     uyvy[0] = GetUYVY(y[0],  y[1],  u[0], v[0]);
     uyvy[1] = GetUYVY(y[2],  y[3],  u[1], v[1]);
@@ -315,10 +314,10 @@ static void EmitYUVTileLine_SwapY1Y2(const s16 *y, const s16 *u, u32 address)
 */
 static void EmitRGBATileLine(const s16 *y, const s16 *u, u32 address)
 {
-    u16 rgba[16] {};
+    u16 rgba[16] {0};
 
-    const s16 * const v  = u + SUBBLOCK_SIZE;
-    const s16 * const y2 = y + SUBBLOCK_SIZE;
+    const s16 * const v  {u + SUBBLOCK_SIZE};
+    const s16 * const y2 {y + SUBBLOCK_SIZE};
 
     rgba[0]  = GetRGBA(y[0],  u[0], v[0]);
     rgba[1]  = GetRGBA(y[1],  u[0], v[0]);
@@ -342,12 +341,10 @@ static void EmitRGBATileLine(const s16 *y, const s16 *u, u32 address)
 
 static void EmitTilesMode0(const tile_line_emitter_t emit_line, const s16 *macroblock, u32 address)
 {
-    u32 i;
+    u32 y_offset {0};
+    u32 u_offset {2*SUBBLOCK_SIZE};
 
-    u32 y_offset = 0;
-    u32 u_offset = 2*SUBBLOCK_SIZE;
-
-    for (i = 0; i < 8; ++i)
+    for (auto i {0}; i < 8; ++i)
     {
         emit_line(&macroblock[y_offset], &macroblock[u_offset], address);
 
@@ -377,9 +374,9 @@ static void EmitTilesMode2(const tile_line_emitter_t emit_line, const s16 *macro
 static void DecodeMacroblock1(s16 *macroblock, s32 *y_dc, s32 *u_dc, s32 *v_dc, const s16 *qtable)
 {
 
-    for (u32 sb = 0; sb < 6; ++sb)
+    for (auto sb {0}; sb < 6; ++sb)
     {
-        s16 tmp_sb[SUBBLOCK_SIZE] {};
+        s16 tmp_sb[SUBBLOCK_SIZE] {0};
 
         /* update DC */
         s32 dc {(s32)macroblock[0]};
@@ -402,11 +399,11 @@ static void DecodeMacroblock1(s16 *macroblock, s32 *y_dc, s32 *u_dc, s32 *v_dc, 
 
 static void DecodeMacroblock2(s16 *macroblock, u32 subblock_count, const s16 qtables[3][SUBBLOCK_SIZE])
 {
-    u32 q {};
+    u32 q {0};
 
-    for (u32 sb = 0; sb < subblock_count; ++sb)
+    for (auto sb {0}; sb < subblock_count; ++sb)
     {
-        s16 tmp_sb[SUBBLOCK_SIZE] {};
+        s16 tmp_sb[SUBBLOCK_SIZE] {0};
         const int isChromaSubBlock = (subblock_count - sb <= 2);
 
         if (isChromaSubBlock) { ++q; }
@@ -521,16 +518,16 @@ static void RShiftSubBlock(s16 *dst, const s16 *src, u32 shift)
 #define K10 -2.562915448f   // -C1-C3
 static void InverseDCT1D(const float * const x, float *dst, u32 stride)
 {
-    float e[4] {};
-    float f[4] {};
-    float x26 {}, x1357 {}, x15 {}, x37 {}, x17 {}, x35 {};
+    float e[4] {0};
+    float f[4] {0};
 
-    x15   =  K3 * (x[1] + x[5]);
-    x37   =  K4 * (x[3] + x[7]);
-    x17   =  K9 * (x[1] + x[7]);
-    x35   = K10 * (x[3] + x[5]);
-    x1357 =  C3 * (x[1] + x[3] + x[5] + x[7]);
-    x26   =  C6 * (x[2] + x[6]);
+
+  f32  x15   {K3 * (x[1] + x[5])};
+  f32  x37   {K4 * (x[3] + x[7])};
+  f32  x17   {K9 * (x[1] + x[7])};
+  f32  x35   {K10 * (x[3] + x[5])};
+  f32  x1357 {C3 * (x[1] + x[3] + x[5] + x[7])};
+  f32  x26   {C6 * (x[2] + x[6])};
 
     f[0] = x[0] + x[4];
     f[1] = x[0] - x[4];
@@ -566,8 +563,8 @@ static void InverseDCT1D(const float * const x, float *dst, u32 stride)
 
 static void InverseDCTSubBlock(s16 *dst, const s16 *src)
 {
-    float x[8] {};
-    float block[SUBBLOCK_SIZE] {};
+    float x[8] {0};
+    float block[SUBBLOCK_SIZE] {0};
     auto i {0}, j {0};
 
     /* idct 1d on rows (+transposition) */

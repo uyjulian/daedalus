@@ -1,4 +1,4 @@
-SW*.DS_Store
+*.DS_Store
 *.d
 *.o
 *.prx
@@ -21,3 +21,4 @@ preferences.ini
 rom.db
 .svn/
 Source/tmp
+*.gch

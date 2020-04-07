@@ -52,7 +52,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #if defined(DAEDALUS_ENABLE_DYNAREC_PROFILE) || defined(DAEDALUS_W32)
 // This isn't really the most appropriate place. Need to check with
 // the graphics plugin really
-u32 g_dwNumFrames {};
+u32 g_dwNumFrames {0};
 #endif
 
 RomInfo g_ROM;
@@ -273,7 +273,7 @@ bool ROM_ReBoot()
 	//
 	// Find out the CIC type and initialise various systems based on the CIC type
 	//
-	u8	rom_base[ RAMROM_GAME_OFFSET ];
+	u8	rom_base[ RAMROM_GAME_OFFSET ] {0};
 	RomBuffer::GetRomBytesRaw( rom_base, 0, RAMROM_GAME_OFFSET );
 
 	g_ROM.cic_chip = ROM_GenerateCICType( rom_base );
@@ -447,7 +447,7 @@ void SpecificGameHacks( const ROMHeader & id )
 // Copy across text, nullptr terminate, and strip spaces
 void ROM_GetRomNameFromHeader( std::string & rom_name, const ROMHeader & header )
 {
-	char	buffer[20+1];
+	char	buffer[20+1] {0};
 	memcpy( buffer, header.Name, 20 );
 	buffer[20] = '\0';
 
@@ -543,7 +543,7 @@ bool ROM_LoadFile(const RomID & rom_id, const RomSettings & settings, const SRom
 
 bool ROM_GetRomName( const char * filename, std::string & game_name )
 {
-	ROMFile * p_rom_file = ROMFile::Create( filename );
+	ROMFile * p_rom_file {ROMFile::Create( filename )};
 	if (p_rom_file == nullptr)
 	{
 		return false;
@@ -558,8 +558,8 @@ bool ROM_GetRomName( const char * filename, std::string & game_name )
 	}
 
 	// Only read in the header
-	const u32	bytes_to_read = sizeof(ROMHeader);
-	u32			size_aligned = AlignPow2( bytes_to_read, 4 );	// Needed?
+	const u32	bytes_to_read {sizeof(ROMHeader)};
+	u32			size_aligned {AlignPow2( bytes_to_read, 4 )};	// Needed?
 	u8 *		p_bytes = new u8[size_aligned];
 
 	if (!p_rom_file->LoadData( bytes_to_read, p_bytes, messages ))

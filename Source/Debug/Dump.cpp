@@ -312,7 +312,7 @@ void Dump_Strings( const char * p_file_name )
 	// Memory dump
 	u32 ascii_start = 0;
 	u32 ascii_count = 0;
-	for ( u32 i = 0; i < RomBuffer::GetRomSize(); i ++)
+	for (auto i {0}; i < RomBuffer::GetRomSize(); i ++)
 	{
 		if ( RomBuffer::ReadValueRaw< u8 >( i ^ 0x3 ) >= ' ' &&
 			 RomBuffer::ReadValueRaw< u8 >( i ^ 0x3 ) < 200 )
