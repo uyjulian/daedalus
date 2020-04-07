@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MATH_MATHUTIL_H_
 
 #include "Math/Math.h"
-
+#include <algorithm>
 
 
 inline float Interpolate( float a, float b, float r )
@@ -37,27 +37,16 @@ inline T Square( T x )
 }
 
 template< typename T >
-inline T Clamp( T x, T lo, T hi )
-{
-	if(x < lo)
-		return lo;
-	else if(x > hi)
-		return hi;
-	else
-		return x;
-}
-
-template< typename T >
 inline T Saturate( s32 x );
 
 template<> inline s16 Saturate( s32 x )
 {
-	return s16( Clamp< s32 >( x, -32768, 32767 ) );
+	return s16( std::clamp( x, -32768, 32767 ) );
 }
 
 template<> inline s8 Saturate( s32 x )
 {
-	return s8( Clamp< s32 >( x, -128, 127 ) );
+	return s8( std::clamp( x, -128, 127 ) );
 }
 
 

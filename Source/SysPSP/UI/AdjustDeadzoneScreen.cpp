@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <pspctrl.h>
 #include <pspgu.h>
+#include <algorithm>
 
 #include "UIContext.h"
 #include "UIScreen.h"
@@ -98,22 +99,22 @@ void	IAdjustDeadzoneScreen::Update( float elapsed_time, const v2 & stick, u32 ol
 	{
 		if( mAdjustingMinDeadzone )
 		{
-			mStickMinDeadzone = Clamp( mStickMinDeadzone - DEADZONE_INCREMENT, 0.0f, mStickMaxDeadzone );
+			mStickMinDeadzone = std::clamp( mStickMinDeadzone - DEADZONE_INCREMENT, 0.0f, mStickMaxDeadzone );
 		}
 		else
 		{
-			mStickMaxDeadzone = Clamp( mStickMaxDeadzone - DEADZONE_INCREMENT, mStickMinDeadzone, 1.0f );
+			mStickMaxDeadzone = std::clamp( mStickMaxDeadzone - DEADZONE_INCREMENT, mStickMinDeadzone, 1.0f );
 		}
 	}
 	if(new_buttons & PSP_CTRL_UP)
 	{
 		if( mAdjustingMinDeadzone )
 		{
-			mStickMinDeadzone = Clamp( mStickMinDeadzone + DEADZONE_INCREMENT, 0.0f, mStickMaxDeadzone );
+			mStickMinDeadzone = std::clamp( mStickMinDeadzone + DEADZONE_INCREMENT, 0.0f, mStickMaxDeadzone );
 		}
 		else
 		{
-			mStickMaxDeadzone = Clamp( mStickMaxDeadzone + DEADZONE_INCREMENT, mStickMinDeadzone, 1.0f );
+			mStickMaxDeadzone = std::clamp( mStickMaxDeadzone + DEADZONE_INCREMENT, mStickMinDeadzone, 1.0f );
 		}
 	}
 

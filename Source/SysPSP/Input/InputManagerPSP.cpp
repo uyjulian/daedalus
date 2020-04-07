@@ -4,6 +4,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include <pspctrl.h>
 #include <psptypes.h>
@@ -1030,7 +1031,7 @@ v2	ApplyDeadzone( const v2 & in, f32 min_deadzone, f32 max_deadzone )
 
 	float	scale( ( length - min_deadzone ) / ( max_deadzone - min_deadzone )  );
 
-	scale = Clamp( scale, 0.0f, 1.0f );
+	scale = std::clamp( scale, 0.0f, 1.0f );
 
 	return ProjectToUnitSquare( in * (scale / length) );
 }
