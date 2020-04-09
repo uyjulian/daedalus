@@ -90,7 +90,8 @@ class c32 /*: public NativePf8888*/
 	private:
 		u32		mColour;
 };
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( c32 ) == 4 );
-
+#endif
 
 #endif // GRAPHICS_COLOURVALUE_H_

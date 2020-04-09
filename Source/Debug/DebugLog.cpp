@@ -93,7 +93,7 @@ void Debug_Print( const char * format, ... )
 //*****************************************************************************
 bool		Debug_GetLoggingEnabled()
 {
-	return g_bLog && (g_hOutputLog != NULL);
+	return g_bLog && (g_hOutputLog != nullptr);
 }
 
 //*****************************************************************************

@@ -36,10 +36,10 @@ namespace DynarecProfile
 //*************************************************************************************
 //
 //*************************************************************************************
-static std::map<u32,u32>		gFrameLookups;
-static u32						gLastFrame;
+static std::map<u32,u32>		gFrameLookups {0};
+static u32 gLastFrame {0};
 
-extern std::map< u32, u32 >		gHotTraceCountMap;
+extern std::map< u32, u32 >		gHotTraceCountMap {0};
 
 
 namespace
@@ -79,7 +79,7 @@ void	CheckForNewFrame()
 
 
 
-		for(int i {}; i < LookupList.size(); ++i)
+		for(int auto {0}; i < LookupList.size(); ++i)
 		{
 				DAED_LOG( DEBUG_DYNAREC_PROF, "%08x: %d lookups", LookupList[ i ].Address, LookupList[ i ].Count );
 		}
