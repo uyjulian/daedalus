@@ -668,7 +668,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 					{
 						#ifdef DAEDALUS_DEBUG_CONSOLE
 					printf("Speedhack copyreg (not handled)\n");
-					char opinfo[128];
+					char opinfo[128] {0};
 					SprintOpCodeInfo( opinfo, trace[i].Address, trace[i].OpCode );
 					printf("\t%p: <0x%08x> %s\n", (u32*)trace[i].Address, trace[i].OpCode._u32, opinfo);
 
@@ -682,7 +682,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 					{
 						#ifdef DAEDALUS_DEBUG_CONSOLE
 					printf("Speedhack unknown (not handled)\n");
-					char opinfo[128];
+					char opinfo[128] {0};
 					SprintOpCodeInfo( opinfo, trace[i].Address, trace[i].OpCode );
 					printf("\t%p: <0x%08x> %s\n", (u32*)trace[i].Address, trace[i].OpCode._u32, opinfo);
 
