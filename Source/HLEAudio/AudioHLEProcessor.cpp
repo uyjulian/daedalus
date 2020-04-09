@@ -68,8 +68,8 @@ void	AudioHLEState::EnvMixer( u8 flags, u32 address )
 	MessageBox (nullptr, "Unaligned EnvMixer... please report this to Azimer with the following information: RomTitle, Place in the rom it occurred, and any save state just before the error", "AudioHLE Error", MB_OK);
 	}*/
 	// ------------------------------------------------------------
-	s16 *inp=(s16 *)(Buffer+InBuffer);
-	s16 *out=(s16 *)(Buffer+OutBuffer);
+	s16 *inp {(s16 *)(Buffer+InBuffer);
+	s16 *out {(s16 *)(Buffer+OutBuffer);
 	s16 *aux1=(s16 *)(Buffer+AuxA);
 	s16 *aux2=(s16 *)(Buffer+AuxC);
 	s16 *aux3=(s16 *)(Buffer+AuxE);

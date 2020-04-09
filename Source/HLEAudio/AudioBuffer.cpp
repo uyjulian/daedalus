@@ -51,7 +51,7 @@ u32 CAudioBuffer::GetNumBufferedSamples() const
 // #endif
 
 	// Safe? What if we read mWrite, and then mRead moves to start of buffer?
-	s32 diff = mWritePtr - mReadPtr;
+	s32 diff {mWritePtr - mReadPtr};
 
 	if( diff < 0 )
 	{
@@ -89,11 +89,11 @@ void CAudioBuffer::AddSamples( const Sample * samples, u32 num_samples, u32 freq
 	//	Principle is the same but rewritten to integer mode (faster & less ASM) //Corn
 
 	const s32 r( (frequency << 12)  / output_freq );
-	s32		  s( 0 );
-	u32		  in_idx( 0 );
-	u32		  output_samples( (( num_samples * output_freq ) / frequency) - 1);
+	s32		  s {0};
+	u32		  in_idx {0};
+	u32		  output_samples {(( num_samples * output_freq ) / frequency) - 1)};
 
-	for( u32 i = output_samples; i != 0 ; i-- )
+	for( u32 i {output_samples}; i != 0 ; i-- )
 	{
 		#ifdef DAEDALUS_ENABLE_ASSERTS
 		DAEDALUS_ASSERT( in_idx + 1 < num_samples, "Input index out of range - %d / %d", in_idx+1, num_samples );
@@ -162,11 +162,11 @@ u32	CAudioBuffer::Drain( Sample * samples, u32 num_samples )
 	//sceKernelDcacheWritebackInvalidateAll();
 	#endif
 
-	const Sample *	read_ptr( mReadPtr );		// No need to invalidate, as this is uncached/volatile
-	const Sample *	write_ptr( mWritePtr );		//
+	const Sample *read_ptr {mReadPtr};		// No need to invalidate, as this is uncached/volatile
+	const Sample *write_ptr {mWritePtr};		//
 
-	Sample *	out_ptr( samples );
-	u32			samples_required( num_samples );
+	Sample *	out_ptr {samples};
+	u32			samples_required {num_samples};
 
 	while( samples_required > 0 )
 	{
