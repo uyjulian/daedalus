@@ -23,11 +23,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef DAEDALUS_PSP
 static inline CRefPtr<CNativeTexture> LoadFrameBuffer(u32 origin)
 {
-	u32 width  = Memory_VI_GetRegister( VI_WIDTH_REG );
+	u32 width  {Memory_VI_GetRegister( VI_WIDTH_REG )};
 	if( width == 0 )
 	{
 		//DAEDALUS_ERROR("Loading 0 size frame buffer?");
-		return NULL;
+		return nullptr;
 	}
 
 	if( origin <= width*2 )
@@ -65,13 +65,13 @@ static inline CRefPtr<CNativeTexture> LoadFrameBuffer(u32 origin)
 static inline void DrawFrameBuffer(u32 origin, const CNativeTexture * texture)
 {
 
-	u16 * pixels = (u16*)malloc(FB_WIDTH*FB_HEIGHT * sizeof(u16));	// TODO: should cache this, but at some point we'll need to deal with variable framebuffer size, so do this later.
-	u32 src_offset = 0;
+	u16 * pixels {(u16*)malloc(FB_WIDTH*FB_HEIGHT * sizeof(u16))};	// TODO: should cache this, but at some point we'll need to deal with variable framebuffer size, so do this later.
+	u32 src_offset {0};
 
-	for (u32 y = 0; y < FB_HEIGHT; ++y)
+	for (u32 y {0}; y < FB_HEIGHT; ++y)
 	{
-		u32 dst_row_offset = y * FB_WIDTH;
-		u32 dst_offset     = dst_row_offset;
+		u32 dst_row_offset {y * FB_WIDTH};
+		u32 dst_offset     {dst_row_offset};
 
 		for (auto x {0}; x < FB_WIDTH; ++x)
 		{
@@ -99,7 +99,7 @@ void RenderFrameBuffer(u32 origin)
 	gRenderer->BeginScene();
 
 	CRefPtr<CNativeTexture> texture = LoadFrameBuffer(origin);
-	if(texture != NULL)
+	if(texture != nullptr)
 		DrawFrameBuffer(origin, texture);
 
 	gRenderer->EndScene();

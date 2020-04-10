@@ -77,8 +77,8 @@ void CAudioBuffer::AddSamples( const Sample * samples, u32 num_samples, u32 freq
 	#ifdef DAEDALUS_PSP
 	//sceKernelDcacheWritebackInvalidateAll();
 	#endif
-	const Sample *	read_ptr( mReadPtr );		// No need to invalidate, as this is uncached/volatile
-	Sample *		write_ptr( mWritePtr );
+	const Sample *read_ptr {mReadPtr};		// No need to invalidate, as this is uncached/volatile
+	Sample *write_ptr {mWritePtr};
 
 	//
 	//	'r' is the number of input samples we progress through for each output sample.
@@ -91,7 +91,7 @@ void CAudioBuffer::AddSamples( const Sample * samples, u32 num_samples, u32 freq
 	const s32 r( (frequency << 12)  / output_freq );
 	s32		  s {0};
 	u32		  in_idx {0};
-	u32		  output_samples {(( num_samples * output_freq ) / frequency) - 1)};
+	u32		  output_samples {(( num_samples * output_freq ) / frequency) - 1};
 
 	for( u32 i {output_samples}; i != 0 ; i-- )
 	{
@@ -165,8 +165,8 @@ u32	CAudioBuffer::Drain( Sample * samples, u32 num_samples )
 	const Sample *read_ptr {mReadPtr};		// No need to invalidate, as this is uncached/volatile
 	const Sample *write_ptr {mWritePtr};		//
 
-	Sample *	out_ptr {samples};
-	u32			samples_required {num_samples};
+	Sample *out_ptr {samples};
+	u32	samples_required {num_samples};
 
 	while( samples_required > 0 )
 	{

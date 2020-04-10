@@ -30,10 +30,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //*****************************************************************************
 void DLParser_GBI0_Vtx_WRUS( MicroCodeCommand command )
 {
-	u32 addr = RDPSegAddr(command.inst.cmd1);
-	u32 v0  = ((command.inst.cmd0 >>16 ) & 0xff) / 5;
-	u32 n   =  (command.inst.cmd0 >>9  ) & 0x7f;
-	u32 len =  (command.inst.cmd0      ) & 0x1ff;
+	u32 addr {RDPSegAddr(command.inst.cmd1)};
+	u32 v0  {((command.inst.cmd0 >>16 ) & 0xff) / 5};
+	u32 n   {(command.inst.cmd0 >>9  ) & 0x7f};
+	u32 len {(command.inst.cmd0      ) & 0x1ff};
 			#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF( "    Address[0x%08x] v0[%d] Num[%d] Len[0x%04x]", addr, v0, n, len );
 #endif

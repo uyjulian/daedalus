@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Profiler.h"
 
 static const char * const	gImageFormatNames[8] {"RGBA", "YUV", "CI", "IA", "I", "?1", "?2", "?3"};
-static const u32			gImageSizesInBits[4] {4, 8, 16, 32};
+static const u32	gImageSizesInBits[4] {4, 8, 16, 32};
 
 const char * TextureInfo::GetFormatName() const
 {
@@ -56,7 +56,7 @@ u32 TextureInfo::GenerateHashValue() const
 	//Number of places to do fragment hash from in texture
 	//More rows will use more CPU...
 	u32 CHK_ROW {5};
-	u32 hash_value {};
+	u32 hash_value {0};
 	u8 *ptr_u8 {g_pu8RamBase + GetLoadAddress()};
 
 	if( g_ROM.GameHacks == YOSHI )

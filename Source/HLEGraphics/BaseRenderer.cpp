@@ -323,8 +323,8 @@ void BaseRenderer::InitViewport()
 	}
 
 #if defined(DAEDALUS_GL)
-	f32 w = mScreenWidth;
-	f32 h = mScreenHeight;
+	f32 w {mScreenWidth};
+	f32 h {mScreenHeight};
 
 	mScreenToDevice = Matrix4x4(
 		2.f / w,       0.f,     0.f,     0.f,
@@ -362,8 +362,8 @@ void BaseRenderer::SetN64Viewport( const v2 & scale, const v2 & trans )
 
 void BaseRenderer::UpdateViewport()
 {
-	v2		n64_min( mVpTrans.x - mVpScale.x, mVpTrans.y - mVpScale.y );
-	v2		n64_max( mVpTrans.x + mVpScale.x, mVpTrans.y + mVpScale.y );
+	v2		n64_min {mVpTrans.x - mVpScale.x, mVpTrans.y - mVpScale.y};
+	v2		n64_max {mVpTrans.x + mVpScale.x, mVpTrans.y + mVpScale.y};
 
 	v2		psp_min {};
 	v2		psp_max {};
@@ -404,9 +404,9 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 	DAEDALUS_ASSERT( v1 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v1 );
 	DAEDALUS_ASSERT( v2 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v2 );
 #endif
-	const u32 & f0 = mVtxProjected[v0].ClipFlags;
-	const u32 & f1 = mVtxProjected[v1].ClipFlags;
-	const u32 & f2 = mVtxProjected[v2].ClipFlags;
+	const u32 &f0 {mVtxProjected[v0].ClipFlags};
+	const u32 &f1 {mVtxProjected[v1].ClipFlags};
+	const u32 &f2 {mVtxProjected[v2].ClipFlags};
 
 	if ( f0 & f1 & f2 )
 	{
@@ -481,7 +481,9 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 
 void BaseRenderer::FlushTris()
 {
+	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_PROFILE( "BaseRenderer::FlushTris" );
+#endif
 	/*
 	if ( mNumIndices == 0 )
 	{
@@ -572,7 +574,7 @@ ALIGNED_TYPE(const v4, NDCPlane[6], 16) =
 #ifdef DAEDALUS_PSP_USE_VFPU
 u32 clip_tri_to_frustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 {
-	u32 vOut( 3 );
+	u32 vOut {3};
 
 	vOut = _ClipToHyperPlane( v1, v0, &NDCPlane[0], vOut ); if( vOut < 3 ) return vOut;		// near
 	vOut = _ClipToHyperPlane( v0, v1, &NDCPlane[1], vOut ); if( vOut < 3 ) return vOut;		// far
@@ -710,9 +712,9 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 
 	for(auto i {0}; i < (mNumIndices - 2);)
 	{
-		const u32 & idx0 {mIndexBuffer[ i++ ]};
-		const u32 & idx1 {mIndexBuffer[ i++ ]};
-		const u32 & idx2 {mIndexBuffer[ i++ ]};
+		const u32 &idx0 {mIndexBuffer[ i++ ]};
+		const u32 &idx1 {mIndexBuffer[ i++ ]};
+		const u32 &idx2 {mIndexBuffer[ i++ ]};
 
 		//Check if any of the vertices are outside the clipbox (NDC), if so we need to clip the triangle
 		if(mVtxProjected[idx0].ClipFlags | mVtxProjected[idx1].ClipFlags | mVtxProjected[idx2].ClipFlags)
@@ -735,7 +737,7 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 				continue;
 
 			// Retesselate
-			u32 new_num_vertices( num_vertices + (out - 3) * 3 );
+			u32 new_num_vertices {num_vertices + (out - 3) * 3};
 						#ifdef DAEDALUS_DEBUG_CONSOLE
 			if( new_num_vertices > MAX_CLIPPED_VERTS )
 			{

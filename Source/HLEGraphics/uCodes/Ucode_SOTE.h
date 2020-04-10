@@ -25,9 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //*****************************************************************************
 void DLParser_GBI0_Vtx_SOTE( MicroCodeCommand command )
 {
-	u32 address = RDPSegAddr(command.inst.cmd1);
-	u32 n		= ((command.inst.cmd0 >> 4) & 0xfff) / 33 + 1;
-	u32 v0		= 0;
+	u32 address {RDPSegAddr(command.inst.cmd1)};
+	u32 n		= {((command.inst.cmd0 >> 4) & 0xfff) / 33 + 1};
+	u32 v0		={0};
 
 			#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF("    Address[0x%08x] v0[%d] Num[%d]", address, v0, n);

@@ -75,7 +75,7 @@ void DLParser_Sprite2DDraw( MicroCodeCommand command, const Sprite2DInfo &info, 
 	// ToDO : Cache ti state as Sprite2D is mostly used for static BGs
 	TextureInfo ti;
 
-	u32 address = RDPSegAddr(sprite->address);
+	u32 address {RDPSegAddr(sprite->address)};
 
 	SImageDescriptor	desc = { sprite->format, sprite->size, sprite->stride, address };
 
@@ -97,15 +97,15 @@ void DLParser_Sprite2DDraw( MicroCodeCommand command, const Sprite2DInfo &info, 
 
 	CRefPtr<CNativeTexture> texture = gRenderer->LoadTextureDirectly(ti);
 
-	s16 px = (s16)((command.inst.cmd1>>16)&0xFFFF)/4;
-	s16 py = (s16)(command.inst.cmd1 &0xFFFF)/4;
-	u16 pw = (u16)(sprite->width / info.scaleX);
-	u16 ph = (u16)(sprite->height / info.scaleY);
+	s16 px {(s16)((command.inst.cmd1>>16)&0xFFFF) /4};
+	s16 py {(s16)(command.inst.cmd1 &0xFFFF) /4};
+	u16 pw {(u16)(sprite->width / info.scaleX)};
+	u16 ph {(u16)(sprite->height / info.scaleY)};
 
-	s32 frameX              = px;
-	s32 frameY              = py;
-	s32 frameW              = px + pw;
-	s32 frameH              = py + ph;
+	s32 frameX              {px};
+	s32 frameY              {py};
+	s32 frameW              {px + pw};
+	s32 frameH              {py + ph};
 
 	// SSV uses this
 	if( info.flipX )
@@ -129,8 +129,8 @@ void DLParser_GBI1_Sprite2DBase( MicroCodeCommand command )
 	Sprite2DInfo info;
 	Sprite2DStruct *sprite;
 
-	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 pc {gDlistStack.address[gDlistStackPointer]};
+	u32 *pCmdBase {(u32 *)(g_pu8RamBase + pc)};
 
 	// Try to execute as many sprite2d ucodes as possible, I seen chains over 200! in FB
 	// NB Glover calls RDP Sync before draw for the sky.. so checks were added

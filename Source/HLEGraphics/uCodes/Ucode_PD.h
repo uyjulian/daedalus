@@ -25,10 +25,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //*****************************************************************************
 void DLParser_Vtx_PD( MicroCodeCommand command )
 {
-	u32 address = RDPSegAddr(command.inst.cmd1);
-	u32 v0 =  ((command.inst.cmd0)>>16)&0x0F;
-	u32 n  = (((command.inst.cmd0)>>20)&0x0F)+1;
-	u32 len = (command.inst.cmd0)&0xFFFF;
+	u32 address {RDPSegAddr(command.inst.cmd1)};
+	u32 v0 {((command.inst.cmd0)>>16)&0x0F};
+	u32 n  {(((command.inst.cmd0)>>20)&0x0F)+1};
+	u32 len {(command.inst.cmd0)&0xFFFF};
 			#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF("    Address[0x%08x] Len[%d] v0[%d] Num[%d]", address, len, v0, n);
 #endif

@@ -51,9 +51,9 @@ static NativePf8888			gPaletteBuffer[ 256 ];
 // we just skip the hashing process entirely, and update textures every frame
 // regardless of whether they've actually changed.
 #ifdef DAEDALUS_PSP
-static const bool kUpdateTexturesEveryFrame = false;
+static const bool kUpdateTexturesEveryFrame {false};
 #else
-static const bool kUpdateTexturesEveryFrame = true;
+static const bool kUpdateTexturesEveryFrame {true};
 #endif
 
 
@@ -116,8 +116,8 @@ static bool GenerateTexels(void ** p_texels,
 		gTexelBuffer.resize( buffer_size );
 	}
 
-	void *			texels  = &gTexelBuffer[0];
-	NativePf8888 *	palette = IsTextureFormatPalettised( texture_format ) ? gPaletteBuffer : nullptr;
+	void *texels  {&gTexelBuffer[0]};
+	NativePf8888 *palette {IsTextureFormatPalettised( texture_format ) ? gPaletteBuffer : nullptr};
 
 #ifdef DAEDALUS_ACCURATE_TMEM
 	// NB: if line is 0, it implies this is a direct load from ram (e.g. DLParser_Sprite2DDraw etc)
@@ -158,7 +158,7 @@ static void UpdateTexture( const TextureInfo & ti, CNativeTexture * texture )
 	if ( texture != nullptr && texture->HasData() )
 	{
 		ETextureFormat	format = texture->GetFormat();
-		u32 			stride {texture->GetStride()};
+		u32 stride {texture->GetStride()};
 
 		void *	texels;
 		void *	palette;

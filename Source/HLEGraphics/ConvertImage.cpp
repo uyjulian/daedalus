@@ -127,7 +127,7 @@ static void ConvertGeneric( const TextureDestInfo & dsti,
 							ConvertRowFunction swapped_fn,
 							ConvertRowFunction unswapped_fn )
 {
-	OutT *		dst        = reinterpret_cast< OutT * >( dsti.Data );
+	OutT *		dst    {reinterpret_cast< OutT * >( dsti.Data )};
 	const u8 *	src  {g_pu8RamBase};
 	u32			src_offset {ti.GetLoadAddress()};
 	u32			src_pitch  {ti.GetPitch()};
@@ -169,10 +169,10 @@ static void ConvertPalettisedTo8888( const TextureDestInfo & dsti, const Texture
 									 ConvertPalettisedRowFunction swapped_fn,
 									 ConvertPalettisedRowFunction unswapped_fn )
 {
-	NativePf8888 *	dst        = reinterpret_cast< NativePf8888 * >( dsti.Data );
-	const u8 *		src        = g_pu8RamBase;
-	u32				src_offset = ti.GetLoadAddress();
-	u32				src_pitch  = ti.GetPitch();
+	NativePf8888 *	dst    {reinterpret_cast< NativePf8888 * >( dsti.Data )};
+	const u8 *src        {g_pu8RamBase};
+	u32	src_offset {ti.GetLoadAddress()};
+	u32	src_pitch  {ti.GetPitch()};
 
 	if (ti.IsSwapped())
 	{
@@ -208,10 +208,10 @@ static void ConvertPalettisedToCI( const TextureDestInfo & dsti, const TextureIn
 								   void (*swapped_fn)( OutT * dst, const u8 * src, u32 src_offset, u32 width ),
 								   void (*unswapped_fn)( OutT * dst, const u8 * src, u32 src_offset, u32 width ) )
 {
-	OutT *		dst        = reinterpret_cast< OutT * >( dsti.Data );
-	const u8 *	src        = g_pu8RamBase;
-	u32			src_offset = ti.GetLoadAddress();
-	u32			src_pitch  = ti.GetPitch();
+	OutT *		dst    {reinterpret_cast< OutT * >( dsti.Data )};
+	const u8 *src        {g_pu8RamBase};
+	u32	src_offset {ti.GetLoadAddress()};
+	u32	src_pitch  {ti.GetPitch()};
 
 	if (ti.IsSwapped())
 	{
@@ -316,7 +316,7 @@ struct SConvertIA4
 		// Do two pixels at a time
 		for (auto x {0}; x < width; x+=2)
 		{
-			u8 b = src[src_offset ^ F];
+			u8 b {src[src_offset ^ F]};
 
 			// Even
 			dst[x + 0] = OutT( ThreeToEight[(b & 0xE0) >> 5],
@@ -460,7 +460,7 @@ static void ConvertCI4_Row( NativePfCI44 * dst, const u8 * src, u32 src_offset, 
 {
 	for (auto x {0}; x+1 < width; x+=2)
 	{
-		u8 b = src[src_offset ^ F];
+		u8 b {src[src_offset ^ F]};
 
 		dst[ x/2 ].Bits = (b >> 4) | (b << 4);
 
@@ -576,8 +576,8 @@ static void ConvertCI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 
 	NativePf8888 temp_palette[256];
 
-	NativePf8888 *	dst_palette = dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette;
-	const void * 	src_palette = reinterpret_cast< const void * >( ti.GetTlutAddress() );
+	NativePf8888 *dst_palette {dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette};
+	const void *src_palette {reinterpret_cast< const void * >( ti.GetTlutAddress() )};
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 256);
 
@@ -610,8 +610,8 @@ static void ConvertCI4(const TextureDestInfo & dsti, const TextureInfo & ti)
 #endif
 	NativePf8888 temp_palette[16];
 
-	NativePf8888 *	dst_palette = dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette;
-	const void * 	src_palette = reinterpret_cast< const void * >( ti.GetTlutAddress() );
+	NativePf8888 *dst_palette {dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette};
+	const void *src_palette {reinterpret_cast< const void * >( ti.GetTlutAddress() )};
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 16);
 
@@ -629,11 +629,13 @@ static void ConvertCI4(const TextureDestInfo & dsti, const TextureInfo & ti)
 							   ConvertCI4_Row< 0x3 > );
 		break;
 
-#ifdef DAEDALUS_DEBUG_CONSOLE
+
 	default:
+	#ifdef DAEDALUS_DEBUG_CONSOLE
 		DAEDALUS_ERROR( "Unhandled format for CI4 textures" );
+				#endif
 		break;
-		#endif
+
 	}
 }
 
