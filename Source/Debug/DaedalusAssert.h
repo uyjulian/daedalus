@@ -48,7 +48,7 @@ template<int x> struct static_assert_test{};
 // NB! This should be enabled across all builds regardless of whether DAEDALUS_ENABLE_ASSERTS is set!
 // It's a compile-time assert and has no runtime cost!
 #define DAEDALUS_STATIC_ASSERT( x )								\
-   typedef static_assert_test<sizeof(STATIC_ASSERTION_FAILURE< (bool)( x ) >)>	static_assert_typedef_##__COUNTER__
+using static_assert_typedef_##__COUNTER__ = static_assert_test<sizeof(STATIC_ASSERTION_FAILURE< (bool)( x ) >)>;
 
 #endif
 
@@ -70,7 +70,8 @@ EAssertResult DAEDALUS_VARARG_CALL_TYPE DaedalusAssert( const char * expression,
 //
 //	Use this api to override the default assert handler, e.g. for logging asserts during a batch process
 //
-typedef EAssertResult (*DaedalusAssertHook)( const char * expression, const char * file, unsigned int line, const char * formatted_msg, ... );
+using DaedalusAssertHook = EAssertResult (*)( const char * expression, const char * file, unsigned int line, const char * formatted_msg, ... );
+
 
 extern DaedalusAssertHook gAssertHook;
 
@@ -82,73 +83,73 @@ inline void SetAssertHook( DaedalusAssertHook hook )
 //
 // Use this to report on problems with the emulator - not the emulated title
 //
-#define DAEDALUS_ASSERT( e, ... )												\
-{																				\
-	static bool ignore = false;													\
-	if ( !(e) && !ignore )														\
-	{																			\
-		EAssertResult ar;														\
-		if (gAssertHook != NULL)												\
-			ar = gAssertHook( #e,  __FILE__, __LINE__, __VA_ARGS__ );			\
-		else																	\
-			ar = DaedalusAssert( #e,  __FILE__, __LINE__, __VA_ARGS__ );		\
-		if ( ar == AR_BREAK )													\
-		{																		\
-			DAEDALUS_HALT;	/* User breakpoint */								\
-		}																		\
-		else if ( ar == AR_IGNORE )												\
-		{																		\
-			ignore = true;	/* Ignore throughout session */						\
-		}																		\
-	}																			\
+#define DAEDALUS_ASSERT( e, ... )
+{
+	static bool ignore = false;
+	if ( !(e) && !ignore )
+	{
+		EAssertResult ar;
+		if (gAssertHook != NULL)
+			ar = gAssertHook( #e,  __FILE__, __LINE__, __VA_ARGS__ );
+		else
+			ar = DaedalusAssert( #e,  __FILE__, __LINE__, __VA_ARGS__ );
+		if ( ar == AR_BREAK )
+		{
+			DAEDALUS_HALT;	/* User breakpoint */
+		}
+		else if ( ar == AR_IGNORE )
+		{
+			ignore = true;	/* Ignore throughout session */
+		}
+	}
 }
 
 //
 // Use this to assert without specifying a message
 //
-#define DAEDALUS_ASSERT_Q( e )													\
-{																				\
-	static bool ignore = false;													\
-	if ( !(e) && !ignore )														\
-	{																			\
-		EAssertResult ar;														\
-		if (gAssertHook != NULL)												\
-			ar = gAssertHook( #e,  __FILE__, __LINE__, "" );					\
-		else																	\
-			ar = DaedalusAssert( #e,  __FILE__, __LINE__, "" );					\
-		if ( ar == AR_BREAK )													\
-		{																		\
-			DAEDALUS_HALT;	/* User breakpoint */								\
-		}																		\
-		else if ( ar == AR_IGNORE )												\
-		{																		\
-			ignore = true;	/* Ignore throughout session */						\
-		}																		\
-	}																			\
+#define DAEDALUS_ASSERT_Q( e )
+{
+	static bool ignore {false};
+	if ( !(e) && !ignore )
+	{
+		EAssertResult ar;
+		if (gAssertHook != NULL)
+			ar = gAssertHook( #e,  __FILE__, __LINE__, "" );
+		else
+			ar = DaedalusAssert( #e,  __FILE__, __LINE__, "" );
+		if ( ar == AR_BREAK )
+		{
+			DAEDALUS_HALT;	/* User breakpoint */
+		}
+		else if ( ar == AR_IGNORE )
+		{
+			ignore = true;	/* Ignore throughout session */
+		}
+	}
 }
 
 //
 // Use this to assert unconditionally - e.g. for unhandled cases
 //
-#define DAEDALUS_ERROR( ... )													\
-{																				\
-	static bool ignore = false;													\
-	if ( !ignore )																\
-	{																			\
-		EAssertResult ar;														\
-		if (gAssertHook != NULL)												\
-			ar = gAssertHook( "",  __FILE__, __LINE__, __VA_ARGS__ );			\
-		else																	\
-			ar = DaedalusAssert( "",  __FILE__, __LINE__, __VA_ARGS__ );		\
-		if ( ar == AR_BREAK )													\
-		{																		\
-			DAEDALUS_HALT;	/* User breakpoint */								\
-		}																		\
-		else if ( ar == AR_IGNORE )												\
-		{																		\
-			ignore = true;	/* Ignore throughout session */						\
-		}																		\
-	}																			\
+#define DAEDALUS_ERROR( ... )
+{
+	static bool ignore {false};
+	if ( !ignore )
+	{
+		EAssertResult ar;
+		if (gAssertHook != NULL)
+			ar = gAssertHook( "",  __FILE__, __LINE__, __VA_ARGS__ );
+		else																	
+			ar = DaedalusAssert( "",  __FILE__, __LINE__, __VA_ARGS__ );
+		if ( ar == AR_BREAK )
+		{
+			DAEDALUS_HALT;	/* User breakpoint */
+		}
+		else if ( ar == AR_IGNORE )
+		{
+			ignore = true;	/* Ignore throughout session */
+		}
+	}
 }
 
 #else // DAEDALUS_ENABLE_ASSERTS

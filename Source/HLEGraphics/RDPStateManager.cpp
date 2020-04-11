@@ -36,7 +36,7 @@ extern SImageDescriptor g_TI;		//Texture data from Timg ucode
 
 CRDPStateManager gRDPStateManager;
 
-static const char * const kTLUTTypeName[] = {"None", "?", "RGBA16", "IA16"};
+static const char * const kTLUTTypeName[] {"None", "?", "RGBA16", "IA16"};
 
 RDP_OtherMode		gRDPOtherMode;
 
@@ -63,8 +63,8 @@ ALIGNED_GLOBAL(u8, gTMEM[ MAX_TMEM_ADDRESS ], 16);	// 4Kb
 static inline void CopyLineQwords(void * dst, const void * src, u32 qwords)
 {
 #ifdef FAST_TMEM_COPY
-	u32* src32 = (u32*)src;
-	u32* dst32 = (u32*)dst;
+	u32* src32 {(u32*)src};
+	u32* dst32 {(u32*)dst};
 
 	DAEDALUS_ASSERT( ((uintptr_t)src32&0x3)==0, "src is not aligned!");
 
@@ -76,9 +76,9 @@ static inline void CopyLineQwords(void * dst, const void * src, u32 qwords)
 		src32 += 2;
 	}
 #else
-	u8* src8 = (u8*)src;
-	u8* dst8 = (u8*)dst;
-	u32 bytes = qwords * 8;
+	u8* src8 {(u8*)src};
+	u8* dst8 {(u8*)dst};
+	u32 bytes {qwords * 8};
 	while(bytes--)
 	{
 		*dst8++ = *(u8*)((uintptr_t)src8++ ^ U8_TWIDDLE);
@@ -396,8 +396,10 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 	u32 lrs    {load.sh};
 	u32 bytes  {((lrs+1) << g_TI.Size) >> 1};
 
+#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_DL_ASSERT( bytes <= 4096, "Suspiciously large loadblock: %d bytes", bytes );
 	DAEDALUS_DL_ASSERT( bytes, "LoadBLock: No bytes??" );
+#endif
 
 	u32 qwords {(bytes+7) / 8};
 	u32 tmem_offset {(rdp_tile.tmem << 3)};
@@ -405,7 +407,9 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 
 	if (( (address + bytes) > MAX_RAM_ADDRESS) || (tmem_offset + bytes) > MAX_TMEM_ADDRESS )
 	{
+#ifdef DAEDALUS_ENABLE_ASSERTS
 		DBGConsole_Msg(0, "[WWarning LoadBlock address is invalid]" );
+#endif
 		return;
 	}
 
@@ -430,7 +434,7 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 		DAEDALUS_ASSERT(qwords_per_line == (u32)ceilf(2048.f / (float)dxt), "Broken DXT calc");
 
 		u32 odd_row {};
-		for (u32 i {}; i < qwords; /* updated in loop */)
+		for (auto i {0}; i < qwords; /* updated in loop */)
 		{
 			u32 qwords_to_copy {Min(qwords-i, qwords_per_line)};
 
@@ -527,7 +531,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	u8* dst {gTMEM + tmem_offset};
 	u8* src {g_pu8RamBase + ram_offset};
 
-	for (u32 y {}; y < h; ++y)
+	for (auto y {0}; y < h; ++y)
 	{
 		if (y&1)
 		{
@@ -599,7 +603,7 @@ static inline u16 GetTextureDimension( u16 tile_dimension, u8 mask, bool clamp )
 		// smaller of the mask dimension and the tile dimension.
 		if (clamp)
 		{
-			return Min< u16 >( mask_dimension, tile_dimension );
+			return std::min( mask_dimension, tile_dimension );
 		}
 
 		return mask_dimension;

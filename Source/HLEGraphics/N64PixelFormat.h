@@ -66,15 +66,16 @@ struct N64Pf5551
 	static const u32	ShiftR {11};
 	static const u32	ShiftG {6};
 	static const u32	ShiftB {1};
-	static const u32	ShiftA {};
+	static const u32	ShiftA {0};
 
 	static const u32	BitsR {5};
 	static const u32	BitsG {5};
 	static const u32	BitsB {5};
 	static const u32	BitsA {1};
 };
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( N64Pf5551 ) == 2 );
-
+#endif
 struct N64Pf8888
 {
 	union
@@ -137,8 +138,9 @@ struct N64Pf8888
 	static const u32	BitsB {8};
 	static const u32	BitsA {8};
 };
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( N64Pf8888 ) == 4 );
-
+#endif
 struct N64PfIA8
 {
 	u8	Bits;
@@ -158,13 +160,14 @@ struct N64PfIA8
 	static const u32	MaskA {0x0f};
 
 	static const u32	ShiftI {4};
-	static const u32	ShiftA {};
+	static const u32	ShiftA {0};
 
 	static const u32	BitsI {4};
 	static const u32	BitsA {4};
 };
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( N64PfIA8 ) == 1 );
-
+#endif
 struct N64PfIA16
 {
 	union
@@ -190,13 +193,14 @@ struct N64PfIA16
 	static const u32	MaskA {0x00ff};
 
 	static const u32	ShiftI {8};
-	static const u32	ShiftA {};
+	static const u32	ShiftA {0};
 
 	static const u32	BitsI {8};
 	static const u32	BitsA {8};
 };
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( N64PfIA16 ) == 2 );
-
+#endif
 struct N64PfI8
 {
 	union
@@ -223,6 +227,7 @@ struct N64PfI8
 
 	static const u32	BitsI {};
 };
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( N64PfI8 ) == 1 );
-
+#endif
 #endif // HLEGRAPHICS_N64PIXELFORMAT_H_

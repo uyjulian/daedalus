@@ -7,16 +7,6 @@
 
 #include <stddef.h>		// ofsetof
 
-/*
-typedef struct OSMesgQueue_s {
-	OSThread	*mtqueue;	// Queue to store threads blocked on empty mailboxes (receive)
-	OSThread	*fullqueue;	// Queue to store threads blocked on full mailboxes (send)
-	s32			validCount;	// Contains number of valid message
-	s32			first;		// Points to first valid message
-	s32			msgCount;	// Contains total # of messages
-	OSMesg		*msg;		// Points to message buffer array
-} OSMesgQueue;
-*/
 
 class COSMesgQueue
 {

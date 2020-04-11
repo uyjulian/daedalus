@@ -139,9 +139,9 @@ Matrix4x4 & Matrix4x4::SetTranslate( const v3 & vec )
 
 Matrix4x4 & Matrix4x4::SetScaling( float scale )
 {
-	for ( u32 r = 0; r < 4; ++r )
+	for ( u32 r {0}; r < 4; ++r )
 	{
-		for ( u32 c = 0; c < 4; ++c )
+		for ( u32 c {0}; c < 4; ++c )
 		{
 			m[ r ][ c ] = ( r == c ) ? scale : 0;
 		}
@@ -151,8 +151,7 @@ Matrix4x4 & Matrix4x4::SetScaling( float scale )
 
 Matrix4x4 & Matrix4x4::SetRotateX( float angle )
 {
-	float	s;
-	float	c;
+	float	s {0.0f}, c{0.0f};
 	sincosf(angle, &s, &c);
 
 	m11 = 1;	m12 = 0;	m13 = 0;	m14 = 0;
@@ -164,8 +163,7 @@ Matrix4x4 & Matrix4x4::SetRotateX( float angle )
 
 Matrix4x4 & Matrix4x4::SetRotateY( float angle )
 {
-	float	s;
-	float	c;
+	float	s {0.0f}, c {0.0f};
 	sincosf(angle, &s, &c);
 
 	m11 = c;	m12 = 0;	m13 = s;	m14 = 0;
@@ -177,8 +175,7 @@ Matrix4x4 & Matrix4x4::SetRotateY( float angle )
 
 Matrix4x4 & Matrix4x4::SetRotateZ( float angle )
 {
-	float	s;
-	float	c;
+		float	s {0.0f}, c {0.0f};
 	sincosf(angle, &s, &c);
 
 	m11 = c;	m12 = -s;	m13 = 0;	m14 = 0;
@@ -260,7 +257,7 @@ Matrix4x4	Matrix4x4::Inverse() const
 		}
 	}
 
-	for ( u32 j = 0; j < 4; ++j )
+	for ( auto j {0}; j < 4; ++j )
 	{
 		bool	found( false );
 		for ( u32 i = j; i < 4; ++i )
@@ -316,9 +313,9 @@ Matrix4x4	Matrix4x4::Inverse() const
 
 void myMulMatrixCPU(Matrix4x4 * m_out, const Matrix4x4 *mat_a, const Matrix4x4 *mat_b)
 {
-	for ( u32 i = 0; i < 4; ++i )
+	for (auto i {0}; i < 4; ++i )
 	{
-		for ( u32 j = 0; j < 4; ++j )
+		for ( auto j {0}; j < 4; ++j )
 		{
 			m_out->m[ i ][ j ] = mat_a->m[ i ][ 0 ] * mat_b->m[ 0 ][ j ] +
 							mat_a->m[ i ][ 1 ] * mat_b->m[ 1 ][ j ] +
@@ -341,9 +338,9 @@ Matrix4x4 Matrix4x4::operator*( const Matrix4x4 & rhs ) const
 	MatrixMultiplyUnaligned( &r, this, &rhs );
 //CPU
 #else
-	for ( u32 i = 0; i < 4; ++i )
+	for (auto i {0}; i < 4; ++i )
 	{
-		for ( u32 j = 0; j < 4; ++j )
+		for ( auto j {0}; j < 4; ++j )
 		{
 			r.m[ i ][ j ] = m[ i ][ 0 ] * rhs.m[ 0 ][ j ] +
 							m[ i ][ 1 ] * rhs.m[ 1 ][ j ] +
@@ -424,5 +421,3 @@ void	Matrix4x4::print() const
 	m[3][0], m[3][1], m[3][2], m[3][3]);
 }
 */
-
-

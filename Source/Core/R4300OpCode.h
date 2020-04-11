@@ -511,8 +511,8 @@ struct OpCode
 
 	};
 };
-
+#ifdef DAEDALUS_ENABLE_ASSERTS
 // Make sure we don't mess this up :)
 DAEDALUS_STATIC_ASSERT( sizeof( OpCode ) == sizeof( u32 ) );
-
+#endif
 #endif // CORE_R4300OPCODE_H_

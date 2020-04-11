@@ -52,7 +52,7 @@ void	CDrawText::Initialise()
 	gFonts[ F_LARGE_BOLD ] = intraFontLoad( "flash0:/font/ltn4.pgf", INTRAFONT_CACHE_ALL | INTRAFONT_STRING_UTF8 );		// Large/sans-serif/bold
 
 #ifdef DAEDALUS_ENABLE_ASSERTS
-	for( u32 i = 0; i < NUM_FONTS; ++i )
+	for( auto i {0}; i < NUM_FONTS; ++i )
 	{
 		DAEDALUS_ASSERT( gFonts[ i ] != nullptr, "Unable to load font (or forgot!)" );
 	}
@@ -64,7 +64,7 @@ void	CDrawText::Initialise()
 //*************************************************************************************
 void	CDrawText::Destroy()
 {
-	for( u32 i = 0; i < NUM_FONTS; ++i )
+	for( auto i {0}; i < NUM_FONTS; ++i )
 	{
 		intraFontUnload( gFonts[ i ] );
 	}

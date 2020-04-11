@@ -216,7 +216,7 @@ void ISavestateSelectorComponent::LoadSlots(){
 	mElements.Clear();
 	mLastPreviewLoad = ~0;
 
-	for( u32 i = 0; i < NUM_SAVESTATE_SLOTS; ++i )
+	for( auto i {0}; i < NUM_SAVESTATE_SLOTS; ++i )
 	{
 		COutputStringStream		str;
 		str << Translate_String("Slot ") << (i+1) << ": ";

@@ -34,10 +34,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 namespace
 {
-	const u32 INVALID_IDX = u32( ~0 );
-	const u32 INDIRECT_EXIT_ADDRESS = u32( ~0 );
+	const u32 INVALID_IDX {~0U};
+	const u32 INDIRECT_EXIT_ADDRESS {~0U};
 
-	const u32 MAX_TRACE_LENGTH = 1500;
+	const u32 MAX_TRACE_LENGTH {1500};
 }
 CTraceRecorder				gTraceRecorder;
 
@@ -168,7 +168,7 @@ CTraceRecorder::EUpdateTraceStatus	CTraceRecorder::UpdateTrace( u32 address,
 	//	If the branch was taken, we need to flip the condition of the
 	//	branch so that anything failing the test is directed off our trace
 	//
-	u32		branch_idx( INVALID_IDX );
+	u32		branch_idx {INVALID_IDX};
 
 	ER4300BranchType	branch_type( usage.BranchType );
 	if( branch_type != BT_NOT_BRANCH )
@@ -214,7 +214,7 @@ CTraceRecorder::EUpdateTraceStatus	CTraceRecorder::UpdateTrace( u32 address,
 			if( branch_taken )
 			{
 				// XXXXXX should be able to get this some other way?
-				bool	backwards( gCPUState.TargetPC <= gCPUState.CurrentPC );
+				bool	backwards {gCPUState.TargetPC <= gCPUState.CurrentPC};
 
 				if( backwards )
 				{
@@ -396,7 +396,7 @@ void CTraceRecorder::Analyse( SRegisterUsageInfo & register_usage )
 
 	std::fill( reg_spans, reg_spans + NUM_N64_REGS, invalid_span );		// Set the interval to an invalid range
 
-	for( u32 i {}; i < mTraceBuffer.size(); ++i )
+	for( auto i {0}; i < mTraceBuffer.size(); ++i )
 	{
 		const STraceEntry & ti( mTraceBuffer[ i ] );
 		const StaticAnalysis::RegisterUsage&	usage = ti.Usage;
@@ -422,7 +422,7 @@ void CTraceRecorder::Analyse( SRegisterUsageInfo & register_usage )
 	register_usage.SpanList.reserve( NUM_N64_REGS );
 
 	// Iterate through registers, inserting all that are used into span list
-	for( u32 i {}; i < NUM_N64_REGS; ++i )
+	for( auto i {0}; i < NUM_N64_REGS; ++i )
 	{
 		s32		start( reg_spans[ i ].first );
 		s32		end( reg_spans[ i ].second );

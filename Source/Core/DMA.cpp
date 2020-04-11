@@ -66,7 +66,7 @@ void DMA_SP_CopyFromRDRAM()
 	u32 count  {((rdlen_reg>>12)&0x00FF)+1};
 	u32 skip   {((rdlen_reg>>20)&0x0FFF)};
 
-	for (u32 c {}; c < count; c++ )
+	for (auto c {0}; c < count; c++ )
 	{
 		// Conker needs this
 		if ( rdram_address  > gRamSize )
@@ -148,7 +148,7 @@ void DMA_SI_CopyFromDRAM( )
 	DPF( DEBUG_MEMORY_PIF, "DRAM (0x%08x) -> PIF Transfer ", mem );
 #endif
 	// Fuse 4 reads and 4 writes to just one which is a lot faster - Corn
-	for(u32 i {}; i < 16; i++)
+	for(auto i {0}; i < 16; i++)
 	{
 		p_dst[i] = BSWAP32(p_src[i]);
 	}
@@ -174,7 +174,7 @@ void DMA_SI_CopyToDRAM( )
 	DPF( DEBUG_MEMORY_PIF, "PIF -> DRAM (0x%08x) Transfer ", mem );
 #endif
 	// Fuse 4 reads and 4 writes to just one which is a lot faster - Corn
-	for(u32 i {}; i < 16; i++)
+	for(auto i {0}; i < 16; i++)
 	{
 		p_dst[i] = BSWAP32(p_src[i]);
 	}
@@ -262,8 +262,8 @@ void DMA_PI_CopyToRDRAM()
     {
 		if (IsFlashDomAddr(cart_address))
 		{
-           	const u8 *	p_src( (const u8 *)g_pMemoryBuffers[MEM_SAVE] );
-			u32			src_size( ( MemoryRegionSizes[MEM_SAVE] ) );
+           	const u8 *	p_src{(const u8 *)g_pMemoryBuffers[MEM_SAVE]};
+			u32			src_size {( MemoryRegionSizes[MEM_SAVE] )};
 			cart_address -= PI_DOM2_ADDR2;
 
 			if (g_ROM.settings.SaveType != SAVE_TYPE_FLASH)
@@ -334,8 +334,8 @@ void DMA_PI_CopyFromRDRAM()
 	// Only care for DOM2/ADDR2
 	if(IsFlashDomAddr(cart_address))
 	{
-		u8 *	p_dst( (u8 *)g_pMemoryBuffers[MEM_SAVE] );
-		u32		dst_size( MemoryRegionSizes[MEM_SAVE] );
+		u8 *	p_dst {(u8 *)g_pMemoryBuffers[MEM_SAVE]};
+		u32		dst_size {MemoryRegionSizes[MEM_SAVE]};
 		cart_address -= PI_DOM2_ADDR2;
 
 		#ifdef DAEDALUS_DEBUG_CONSOLE

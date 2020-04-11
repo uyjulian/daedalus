@@ -1,5 +1,5 @@
 
-#define TEST_DISABLE_MATH_FUNCS DAEDALUS_PROFILE(__FUNCTION__);
+#define TEST_DISABLE_MATH_FUNCS //DAEDALUS_PROFILE(__FUNCTION__);
 
 //*****************************************************************************
 //
@@ -318,5 +318,3 @@ u32 Patch___ldiv()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }
-
-

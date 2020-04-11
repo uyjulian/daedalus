@@ -164,7 +164,7 @@ BaseRenderer::BaseRenderer()
 #ifdef DAEDALUS_DEBUG_CONSOLE && DAEDALUS_PSP
 	DAEDALUS_ASSERT( IsPointerAligned( &mTnL, 16 ), "Oops, mTnL should be 16-byte aligned" );
 #endif
-	for ( u32 i {}; i < kNumBoundTextures; i++ )
+	for ( auto i {0}; i < kNumBoundTextures; i++ )
 	{
 		mTileTopLeft[i].s = 0;
 		mTileTopLeft[i].t = 0;
@@ -272,7 +272,7 @@ void BaseRenderer::EndScene()
 
 	//
 	//	Clear this, to ensure we're force to check for updates to it on the next frame
-	for( u32 i {}; i < kNumBoundTextures; i++ )
+	for( auto i {0}; i < kNumBoundTextures; i++ )
 	{
 		mBoundTextureInfo[ i ] = TextureInfo();
 		mBoundTexture[ i ]     = nullptr;
@@ -323,8 +323,8 @@ void BaseRenderer::InitViewport()
 	}
 
 #if defined(DAEDALUS_GL)
-	f32 w = mScreenWidth;
-	f32 h = mScreenHeight;
+	f32 w {mScreenWidth};
+	f32 h {mScreenHeight};
 
 	mScreenToDevice = Matrix4x4(
 		2.f / w,       0.f,     0.f,     0.f,
@@ -362,8 +362,8 @@ void BaseRenderer::SetN64Viewport( const v2 & scale, const v2 & trans )
 
 void BaseRenderer::UpdateViewport()
 {
-	v2		n64_min( mVpTrans.x - mVpScale.x, mVpTrans.y - mVpScale.y );
-	v2		n64_max( mVpTrans.x + mVpScale.x, mVpTrans.y + mVpScale.y );
+	v2		n64_min {mVpTrans.x - mVpScale.x, mVpTrans.y - mVpScale.y};
+	v2		n64_max {mVpTrans.x + mVpScale.x, mVpTrans.y + mVpScale.y};
 
 	v2		psp_min {};
 	v2		psp_max {};
@@ -404,9 +404,9 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 	DAEDALUS_ASSERT( v1 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v1 );
 	DAEDALUS_ASSERT( v2 < kMaxN64Vertices, "Vertex index is out of bounds (%d)", v2 );
 #endif
-	const u32 & f0 = mVtxProjected[v0].ClipFlags;
-	const u32 & f1 = mVtxProjected[v1].ClipFlags;
-	const u32 & f2 = mVtxProjected[v2].ClipFlags;
+	const u32 &f0 {mVtxProjected[v0].ClipFlags};
+	const u32 &f1 {mVtxProjected[v1].ClipFlags};
+	const u32 &f2 {mVtxProjected[v2].ClipFlags};
 
 	if ( f0 & f1 & f2 )
 	{
@@ -481,7 +481,9 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 
 void BaseRenderer::FlushTris()
 {
+	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_PROFILE( "BaseRenderer::FlushTris" );
+#endif
 	/*
 	if ( mNumIndices == 0 )
 	{
@@ -572,7 +574,7 @@ ALIGNED_TYPE(const v4, NDCPlane[6], 16) =
 #ifdef DAEDALUS_PSP_USE_VFPU
 u32 clip_tri_to_frustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 {
-	u32 vOut( 3 );
+	u32 vOut {3};
 
 	vOut = _ClipToHyperPlane( v1, v0, &NDCPlane[0], vOut ); if( vOut < 3 ) return vOut;		// near
 	vOut = _ClipToHyperPlane( v0, v1, &NDCPlane[1], vOut ); if( vOut < 3 ) return vOut;		// far
@@ -611,7 +613,7 @@ static u32 clipToHyperPlane( DaedalusVtx4 * dest, const DaedalusVtx4 * source, u
 
 	f32 bDotPlane = b->ProjectedPos.Dot( plane );
 
-	for( u32 i {}; i < inCount + 1; ++i)
+	for( auto i {0}; i < inCount + 1; ++i)
 	{
 		//a = &source[i%inCount];
 		const s32 condition {i - inCount};
@@ -708,11 +710,11 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 	//
 	u32 num_vertices {};
 
-	for(u32 i {}; i < (mNumIndices - 2);)
+	for(auto i {0}; i < (mNumIndices - 2);)
 	{
-		const u32 & idx0 {mIndexBuffer[ i++ ]};
-		const u32 & idx1 {mIndexBuffer[ i++ ]};
-		const u32 & idx2 {mIndexBuffer[ i++ ]};
+		const u32 &idx0 {mIndexBuffer[ i++ ]};
+		const u32 &idx1 {mIndexBuffer[ i++ ]};
+		const u32 &idx2 {mIndexBuffer[ i++ ]};
 
 		//Check if any of the vertices are outside the clipbox (NDC), if so we need to clip the triangle
 		if(mVtxProjected[idx0].ClipFlags | mVtxProjected[idx1].ClipFlags | mVtxProjected[idx2].ClipFlags)
@@ -735,7 +737,7 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 				continue;
 
 			// Retesselate
-			u32 new_num_vertices( num_vertices + (out - 3) * 3 );
+			u32 new_num_vertices {num_vertices + (out - 3) * 3};
 						#ifdef DAEDALUS_DEBUG_CONSOLE
 			if( new_num_vertices > MAX_CLIPPED_VERTS )
 			{
@@ -744,7 +746,7 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 			}
 					#endif
 			//Make new triangles from the vertices we got back from clipping the original triangle
-			for( u32 j {}; j <= out - 3; ++j)
+			for( u32 j {0}; j <= out - 3; ++j)
 			{
 #ifdef DAEDALUS_PSP_USE_VFPU
 				_ConvertVertice( &clip_vtx[ num_vertices++ ], &temp_a[ 0 ]);
@@ -846,7 +848,7 @@ void BaseRenderer::PrepareTrisUnclipped( TempVerts * temp_verts ) const
 	//
 	//	Now we just shuffle all the data across directly (potentially duplicating verts)
 	//
-	for( u32 i {}; i < num_vertices; ++i )
+	for( auto i {0}; i < num_vertices; ++i )
 	{
 		u32 index = mIndexBuffer[ i ];
 
@@ -1762,7 +1764,7 @@ static void T1Hack(const TextureInfo & ti0, CNativeTexture * texture0,
 			//Merge RGB + I -> RGBA in texture 1
 			//We do two pixels in one go since its 16bit (RGBA_4444) //Corn
 			u32 size {texture1->GetWidth() * texture1->GetHeight() >> 1};
-			for(u32 i {}; i < size ; i++)
+			for(auto i {0}; i < size ; i++)
 			{
 				*dst = (*dst & 0xF000F000) | (*src & 0x0FFF0FFF);
 				dst++;
@@ -1777,7 +1779,7 @@ static void T1Hack(const TextureInfo & ti0, CNativeTexture * texture0,
 			//Merge RGB + I -> RGBA in texture 0
 			//We do two pixels in one go since its 16bit (RGBA_4444) //Corn
 			u32 size {texture1->GetWidth() * texture1->GetHeight() >> 1};
-			for(u32 i {}; i < size ; i++)
+			for(auto i {0}; i < size ; i++)
 			{
 				*dst = (*dst & 0x0FFF0FFF) | (*src & 0xF000F000);
 				dst++;
@@ -1914,7 +1916,7 @@ inline void FixUV(u32 * wrap, s16 * c0_, s16 * c1_, s16 offset, s32 size)
 		// Check if the coord is negative - if so, offset to the range [0,size]
 		if (c0 < 0)
 		{
-			s32 lowest {Min(c0, c1)};
+			s32 lowest {std::min(c0, c1)};
 
 			// Figure out by how much to translate so that the lowest of c0/c1 lies in the range [0,size]
 			// If we do lowest%size, we run the risk of implementation dependent behaviour for modulo of negative values.
@@ -2000,8 +2002,8 @@ void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 	ConvertN64ToScreen( n64_br, screen_br );
 
 	//Clamp TOP and LEFT values to 0 if < 0 , needed for zooming //Corn
-	s32 l {Max<s32>( s32(screen_tl.x), 0 )};
-	s32 t {Max<s32>( s32(screen_tl.y), 0 )};
+	s32 l {std::max( s32(screen_tl.x), 0 )};
+	s32 t {std::max( s32(screen_tl.y), 0 )};
 	s32 r {           s32(screen_br.x)};
 	s32 b {          s32(screen_br.y)};
 

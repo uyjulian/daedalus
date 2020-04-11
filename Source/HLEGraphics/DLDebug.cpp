@@ -14,7 +14,7 @@
 #include "Utility/Macros.h"
 
 
-DLDebugOutput * gDLDebugOutput = nullptr;
+DLDebugOutput * gDLDebugOutput {nullptr};
 
 void DLDebug_SetOutput(DLDebugOutput * output)
 {
@@ -144,28 +144,28 @@ static const char * const kAddInputAlpha[8] =
 
 void DLDebug_DumpMux( u64 mux )
 {
-	u32 mux0 = (u32)(mux>>32);
-	u32 mux1 = (u32)(mux);
+	u32 mux0 {(u32)(mux>>32)};
+	u32 mux1 {(u32)(mux)};
 
-	u32 aRGB0  = (mux0>>20)&0x0F;	// c1 c1		// a0
-	u32 bRGB0  = (mux1>>28)&0x0F;	// c1 c2		// b0
-	u32 cRGB0  = (mux0>>15)&0x1F;	// c1 c3		// c0
-	u32 dRGB0  = (mux1>>15)&0x07;	// c1 c4		// d0
+	u32 aRGB0  {(mux0>>20)&0x0F};	// c1 c1		// a0
+	u32 bRGB0  {(mux1>>28)&0x0F};	// c1 c2		// b0
+	u32 cRGB0  {(mux0>>15)&0x1F};	// c1 c3		// c0
+	u32 dRGB0  {(mux1>>15)&0x07};	// c1 c4		// d0
 
-	u32 aA0    = (mux0>>12)&0x07;	// c1 a1		// Aa0
-	u32 bA0    = (mux1>>12)&0x07;	// c1 a2		// Ab0
-	u32 cA0    = (mux0>>9 )&0x07;	// c1 a3		// Ac0
-	u32 dA0    = (mux1>>9 )&0x07;	// c1 a4		// Ad0
+	u32 aA0    {(mux0>>12)&0x07};	// c1 a1		// Aa0
+	u32 bA0    {(mux1>>12)&0x07};	// c1 a2		// Ab0
+	u32 cA0    {(mux0>>9 )&0x07};	// c1 a3		// Ac0
+	u32 dA0    {(mux1>>9 )&0x07};	// c1 a4		// Ad0
 
-	u32 aRGB1  = (mux0>>5 )&0x0F;	// c2 c1		// a1
-	u32 bRGB1  = (mux1>>24)&0x0F;	// c2 c2		// b1
-	u32 cRGB1  = (mux0    )&0x1F;	// c2 c3		// c1
-	u32 dRGB1  = (mux1>>6 )&0x07;	// c2 c4		// d1
+	u32 bRGB1  {(mux1>>24)&0x0F};	// c2 c2		// b1
+	u32 aRGB1  {(mux0>>5 )&0x0F};	// c2 c1		// a1
+	u32 cRGB1  {(mux0    )&0x1F};	// c2 c3		// c1
+	u32 dRGB1  {(mux1>>6 )&0x07};	// c2 c4		// d1
 
-	u32 aA1    = (mux1>>21)&0x07;	// c2 a1		// Aa1
-	u32 bA1    = (mux1>>3 )&0x07;	// c2 a2		// Ab1
-	u32 cA1    = (mux1>>18)&0x07;	// c2 a3		// Ac1
-	u32 dA1    = (mux1    )&0x07;	// c2 a4		// Ad1
+	u32 aA1    {(mux1>>21)&0x07};	// c2 a1		// Aa1
+	u32 bA1    {(mux1>>3 )&0x07};	// c2 a2		// Ab1
+	u32 cA1    {(mux1>>18)&0x07};	// c2 a3		// Ac1
+	u32 dA1    {(mux1    )&0x07};	// c2 a4		// Ad1
 
 	DL_PF("    Mux: 0x%08x%08x", mux0, mux1);
 
@@ -177,28 +177,28 @@ void DLDebug_DumpMux( u64 mux )
 
 void DLDebug_PrintMux( FILE * fh, u64 mux )
 {
-	u32 mux0 = (u32)(mux>>32);
-	u32 mux1 = (u32)(mux);
+	u32 mux0 {(u32)(mux>>32)};
+	u32 mux1 {(u32)(mux)|;
 
-	u32 aRGB0  = (mux0>>20)&0x0F;	// c1 c1		// a0
-	u32 bRGB0  = (mux1>>28)&0x0F;	// c1 c2		// b0
-	u32 cRGB0  = (mux0>>15)&0x1F;	// c1 c3		// c0
-	u32 dRGB0  = (mux1>>15)&0x07;	// c1 c4		// d0
+	u32 aRGB0  {(mux0>>20) &0x0F};	// c1 c1		// a0
+	u32 bRGB0  {(mux1>>28) &0x0F};	// c1 c2		// b0
+	u32 cRGB0  {(mux0>>15) &0x1F};	// c1 c3		// c0
+	u32 dRGB0  {(mux1>>15) &0x07};	// c1 c4		// d0
 
-	u32 aA0    = (mux0>>12)&0x07;	// c1 a1		// Aa0
-	u32 bA0    = (mux1>>12)&0x07;	// c1 a2		// Ab0
-	u32 cA0    = (mux0>>9 )&0x07;	// c1 a3		// Ac0
-	u32 dA0    = (mux1>>9 )&0x07;	// c1 a4		// Ad0
+	u32 aA0    {(mux0>>12) &0x07};	// c1 a1		// Aa0
+	u32 bA0    {(mux1>>12) &0x07};	// c1 a2		// Ab0
+	u32 cA0    {(mux0>>9 ) &0x07};	// c1 a3		// Ac0
+	u32 dA0    {(mux1>>9 ) &0x07};	// c1 a4		// Ad0
 
-	u32 aRGB1  = (mux0>>5 )&0x0F;	// c2 c1		// a1
-	u32 bRGB1  = (mux1>>24)&0x0F;	// c2 c2		// b1
-	u32 cRGB1  = (mux0    )&0x1F;	// c2 c3		// c1
-	u32 dRGB1  = (mux1>>6 )&0x07;	// c2 c4		// d1
+	u32 aRGB1  {(mux0>>5 ) &0x0F};	// c2 c1		// a1
+	u32 bRGB1  {(mux1>>24) &0x0F};	// c2 c2		// b1
+	u32 cRGB1  {(mux0    ) &0x1F};	// c2 c3		// c1
+	u32 dRGB1  {(mux1>>6 ) &0x07};	// c2 c4		// d1
 
-	u32 aA1    = (mux1>>21)&0x07;	// c2 a1		// Aa1
-	u32 bA1    = (mux1>>3 )&0x07;	// c2 a2		// Ab1
-	u32 cA1    = (mux1>>18)&0x07;	// c2 a3		// Ac1
-	u32 dA1    = (mux1    )&0x07;	// c2 a4		// Ad1
+	u32 aA1    {(mux1>>21) &0x07};	// c2 a1		// Aa1
+	u32 bA1    {(mux1>>3 ) &0x07};	// c2 a2		// Ab1
+	u32 cA1    {(mux1>>18) &0x07};	// c2 a3		// Ac1
+	u32 dA1    {(mux1    ) &0x07};	// c2 a4		// Ad1
 
 	fprintf(fh, "//case 0x%08x%08xLL:\n", mux0, mux1);
 	fprintf(fh, "//aRGB0: (%s - %s) * %s + %s\n", kSubAInputRGB[aRGB0], kSubBInputRGB[bRGB0], kMulInputRGB[cRGB0], kAddInputRGB[dRGB0]);
@@ -287,12 +287,12 @@ static const u32 kOtherModeLabelWidth = 15;
 
 static void DumpOtherMode(const OtherModeData * table, u32 table_len, u32 * mask_, u32 * data_)
 {
-	u32 mask = *mask_;
-	u32 data = *data_;
+	u32 mask {*mask_};
+	u32 data {*data_};
 
 	const char padstr[] = "                    ";
 
-	for (u32 i = 0; i < table_len; ++i)
+	for (auto i {0}; i < table_len; ++i)
 	{
 		const OtherModeData & e = table[i];
 
@@ -364,15 +364,15 @@ static void DumpBlender(u32 data)
 {
 	u32 blender = data >> G_MDSFT_BLENDER;
 
-	u32 m1a_1 = (blender >>14) & 0x3;
-	u32 m1b_1 = (blender >>10) & 0x3;
-	u32 m2a_1 = (blender >> 6) & 0x3;
-	u32 m2b_1 = (blender >> 2) & 0x3;
+	u32 m1a_1 {(blender >>14) & 0x3};
+	u32 m1b_1 {(blender >>10) & 0x3};
+	u32 m2a_1 {(blender >> 6) & 0x3};
+	u32 m2b_1 {(blender >> 2) & 0x3};
 
-	u32 m1a_2 = (blender >>12) & 0x3;
-	u32 m1b_2 = (blender >> 8) & 0x3;
-	u32 m2a_2 = (blender >> 4) & 0x3;
-	u32 m2b_2 = (blender     ) & 0x3;
+	u32 m1a_2 {(blender >>12) & 0x3};
+	u32 m1b_2 {(blender >> 8) & 0x3};
+	u32 m2a_2 {(blender >> 4) & 0x3};
+	u32 m2b_2 {(blender     ) & 0x3};
 
 	DL_PF("    blender:       0x%04x - %s*%s + %s*%s | %s*%s + %s*%s",
 		blender,
@@ -384,8 +384,8 @@ void DLDebug_DumpRDPOtherMode(const RDP_OtherMode & mode)
 {
 	if (DLDebug_IsActive())
 	{
-		u32 mask = 0xffffffff;
-		u32 data = mode.L;
+		u32 mask {0xffffffff};
+		u32 data {mode.L};
 		DumpOtherMode(kOtherModeLData, ARRAYSIZE(kOtherModeLData), &mask, &data);
 
 		mask = 0xffffffff;

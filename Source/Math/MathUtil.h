@@ -22,30 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define MATH_MATHUTIL_H_
 
 #include "Math/Math.h"
+#include <algorithm>
 
-template< typename T >
-inline const T & Max( const T & a, const T & b )
-{
-	if(a > b)
-		return a;
-	return b;
-}
-
-template< typename T >
-inline const T & Min( const T & a, const T & b )
-{
-	if(a < b)
-		return a;
-	return b;
-}
-
-template< typename T >
-inline void Swap( T & a, T & b )
-{
-	T t = a;
-	a = b;
-	b = t;
-}
 
 inline float Interpolate( float a, float b, float r )
 {
@@ -53,41 +31,27 @@ inline float Interpolate( float a, float b, float r )
 }
 
 template< typename T >
-inline T Square( T x )
-{
-	return x * x;
-}
-
-template< typename T >
-inline T Clamp( T x, T lo, T hi )
-{
-	if(x < lo)
-		return lo;
-	else if(x > hi)
-		return hi;
-	else
-		return x;
-}
-
-template< typename T >
 inline T Saturate( s32 x );
 
 template<> inline s16 Saturate( s32 x )
 {
-	return s16( Clamp< s32 >( x, -32768, 32767 ) );
+	return s16( std::clamp( x, -32768, 32767 ) );
 }
 
 template<> inline s8 Saturate( s32 x )
 {
-	return s8( Clamp< s32 >( x, -128, 127 ) );
+	return s8( std::clamp( x, -128, 127 ) );
 }
 
 
 template< typename T >
 inline const T * RoundPointerDown( const T * p, uintptr_t r )
 {
+	// take pointer
 	const uintptr_t mask = r-1;
 	return reinterpret_cast< const T * >( reinterpret_cast< uintptr_t >( p ) & ~mask );
+	//		const u8 * p_lower( RoundPointerDown( jump.GetTargetU8P(), 64 ) );
+
 }
 
 template< typename T >
@@ -121,15 +85,7 @@ inline u32 GetNextPowerOf2( u32 x )
 		n = n<<1;
 	}
 
-/*
-	v--;
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
-	v++;
-*/
+
 
 	return n;
 }

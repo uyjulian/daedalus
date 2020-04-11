@@ -48,7 +48,7 @@ _ConvertVertice:
 #
 #	The code handles the following:
 #
-#	for( u32 i = 0; i < num_vertices; ++i )
+#	for( auto i {0}; i < num_vertices; ++i )
 #	{
 #		p_vertices[ i ].Texture = clipped_vertices[ i ].Texture;
 #		p_vertices[ i ].Colour = c32( clipped_vertices[ i ].Colour );

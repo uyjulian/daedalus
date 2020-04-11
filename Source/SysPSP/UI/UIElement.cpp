@@ -31,7 +31,7 @@ CUIElementBag::CUIElementBag()
 
 CUIElementBag::~CUIElementBag()
 {
-	for( u32 i = 0; i < mElements.size(); ++i )
+	for( auto i {0}; i < mElements.size(); ++i )
 	{
 		delete mElements[ i ];
 	}
@@ -43,7 +43,7 @@ void CUIElementBag::Draw( CUIContext * context, s32 min_x, s32 max_x, EAlignType
 	const s32 MINTOP = 25; //Only draw text below
 	const s32 MAXBOT = 247;	//Only draw text above
 
-	for( u32 i = 0; i < mElements.size(); ++i )
+	for( auto i {0}; i < mElements.size(); ++i )
 	{
 		const CUIElement *	element( mElements[ i ] );
 
@@ -57,7 +57,7 @@ void	CUIElementBag::DrawCentredVertically( CUIContext * context, s32 min_x, s32 
 {
 	s32 total_height( 0 );
 
-	for( u32 i = 0; i < mElements.size(); ++i )
+	for( auto i {0}; i < mElements.size(); ++i )
 	{
 		const CUIElement *	element( mElements[ i ] );
 
@@ -67,7 +67,7 @@ void	CUIElementBag::DrawCentredVertically( CUIContext * context, s32 min_x, s32 
 	s32		slack( (max_y - min_y) - total_height );
 	s32		y( min_y + (slack / 2) );
 
-	for( u32 i = 0; i < mElements.size(); ++i )
+	for( auto i {0}; i < mElements.size(); ++i )
 	{
 		const CUIElement *	element( mElements[ i ] );
 

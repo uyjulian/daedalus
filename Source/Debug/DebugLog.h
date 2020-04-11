@@ -65,7 +65,7 @@ enum EDebugFlags
 //	The compiler is clever enough to optimise away calls to DPF
 //	if a particular flag isn't set.
 //
-static const u32	DAED_DEBUG_MASK( 0 );
+static const u32	DAED_DEBUG_MASK {0};
 
 bool		Debug_InitLogging();
 void		Debug_FinishLogging();
@@ -87,5 +87,3 @@ void		Debug_Print( const char * format, ... );
 
 
 #endif // DEBUG_DEBUGLOG_H_
-
-
