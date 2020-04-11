@@ -61,7 +61,9 @@ ALIGNED_TYPE(class, Matrix4x4, 16)
 		};
 };
 
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( Matrix4x4 ) == 16*4 );
+#endif
 
 extern const Matrix4x4	gMatrixIdentity;
 

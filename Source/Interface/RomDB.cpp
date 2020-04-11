@@ -159,7 +159,7 @@ class IRomDB : public CRomDB
 		};
 		using FilenameVec = std::vector< RomFilesKeyValue>;
 		using DetailsVec = std::vector< RomDetails>;
-		
+
 		IO::Filename					mRomDBFileName;
 		FilenameVec						mRomFiles;
 		DetailsVec						mRomDetails;

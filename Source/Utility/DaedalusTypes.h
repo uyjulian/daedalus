@@ -56,6 +56,7 @@ using f64 = double;
 
 #endif
 
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( u8 ) == 1 );
 DAEDALUS_STATIC_ASSERT( sizeof( s8 ) == 1 );
 DAEDALUS_STATIC_ASSERT( sizeof( u16 ) == 2 );
@@ -66,7 +67,7 @@ DAEDALUS_STATIC_ASSERT( sizeof( u64 ) == 8 );
 DAEDALUS_STATIC_ASSERT( sizeof( s64 ) == 8 );
 DAEDALUS_STATIC_ASSERT( sizeof( f32 ) == 4 );
 DAEDALUS_STATIC_ASSERT( sizeof( f64 ) == 8 );
-
+#endif
 
 union REG64
 {
@@ -98,9 +99,9 @@ union REG64
 	s8		_s8[8];
 	u8		_u8[8];*/
 };
-
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( REG64 ) == sizeof( u64 ) );
-
+#endif
 union REG32
 {
 	f32		_f32;
@@ -112,12 +113,13 @@ union REG32
 	s8		_s8[4];
 	u8		_u8[4];*/
 };
-
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof( REG32 ) == sizeof( u32 ) );
+#endif
 
 #if defined(DAEDALUS_PSP)
 #define _strcmpi stricmp
-#elif defined(DAEDALUS_PS3) || defined(DAEDALUS_OSX) || defined(DAEDALUS_LINUX)
+#elif defined(DAEDALUS_OSX) || defined(DAEDALUS_LINUX)
 #define _strcmpi strcasecmp
 #endif
 
