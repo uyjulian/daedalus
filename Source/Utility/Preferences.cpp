@@ -79,7 +79,7 @@ class IPreferences : public CPreferences
 		void					OutputSectionDetails( const RomID & id, const SRomPreferences & preferences, FILE * fh );
 
 	private:
-		typedef std::map<RomID, SRomPreferences>	PreferencesMap;
+		using PreferencesMap = std::map<RomID, SRomPreferences>;
 
 		PreferencesMap			mPreferences;
 
@@ -533,7 +533,7 @@ static u32 GetTexureHashFrequencyAsFrames( ETextureHashFrequency thf )
 
 static ETextureHashFrequency GetTextureHashFrequencyFromFrames( u32 frames )
 {
-	for( u32 i = 0; i < NUM_THF; ++i )
+	for( auto i {0}; i < NUM_THF; ++i )
 	{
 		if( frames <= gTextureHashFreqeuncies[ i ] )
 		{

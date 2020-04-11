@@ -205,7 +205,7 @@ void IGraphicsContext::ClearAllSurfaces()
 	if(gDoubleDisplayEnabled)
 		sceGuStart(GU_CALL,list[listNum]); //Begin other Display List	return;
 
-	for( u32 i = 0; i < 2; ++i )
+	for( auto i {0}; i < 2; ++i )
 	{
 		//Start Frame
 		BeginFrame();

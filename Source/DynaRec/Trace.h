@@ -43,7 +43,7 @@ enum SpeedHackProbe
 struct SBranchDetails
 {
 	SBranchDetails( )
-		:	TargetAddress( u32(~0) )
+		:	TargetAddress( u32(~0U) )
 		,	DelaySlotTraceIndex( -1 )
 		,	ConditionalBranchTaken( false )
 		,	Likely( false )

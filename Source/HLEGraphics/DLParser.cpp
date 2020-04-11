@@ -168,7 +168,7 @@ void DLParser_InitMicrocode( u32 code_base, u32 code_size, u32 data_base, u32 da
 void RDP_MoveMemLight(u32 light_idx, const N64Light *light);
 
 // Used to keep track of when we're processing the first display list
-static bool gFirstCall = true;
+static bool gFirstCall {true};
 
 static u32				gSegments[16] {};
 static RDP_Scissor		scissors {};
@@ -272,10 +272,10 @@ extern u32 uViWidth, uViHeight;
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
-static const char * const gFormatNames[8] = {"RGBA", "YUV", "CI", "IA", "I", "?1", "?2", "?3"};
+static const char * const gFormatNames[8] {"RGBA", "YUV", "CI", "IA", "I", "?1", "?2", "?3"};
 
-static const char * const gSizeNames[4]   = {"4bpp", "8bpp", "16bpp", "32bpp"};
-static const char * const gOnOffNames[2]  = {"Off", "On"};
+static const char * const gSizeNames[4]  {"4bpp", "8bpp", "16bpp", "32bpp"};
+static const char * const gOnOffNames[2]  {"Off", "On"};
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 //*****************************************************************************
@@ -464,7 +464,7 @@ static u32 DLParser_ProcessDList(u32 instruction_limit)
 {
 	MicroCodeCommand command;
 
-	u32 current_instruction_count {};
+	u32 current_instruction_count {0};
 
 	while(gDlistStackPointer >= 0)
 	{
@@ -573,7 +573,7 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	DL_PF("DP: Firing up RDP!");
 	#endif
 
-	u32 count {};
+	u32 count {0};
 
 	if(!gFrameskipActive)
 	{
@@ -621,9 +621,9 @@ void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address )
 	const f32 fRecip {1.0f / 65536.0f};
 	const N64mat *Imat {(N64mat *)( g_pu8RamBase + address )};
 
-	s16 hi {};
-	s32 tmp {};
-	for (u32 i {}; i < 4; i++)
+	s16 hi {0};
+	s32 tmp {0};
+	for (auto i {0}; i < 4; i++)
 	{
 #if 1	// Crappy compiler.. reordering is to optimize the ASM // Corn
 		tmp = ((Imat->h[i].x << 16) | Imat->l[i].x);
@@ -699,14 +699,14 @@ void RDP_MoveMemViewport(u32 address)
 	DAEDALUS_ASSERT( address+16 < MAX_RAM_ADDRESS, "MoveMem Viewport, invalid memory" );
 	#endif
 	// address is offset into RD_RAM of 8 x 16bits of data...
-	N64Viewport *vp = (N64Viewport*)(g_pu8RamBase + address);
+	N64Viewport *vp {(N64Viewport*)(g_pu8RamBase + address)};
 
 	// With D3D we had to ensure that the vp coords are positive, so
 	// we truncated them to 0. This happens a lot, as things
 	// seem to specify the scale as the screen w/2 h/2
 
-	v2 vec_scale( vp->scale_x * 0.25f, vp->scale_y * 0.25f );
-	v2 vec_trans( vp->trans_x * 0.25f, vp->trans_y * 0.25f );
+	v2 vec_scale {vp->scale_x * 0.25f, vp->scale_y * 0.25f };
+	v2 vec_trans {vp->trans_x * 0.25f, vp->trans_y * 0.25f };
 
 	gRenderer->SetN64Viewport( vec_scale, vec_trans );
 
@@ -827,8 +827,8 @@ void DLParser_SetScissor( MicroCodeCommand command )
 	{
 		scissors.left += 160;
 		scissors.right += 160;
-		v2 vec_trans( 240, 120 );
-		v2 vec_scale( 80, 120 );
+		v2 vec_trans {240, 120};
+		v2 vec_scale {80, 120};
 		gRenderer->SetN64Viewport( vec_scale, vec_trans );
 	}
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
@@ -995,8 +995,8 @@ void DLParser_TexRect( MicroCodeCommand command )
 	s16 rect_s1 {(s16)(rect_s0 + (rect_dsdx * ( tex_rect.x1 - tex_rect.x0 ) >> 7))};	// 7 = (>>10)=1/1024, (>>2)=1/4 and (<<5)=32
 	s16 rect_t1 {(s16)(rect_t0 + (rect_dtdy * ( tex_rect.y1 - tex_rect.y0 ) >> 7))};
 
-	TexCoord st0( rect_s0, rect_t0 );
-	TexCoord st1( rect_s1, rect_t1 );
+	TexCoord st0 {rect_s0, rect_t0 };
+	TexCoord st1 {rect_s1, rect_t1 };
 
 	v2 xy0( tex_rect.x0 / 4.0f, tex_rect.y0 / 4.0f );
 	v2 xy1( tex_rect.x1 / 4.0f, tex_rect.y1 / 4.0f );
@@ -1054,11 +1054,11 @@ void DLParser_TexRectFlip( MicroCodeCommand command )
 	s16 rect_s1 {(s16)(rect_s0 + (rect_dsdx * ( tex_rect.y1 - tex_rect.y0 ) >> 7))};	// Flip - use y
 	s16 rect_t1 {(s16)(rect_t0 + (rect_dtdy * ( tex_rect.x1 - tex_rect.x0 ) >> 7))};	// Flip - use x
 
-	TexCoord st0( rect_s0, rect_t0 );
-	TexCoord st1( rect_s1, rect_t1 );
+	TexCoord st0 {rect_s0, rect_t0 };
+	TexCoord st1 {rect_s1, rect_t1 };
 
-	v2 xy0( tex_rect.x0 / 4.0f, tex_rect.y0 / 4.0f );
-	v2 xy1( tex_rect.x1 / 4.0f, tex_rect.y1 / 4.0f );
+	v2 xy0 {tex_rect.x0 / 4.0f, tex_rect.y0 / 4.0f};
+	v2 xy1 {tex_rect.x1 / 4.0f, tex_rect.y1 / 4.0f};
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF("    Screen(%.1f,%.1f) -> (%.1f,%.1f) Tile[%d]", xy0.x, xy0.y, xy1.x, xy1.y, tex_rect.tile_idx);
@@ -1078,19 +1078,24 @@ void Clear_N64DepthBuffer( MicroCodeCommand command )
 	u32 y0 {command.fillrect.y0};
 
 	// Using s32 to force min/max to be done in a single op code for the PSP
-	x0 = Min<s32>(Max<s32>(x0, scissors.left), scissors.right);
-	x1 = Min<s32>(Max<s32>(x1, scissors.left), scissors.right);
-	y1 = Min<s32>(Max<s32>(y1, scissors.top), scissors.bottom);
-	y0 = Min<s32>(Max<s32>(y0, scissors.top), scissors.bottom);
+
+	x0 = std::min(std::max(x0, scissors.left), scissors.right);
+	x1 = std::min(std::max(x1, scissors.left), scissors.right);
+	y1 = std::min(std::max(y1, scissors.top), scissors.bottom);
+	y0 = std::min(std::max(y0, scissors.top), scissors.bottom);
+	// x0 = Min<s32>(Max<s32>(x0, scissors.left), scissors.right);
+	// x1 = Min<s32>(Max<s32>(x1, scissors.left), scissors.right);
+	// y1 = Min<s32>(Max<s32>(y1, scissors.top), scissors.bottom);
+	// y0 = Min<s32>(Max<s32>(y0, scissors.top), scissors.bottom);
 	x0 >>= 1;
 	x1 >>= 1;
 	u32 zi_width_in_dwords {g_CI.Width >> 1};
 	u32 fill_colour {gRenderer->GetFillColour()};
 	u32 * dst {(u32*)(g_pu8RamBase + g_CI.Address) + y0 * zi_width_in_dwords};
 
-	for( u32 y = y0; y <y1; y++ )
+	for( u32 y {y0}; y <y1; y++ )
 	{
-		for( u32 x = x0; x < x1; x++ )
+		for( u32 x {x0}; x < x1; x++ )
 		{
 			dst[x] = fill_colour;
 		}
@@ -1146,7 +1151,7 @@ void DLParser_FillRect( MicroCodeCommand command )
 	{
 		if ( cycle_mode == CYCLE_FILL )
 		{
-			u32 fill_colour = gRenderer->GetFillColour();
+			u32 fill_colour {gRenderer->GetFillColour()};
 			if(g_CI.Size == G_IM_SIZ_16b)
 			{
 				const N64Pf5551	c( (u16)fill_colour );
@@ -1158,8 +1163,8 @@ void DLParser_FillRect( MicroCodeCommand command )
 				colour = ConvertPixelFormat< c32, N64Pf8888 >( c );
 			}
 
-			u32 clear_screen_x = command.fillrect.x1 - command.fillrect.x0;
-			u32 clear_screen_y = command.fillrect.y1 - command.fillrect.y0;
+			u32 clear_screen_x {command.fillrect.x1 - command.fillrect.x0};
+			u32 clear_screen_y {command.fillrect.y1 - command.fillrect.y0};
 
 			// Clear color buffer (screen clear)
 			if( uViWidth == clear_screen_x && uViHeight == clear_screen_y )
@@ -1179,8 +1184,8 @@ void DLParser_FillRect( MicroCodeCommand command )
 	DL_PF("    Filling Rectangle (%d,%d)->(%d,%d)", command.fillrect.x0, command.fillrect.y0, command.fillrect.x1, command.fillrect.y1);
 #endif
 	//Converting int->float with bitfields, gives some damn good asm on the PSP
-	v2 xy0( (f32)command.fillrect.x0, (f32)command.fillrect.y0 );
-	v2 xy1( (f32)command.fillrect.x1, (f32)command.fillrect.y1 );
+	v2 xy0 {(f32)command.fillrect.x0, (f32)command.fillrect.y0};
+	v2 xy1 {(f32)command.fillrect.x1, (f32)command.fillrect.y1};
 
 	// TODO - In 1/2cycle mode, skip bottom/right edges!?
 	// This is done in BaseRenderer.
@@ -1221,7 +1226,7 @@ void DLParser_SetCImg( MicroCodeCommand command )
 void DLParser_SetCombine( MicroCodeCommand command )
 {
 	//Swap the endian
-	REG64 Mux {};
+	REG64 Mux ;
 	Mux._u32_0 = command.inst.cmd1;
 	Mux._u32_1 = command.inst.arg0;
 
@@ -1259,7 +1264,7 @@ void DLParser_SetFogColor( MicroCodeCommand command )
 	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
 #endif
 	//c32	fog_colour( command.color.r, command.color.g, command.color.b, command.color.a );
-	c32	fog_colour( command.color.r, command.color.g, command.color.b, 0 );	//alpha is always 0
+	c32	fog_colour {command.color.r, command.color.g, command.color.b, 0};	//alpha is always 0
 
 	gRenderer->SetFogColour( fog_colour );
 }
@@ -1272,7 +1277,7 @@ void DLParser_SetBlendColor( MicroCodeCommand command )
 			#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
 #endif
-	c32	blend_colour( command.color.r, command.color.g, command.color.b, command.color.a );
+	c32	blend_colour {command.color.r, command.color.g, command.color.b, command.color.a};
 
 	gRenderer->SetBlendColour( blend_colour );
 }
@@ -1285,7 +1290,7 @@ void DLParser_SetPrimColor( MicroCodeCommand command )
 			#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF("    M:%d L:%d RGBA: %d %d %d %d", command.color.prim_min_level, command.color.prim_level, command.color.r, command.color.g, command.color.b, command.color.a);
 #endif
-	c32	prim_colour( command.color.r, command.color.g, command.color.b, command.color.a );
+	c32	prim_colour {command.color.r, command.color.g, command.color.b, command.color.a};
 
 	gRenderer->SetPrimitiveLODFraction(command.color.prim_level / 256.f);
 	gRenderer->SetPrimitiveColour( prim_colour );
@@ -1299,7 +1304,7 @@ void DLParser_SetEnvColor( MicroCodeCommand command )
 			#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
 #endif
-	c32	env_colour( command.color.r, command.color.g,command.color.b, command.color.a );
+	c32	env_colour {command.color.r, command.color.g,command.color.b, command.color.a};
 
 	gRenderer->SetEnvColour( env_colour );
 }

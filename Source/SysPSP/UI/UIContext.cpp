@@ -145,7 +145,7 @@ IUIContext::IUIContext()
 IUIContext::~IUIContext()
 {
 	// Clear everything to black
-	for( u32 i = 0; i < 2; ++i )
+	for( auto i {0}; i < 2; ++i )
 	{
 		CGraphicsContext::Get()->BeginFrame();
 		CGraphicsContext::Get()->ClearToBlack();
@@ -400,7 +400,7 @@ s32		IUIContext::DrawTextArea( s32 left, s32 top, u32 width, u32 height, const c
 		return y - top;
 	}
 
-	for( u32 i = 0; i < lengths.size(); ++i )
+	for( auto i {0}; i < lengths.size(); ++i )
 	{
 		y += font_height;
 		DrawTextScale( x, y, 0.8f, text, lengths[ i ], colour );

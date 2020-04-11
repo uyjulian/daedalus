@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <pspctrl.h>
 #include <pspgu.h>
+#include <algorithm>
 
 #include "UIContext.h"
 #include "UIScreen.h"
@@ -98,22 +99,22 @@ void	IAdjustDeadzoneScreen::Update( float elapsed_time, const v2 & stick, u32 ol
 	{
 		if( mAdjustingMinDeadzone )
 		{
-			mStickMinDeadzone = Clamp( mStickMinDeadzone - DEADZONE_INCREMENT, 0.0f, mStickMaxDeadzone );
+			mStickMinDeadzone = std::clamp( mStickMinDeadzone - DEADZONE_INCREMENT, 0.0f, mStickMaxDeadzone );
 		}
 		else
 		{
-			mStickMaxDeadzone = Clamp( mStickMaxDeadzone - DEADZONE_INCREMENT, mStickMinDeadzone, 1.0f );
+			mStickMaxDeadzone = std::clamp( mStickMaxDeadzone - DEADZONE_INCREMENT, mStickMinDeadzone, 1.0f );
 		}
 	}
 	if(new_buttons & PSP_CTRL_UP)
 	{
 		if( mAdjustingMinDeadzone )
 		{
-			mStickMinDeadzone = Clamp( mStickMinDeadzone + DEADZONE_INCREMENT, 0.0f, mStickMaxDeadzone );
+			mStickMinDeadzone = std::clamp( mStickMinDeadzone + DEADZONE_INCREMENT, 0.0f, mStickMaxDeadzone );
 		}
 		else
 		{
-			mStickMaxDeadzone = Clamp( mStickMaxDeadzone + DEADZONE_INCREMENT, mStickMinDeadzone, 1.0f );
+			mStickMaxDeadzone = std::clamp( mStickMaxDeadzone + DEADZONE_INCREMENT, mStickMinDeadzone, 1.0f );
 		}
 	}
 
@@ -126,6 +127,7 @@ void	IAdjustDeadzoneScreen::Update( float elapsed_time, const v2 & stick, u32 ol
 
 		if(new_buttons & (PSP_CTRL_TRIANGLE))
 		{
+
 			mStickMinDeadzone = DEFAULT_MIN_DEADZONE;
 			mStickMaxDeadzone = DEFAULT_MAX_DEADZONE;
 		}
@@ -168,7 +170,7 @@ void	IAdjustDeadzoneScreen::DrawCircle( s32 x, s32 y, s32 r, c32 colour )
 	s32		x0 = s32( sinf( 0 ) * radius ) + x;
 	s32		y0 = s32( cosf( 0 ) * radius ) + y;
 
-	for( u32 i = 0; i < NUM_POINTS; ++i )
+	for( auto i {0}; i < NUM_POINTS; ++i )
 	{
 		f32		angle( 2 * PI * f32( i+1 ) / f32( NUM_POINTS ) );
 		s32		x1 = s32( sinf( angle ) * radius ) + x;

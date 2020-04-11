@@ -82,7 +82,7 @@ void CBlendConstantExpressionValue::ApplyExpressionRGB( const SRenderState & sta
 	if( mConstant != BC_SHADE )
 	{
 		c32		new_colour( EvaluateConstant( state.PrimitiveColour, state.EnvironmentColour ) );
-		for( u32 i = 0; i < state.NumVertices; ++i )
+		for( auto i {0}; i < state.NumVertices; ++i )
 		{
 			state.Vertices[ i ].Colour.SetBits( new_colour, c32::MASK_RGB );
 		}
@@ -95,7 +95,7 @@ void CBlendConstantExpressionValue::ApplyExpressionAlpha( const SRenderState & s
 	if( mConstant != BC_SHADE )
 	{
 		c32		new_colour( EvaluateConstant( state.PrimitiveColour, state.EnvironmentColour ) );
-		for( u32 i = 0; i < state.NumVertices; ++i )
+		for( auto i {0}; i < state.NumVertices; ++i )
 		{
 			state.Vertices[ i ].Colour.SetBits( new_colour, c32::MASK_A );
 		}
@@ -160,7 +160,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionRGB( const SRenderState & 
 	if( have_a && have_b )
 	{
 		c32	col( ColOp::Process( a, b ) );
-		for( u32 i = 0; i < state.NumVertices; ++i )
+		for( auto i {0}; i < state.NumVertices; ++i )
 		{
 			state.Vertices[ i ].Colour.SetBits( col, c32::MASK_RGB );
 		}
@@ -169,7 +169,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionRGB( const SRenderState & 
 	{
 		if( mB->IsShade() )
 		{
-			for( u32 i = 0; i < state.NumVertices; ++i )
+			for( auto i {0}; i < state.NumVertices; ++i )
 			{
 				c32	col( ColOp::Process( a, state.Vertices[ i ].Colour ) );
 
@@ -178,7 +178,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionRGB( const SRenderState & 
 		}
 		else
 		{
-			for( u32 i = 0; i < state.NumVertices; ++i )
+			for( auto i {0}; i < state.NumVertices; ++i )
 			{
 				b = mB->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour );
 
@@ -190,7 +190,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionRGB( const SRenderState & 
 	{
 		if( mA->IsShade() )
 		{
-			for( u32 i = 0; i < state.NumVertices; ++i )
+			for( auto i {0}; i < state.NumVertices; ++i )
 			{
 				c32	col( ColOp::Process( state.Vertices[ i ].Colour, b ) );
 
@@ -199,7 +199,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionRGB( const SRenderState & 
 		}
 		else
 		{
-			for( u32 i = 0; i < state.NumVertices; ++i )
+			for( auto i {0}; i < state.NumVertices; ++i )
 			{
 				a = mA->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour );
 
@@ -209,7 +209,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionRGB( const SRenderState & 
 	}
 	else
 	{
-		for( u32 i = 0; i < state.NumVertices; ++i )
+		for( auto i {0}; i < state.NumVertices; ++i )
 		{
 			a = mA->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour );
 			b = mB->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour );
@@ -227,7 +227,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionAlpha( const SRenderState 
 	if( have_a && have_b )
 	{
 		c32	col( ColOp::Process( a, b ) );
-		for( u32 i = 0; i < state.NumVertices; ++i )
+		for( auto i {0}; i < state.NumVertices; ++i )
 		{
 			state.Vertices[ i ].Colour.SetBits( col, c32::MASK_A );
 		}
@@ -236,7 +236,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionAlpha( const SRenderState 
 	{
 		if( mB->IsShade() )
 		{
-			for( u32 i = 0; i < state.NumVertices; ++i )
+			for( auto i {0}; i < state.NumVertices; ++i )
 			{
 				c32	col( ColOp::Process( a, state.Vertices[ i ].Colour ) );
 
@@ -245,7 +245,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionAlpha( const SRenderState 
 		}
 		else
 		{
-			for( u32 i = 0; i < state.NumVertices; ++i )
+			for( auto i {0}; i < state.NumVertices; ++i )
 			{
 				b = mB->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour );
 
@@ -257,7 +257,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionAlpha( const SRenderState 
 	{
 		if( mA->IsShade() )
 		{
-			for( u32 i = 0; i < state.NumVertices; ++i )
+			for( auto i {0}; i < state.NumVertices; ++i )
 			{
 				c32	col( ColOp::Process( state.Vertices[ i ].Colour, b ) );
 
@@ -266,7 +266,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionAlpha( const SRenderState 
 		}
 		else
 		{
-			for( u32 i = 0; i < state.NumVertices; ++i )
+			for( auto i {0}; i < state.NumVertices; ++i )
 			{
 				a = mA->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour );
 
@@ -276,7 +276,7 @@ void CBlendConstantExpression2<ColOp>::ApplyExpressionAlpha( const SRenderState 
 	}
 	else
 	{
-		for( u32 i = 0; i < state.NumVertices; ++i )
+		for( auto i {0}; i < state.NumVertices; ++i )
 		{
 			a = mA->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour );
 			b = mB->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour );
@@ -328,7 +328,7 @@ bool CBlendConstantExpressionBlend::TryEvaluateConstant( const SRenderState & st
 
 void CBlendConstantExpressionBlend::ApplyExpressionRGB( const SRenderState & state ) const
 {
-	for( u32 i = 0; i < state.NumVertices; ++i )
+	for( auto i {0}; i < state.NumVertices; ++i )
 	{
 		c32		a( mA->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour ) );
 		c32		b( mB->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour ) );
@@ -340,7 +340,7 @@ void CBlendConstantExpressionBlend::ApplyExpressionRGB( const SRenderState & sta
 
 void CBlendConstantExpressionBlend::ApplyExpressionAlpha( const SRenderState & state ) const
 {
-	for( u32 i = 0; i < state.NumVertices; ++i )
+	for( auto i {0}; i < state.NumVertices; ++i )
 	{
 		c32		a( mA->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour ) );
 		c32		b( mB->Evaluate( state.Vertices[ i ].Colour, state.PrimitiveColour, state.EnvironmentColour ) );

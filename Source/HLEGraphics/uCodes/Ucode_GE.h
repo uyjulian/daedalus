@@ -32,12 +32,12 @@ void DLParser_RDPHalf1_GoldenEye( MicroCodeCommand command )
 	if ( (command.inst.cmd1)>>24 != 0xce )
 		return;
 
-	u32 pc = gDlistStack.address[gDlistStackPointer];		// This points to the next instruction
-	u32 * Cmd = (u32 *)(g_pu8RamBase + pc);
+	u32 pc {gDlistStack.address[gDlistStackPointer]};		// This points to the next instruction
+	u32 *Cmd {(u32 *)(g_pu8RamBase + pc)};
 
 	// Indices
-	u32 a1 = *Cmd+8*0+4;
-	u32 a3 = *Cmd+8*2+4;
+	u32 a1 {*Cmd+8*0+4};
+	u32 a3 {*Cmd+8*2+4};
 
 	// Unused for now
 #ifdef __GE_NOTHING
@@ -53,16 +53,16 @@ void DLParser_RDPHalf1_GoldenEye( MicroCodeCommand command )
 	// Note : Color itself is handled elsewhere N.B Blendmode.cpp
 	//
 	// Coordinates, textures
-	s32 x0 = s32(a3>>16)>>24;
+	s32 x0 {s32(a3>>16)>>24};
 	//s32 s0 = s32(a1&0xFFFF)/4;
-	s32 y0 = 320*100;
-	s32 t0 = s32(a1>>16)/4;
+	s32 y0 {320*100};
+	s32 t0 {s32(a1>>16)/4};
 
 	// TIP : f32 x1 can be modified to render the sky differently.
 	// Need to check on real hardware to tweak our sky correctly if needed.
 
-	v2 xy0( (f32)x0, (f32)x0 );
-	v2 xy1( (f32)y0, (f32)y0 );
+	v2 xy0 {(f32)x0, (f32)x0};
+	v2 xy1 {(f32)y0, (f32)y0};
 	TexCoord uv0( 0.f, 0.f );
 	TexCoord uv1( t0 / 40.0f, t0 / 40.0f );
 

@@ -122,8 +122,7 @@ class IIniFileSection : public CIniFileSection
 				void			AddProperty( const IIniFileProperty * p_property );
 
 	private:
-
-		typedef std::vector< const IIniFileProperty * >	PropertyVec;
+using PropertyVec = std::vector< const IIniFileProperty * >;
 
 		struct SCompareProperties
 		{
@@ -157,7 +156,7 @@ CIniFileSection::~CIniFileSection()
 //*****************************************************************************
 IIniFileSection::~IIniFileSection()
 {
-	for( u32 i = 0; i < mProperties.size(); ++i )
+	for( auto i {0}; i < mProperties.size(); ++i )
 	{
 		delete mProperties[ i ];
 	}
@@ -244,7 +243,7 @@ IIniFile::~IIniFile()
 {
 	delete mpDefaultSection;
 
-	for( u32 i = 0; i < mSections.size(); ++i )
+	for( auto i {0}; i < mSections.size(); ++i )
 	{
 		delete mSections[ i ];
 		mSections[ i ] = NULL;
@@ -265,7 +264,7 @@ static bool	trim( char * p_string, const char * p_trim_chars )
 		char c = *pin;
 
 		found = false;
-		for ( u32 i = 0; i < num_trims; i++ )
+		for (auto i {0}; i < num_trims; i++ )
 		{
 			if ( p_trim_chars[ i ] == c )
 			{
@@ -420,7 +419,7 @@ const CIniFileSection *	IIniFile::GetSection( u32 section_idx ) const
 const CIniFileSection *		IIniFile::GetSectionByName( const char * section_name ) const
 {
 	// TODO: Could use a map for this if it starts to prove expensive
-	for( u32 i = 0; i < mSections.size(); ++i )
+	for( auto i {0}; i < mSections.size(); ++i )
 	{
 		if( strcmp( mSections[ i ]->GetName(), section_name ) == 0 )
 		{

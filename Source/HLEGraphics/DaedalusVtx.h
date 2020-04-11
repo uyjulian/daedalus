@@ -28,19 +28,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // The ordering of these elements is required for the VectorTnL code.
 ALIGNED_TYPE(struct, DaedalusVtx4, 16)
 {
-    v4	TransformedPos {};
-    v4	ProjectedPos {};
-    v4	Colour {};
-    v2	Texture {};
+    v4	TransformedPos;
+    v4	ProjectedPos;
+    v4	Colour;
+    v2	Texture;
 
-	u32	ClipFlags {};
-	u32 Pad {};
+	u32	ClipFlags;
+	u32 Pad;
 
 	void Interpolate( const DaedalusVtx4 & lhs, const DaedalusVtx4 & rhs, float factor );
 };
-
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof(DaedalusVtx4) == 64 );
-
+#endif
 struct TexCoord
 {
 	s16		s;
@@ -75,7 +75,7 @@ struct DaedalusVtx
 	c32		Colour {};
     v3		Position {};
 };
-
+#ifdef DAEDALUS_ENABLE_ASSERTS
 DAEDALUS_STATIC_ASSERT( sizeof(DaedalusVtx) == 24 );
-
+#endif
 #endif // HLEGRAPHICS_DAEDALUSVTX_H_

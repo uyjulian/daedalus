@@ -63,9 +63,9 @@ static bool	GBIMicrocode_DetectVersionString( u32 data_base, u32 data_size, char
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT( data_base < MAX_RAM_ADDRESS + 0x1000 ,"GBIMicrocode out of bound %08X", data_base );
 	#endif
-	const s8 * ram( g_ps8RamBase );
+	const s8 *ram {g_ps8RamBase};
 
-	for ( u32 i {}; i+2 < data_size; i++ )
+	for ( auto i {0}; i+2 < data_size; i++ )
 	{
 		if ( ram[ (data_base + i+0) ^ 3 ] == 'R' &&
 			 ram[ (data_base + i+1) ^ 3 ] == 'S' &&
@@ -77,7 +77,7 @@ static bool	GBIMicrocode_DetectVersionString( u32 data_base, u32 data_size, char
 			// Loop while we haven't filled our buffer, and there's space for our terminator
 			while (p+1 < e)
 			{
-				char c( ram[ (data_base + i)  ^ U8_TWIDDLE ] );
+				char c {ram[ (data_base + i)  ^ U8_TWIDDLE ]};
 				if( c < ' ')
 					break;
 
@@ -96,10 +96,10 @@ static u32 GBIMicrocode_MicrocodeHash(u32 code_base, u32 code_size)
 	// Needed for Conker's Bad Fur Day
 	if( code_size == 0 ) code_size = 0x1000;
 
-	const u8 * ram( g_pu8RamBase );
+	const u8 * ram {g_pu8RamBase} ;
 
-	u32 hash {};
-	for (u32 i = 0; i < code_size; ++i)
+	u32 hash {0};
+	for (auto i {0}; i < code_size; ++i)
 	{
 		hash = (hash << 4) + hash + ram[ (code_base+i) ^ U8_TWIDDLE ];   // Best hash ever!
 	}
@@ -149,8 +149,8 @@ u32	GBIMicrocode_DetectVersion( u32 code_base, u32 code_size, u32 data_base, u32
 	// Cheap way to cache ucodes, don't check for strings (too slow!) but check last used ucode entries which is alot faster than string comparison.
 	// This only needed for GBI1/2/SDEX ucodes that use LoadUcode, else we only check when code_base changes, which usually never happens
 	//
-	u32 i ;
-	for( i = 0; i < MAX_UCODE_CACHE_ENTRIES; i++ )
+	// u32 i {0};
+	for( auto i = 0; i < MAX_UCODE_CACHE_ENTRIES; i++ )
 	{
 		const UcodeInfo &used( gUcodeInfo[ i ] );
 
@@ -170,11 +170,12 @@ u32	GBIMicrocode_DetectVersion( u32 code_base, u32 code_size, u32 data_base, u32
 
 	// It wasn't the same as the last time around, we'll hash it and check if is a custom ucode.
 	//
-	u32 code_hash = GBIMicrocode_MicrocodeHash( code_base, code_size );
-	u32 ucode_version = GBI_0;
-	u32 ucode_offset = ~0;
+	u32 code_hash {GBIMicrocode_MicrocodeHash( code_base, code_size )};
+	u32 ucode_version {GBI_0};
+	u32 ucode_offset {~0U};
 
-	for ( u32 i = 0; i < ARRAYSIZE(gMicrocodeData); i++ )
+ u32 i {0};
+	for ( i = 0; i < ARRAYSIZE(gMicrocodeData); i++ )
 	{
 		if ( code_hash == gMicrocodeData[i].hash )
 		{
@@ -198,7 +199,7 @@ u32	GBIMicrocode_DetectVersion( u32 code_base, u32 code_size, u32 data_base, u32
 		const char  *ucodes[] { "F3", "L3", "S2DEX" };
 		char 		*match {};
 
-		for(u32 j {}; j<3;j++)
+		for(u32 j {0}; j<3;j++)
 		{
 			if( (match = strstr(str, ucodes[j])) )
 				break;

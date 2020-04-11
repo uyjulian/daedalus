@@ -147,7 +147,7 @@ CCombinerSum::CCombinerSum( CCombinerOperand * operand )
 CCombinerSum::CCombinerSum( const CCombinerSum & rhs )
 :	CCombinerOperand( CT_SUM )
 {
-	for( u32 i = 0; i < rhs.mOperands.size(); ++i )
+	for( auto i {0}; i < rhs.mOperands.size(); ++i )
 	{
 		mOperands.push_back( Node( rhs.mOperands[ i ].Operand->Clone(), rhs.mOperands[ i ].Negate ) );
 	}
@@ -158,7 +158,7 @@ CCombinerSum::CCombinerSum( const CCombinerSum & rhs )
 //*****************************************************************************
 CCombinerSum::~CCombinerSum()
 {
-	for( u32 i = 0; i < mOperands.size(); ++i )
+	for( auto i {0}; i < mOperands.size(); ++i )
 	{
 		delete mOperands[ i ].Operand;
 	}
@@ -179,7 +179,7 @@ int CCombinerSum::Compare( const CCombinerOperand & other ) const
 	if( size_diff != 0 )
 		return size_diff;
 
-	for( u32 i = 0; i < mOperands.size(); ++i )
+	for( auto i {0}; i < mOperands.size(); ++i )
 	{
 		// Compare signs first
 		if( mOperands[ i ].Negate && !rhs.mOperands[ i ].Negate )
@@ -212,7 +212,7 @@ void CCombinerSum::Add( CCombinerOperand * operand )
 	{
 		// Recursively add all children
 		CCombinerSum *	sum( static_cast< CCombinerSum * >( operand ) );
-		for( u32 i = 0; i < sum->mOperands.size(); ++i )
+		for( auto i {0}; i < sum->mOperands.size(); ++i )
 		{
 			if( sum->mOperands[ i ].Negate )
 			{
@@ -246,7 +246,7 @@ void CCombinerSum::Sub( CCombinerOperand * operand )
 	{
 		// Recursively add all children
 		CCombinerSum *	sum( static_cast< CCombinerSum * >( operand ) );
-		for( u32 i = 0; i < sum->mOperands.size(); ++i )
+		for( auto i {0}; i < sum->mOperands.size(); ++i )
 		{
 			if( sum->mOperands[ i ].Negate )
 			{
@@ -347,7 +347,7 @@ CCombinerOperand * CCombinerSum::SimplifyAndReduce() const
 COutputStream &	CCombinerSum::Stream( COutputStream & stream ) const
 {
 	stream << "( ";
-	for( u32 i = 0; i < mOperands.size(); ++i )
+	for( auto i {0}; i < mOperands.size(); ++i )
 	{
 		if( i != 0 )
 		{
@@ -392,7 +392,7 @@ CCombinerProduct::CCombinerProduct( CCombinerOperand * operand )
 CCombinerProduct::CCombinerProduct( const CCombinerProduct & rhs )
 :	CCombinerOperand( CT_PRODUCT )
 {
-	for( u32 i = 0; i < rhs.mOperands.size(); ++i )
+	for( auto i {0}; i < rhs.mOperands.size(); ++i )
 	{
 		mOperands.push_back( rhs.mOperands[ i ].Operand->Clone() );
 	}
@@ -411,7 +411,7 @@ CCombinerProduct::~CCombinerProduct()
 //*****************************************************************************
 void CCombinerProduct::Clear()
 {
-	for( u32 i = 0; i < mOperands.size(); ++i )
+	for( auto i {0}; i < mOperands.size(); ++i )
 	{
 		delete mOperands[ i ].Operand;
 	}
@@ -432,7 +432,7 @@ int CCombinerProduct::Compare( const CCombinerOperand & other ) const
 	if( size_diff != 0 )
 		return size_diff;
 
-	for( u32 i = 0; i < mOperands.size(); ++i )
+	for( auto i {0}; i < mOperands.size(); ++i )
 	{
 		int diff( mOperands[ i ].Operand->Compare( *rhs.mOperands[ i ].Operand ) );
 		if( diff != 0 )
@@ -464,7 +464,7 @@ void CCombinerProduct::Mul( CCombinerOperand * operand )
 	{
 		// Recursively add all children
 		CCombinerProduct *	product( static_cast< CCombinerProduct * >( operand ) );
-		for( u32 i = 0; i < product->mOperands.size(); ++i )
+		for( auto i {0}; i < product->mOperands.size(); ++i )
 		{
 			Mul( product->mOperands[ i ].Operand->SimplifyAndReduce() );
 		}
@@ -506,7 +506,7 @@ CCombinerOperand * CCombinerProduct::SimplifyAndReduce() const
 COutputStream &		CCombinerProduct::Stream( COutputStream & stream ) const
 {
 	stream << "( ";
-	for( u32 i = 0; i < mOperands.size(); ++i )
+	for( auto i {0}; i < mOperands.size(); ++i )
 	{
 		if( i != 0 )
 		{

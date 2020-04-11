@@ -156,7 +156,7 @@ bool Memory_Init()
 
 #else
 	//u32 count = 0;
-	for (u32 m {}; m < NUM_MEM_BUFFERS; m++)
+	for (auto m {0}; m < NUM_MEM_BUFFERS; m++)
 	{
 		u32 region_size {MemoryRegionSizes[m]};
 		// Skip zero sized areas. An example of this is the cart rom
@@ -214,7 +214,7 @@ void Memory_Fini(void)
 	gMemBase = nullptr;
 
 #else
-	for (u32 m {}; m < NUM_MEM_BUFFERS; m++)
+	for (auto m {0}; m < NUM_MEM_BUFFERS; m++)
 	{
 		if (g_pMemoryBuffers[m] != nullptr)
 		{
@@ -253,7 +253,7 @@ bool Memory_Reset()
 
 	// Required - virtual alloc gives zeroed memory but this is also used when resetting
 	// Clear memory
-	for (u32 i {}; i < NUM_MEM_BUFFERS; i++)
+	for (auto i {0}; i < NUM_MEM_BUFFERS; i++)
 	{
 		if (g_pMemoryBuffers[i])
 		{
@@ -335,7 +335,7 @@ void Memory_InitTables()
 	memset(g_MemoryLookupTableRead, 0, sizeof(MemFuncRead) * 0x4000);
 	memset(g_MemoryLookupTableWrite, 0, sizeof(MemFuncWrite) * 0x4000);
 
-	u32 i {};
+	auto i {0};
 	for (i = 0; i < (0x10000 >> 2); i++)
 	{
 		g_MemoryLookupTableRead[i].pRead = nullptr;

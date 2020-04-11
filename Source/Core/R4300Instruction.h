@@ -28,10 +28,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // create a temporary to be able to pull the various fields from the opcode, but
 // the compiler is clever enough to optimiste this overhead away.
 
-#define R4300_CALL_SIGNATURE	u32	op_code_bits 
+#define R4300_CALL_SIGNATURE	u32	op_code_bits
 #define R4300_CALL_ARGUMENTS	op_code_bits
-
-typedef void (R4300_CALL_TYPE *CPU_Instruction )( R4300_CALL_SIGNATURE );
+using CPU_Instruction = void (R4300_CALL_TYPE *)(R4300_CALL_SIGNATURE);
 
 
 #endif // CORE_R4300INSTRUCTION_H_

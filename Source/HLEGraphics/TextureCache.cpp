@@ -59,8 +59,8 @@ CTextureCache::~CTextureCache()
 
 inline u32 CTextureCache::MakeHashIdxA( const TextureInfo & ti )
 {
-	u32 address( ti.GetLoadAddress() );
-	u32 hash( (address >> (HASH_TABLE_BITS*2)) ^ (address >> HASH_TABLE_BITS) ^ address );
+	u32 address {ti.GetLoadAddress()};
+	u32 hash {(address >> (HASH_TABLE_BITS*2)) ^ (address >> HASH_TABLE_BITS) ^ address};
 
 	hash ^= ti.GetPalette() >> 2;			// Useful for palettised fonts, e.g in Starfox
 
@@ -81,13 +81,14 @@ void CTextureCache::PurgeOldTextures()
 	//	Erase expired textures in reverse order, which should require less
 	//	copying when large clumps of textures are released simultaneously.
 	//
-	for( s32 i = mTextures.size() - 1; i >= 0; --i )
+	// This appears to be very sensitive to change, changing to auto will give black screen of death
+	for( s32 i {mTextures.size() - 1}; i >= 0; --i )
 	{
 		CachedTexture * texture = mTextures[ i ];
 		if ( texture->HasExpired() )
 		{
-			u32	ixa = MakeHashIdxA( texture->GetTextureInfo() );
-			u32 ixb = MakeHashIdxB( texture->GetTextureInfo() );
+			u32	ixa {MakeHashIdxA( texture->GetTextureInfo() )};
+			u32 ixb {MakeHashIdxB( texture->GetTextureInfo() )};
 
 			if( mpCacheHashTable[ixa] == texture )
 			{
@@ -109,12 +110,12 @@ void CTextureCache::DropTextures()
 {
 	MutexLock lock(GetDebugMutex());
 
-	for( u32 i {}; i < mTextures.size(); ++i)
+	for( auto i {0}; i < mTextures.size(); ++i)
 	{
 		delete mTextures[i];
 	}
 	mTextures.clear();
-	for( u32 i {}; i < HASH_TABLE_SIZE; ++i )
+	for( auto i {0}; i < HASH_TABLE_SIZE; ++i )
 	{
 		mpCacheHashTable[i] = nullptr;
 	}
@@ -138,9 +139,9 @@ static void TextureCacheStat( u32 l1_hit, u32 l2_hit, u32 size )
 	}
 }
 #else
-
+#ifdef DAEDALUS_DEBUG_CONSOLE
 #define RECORD_CACHE_HIT( a, b )
-
+#endif
 #endif
 
 struct SSortTextureEntries
@@ -180,7 +181,9 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 	u32	ixa {MakeHashIdxA( ti )};
 	if( mpCacheHashTable[ixa] && mpCacheHashTable[ixa]->GetTextureInfo() == ti )
 	{
+		#ifdef DAEDALUS_DEBUG_CONSOLE
 		RECORD_CACHE_HIT( 1, 0 );
+		#endif
 		mpCacheHashTable[ixa]->UpdateIfNecessary();
 
 		return mpCacheHashTable[ixa];
@@ -189,7 +192,9 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 	u32 ixb {MakeHashIdxB( ti )};
 	if( mpCacheHashTable[ixb] && mpCacheHashTable[ixb]->GetTextureInfo() == ti )
 	{
+		#ifdef DAEDALUS_DEBUG_CONSOLE
 		RECORD_CACHE_HIT( 1, 0 );
+		#endif
 		mpCacheHashTable[ixb]->UpdateIfNecessary();
 
 		return mpCacheHashTable[ixb];
@@ -200,7 +205,9 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 	if( it != mTextures.end() && (*it)->GetTextureInfo() == ti )
 	{
 		texture = *it;
+		#ifdef DAEDALUS_DEBUG_CONSOLE
 		RECORD_CACHE_HIT( 0, 1 );
+		#endif
 	}
 	else
 	{
@@ -209,8 +216,9 @@ CachedTexture * CTextureCache::GetOrCreateCachedTexture(const TextureInfo & ti)
 		{
 			mTextures.insert( it, texture );
 		}
-
+#ifdef DAEDALUS_DEBUG_CONSOLEZ
 		RECORD_CACHE_HIT( 0, 0 );
+		#endif
 	}
 
 	// Update the hashtable

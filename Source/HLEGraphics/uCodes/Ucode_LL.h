@@ -49,15 +49,15 @@ void DLParser_Last_Legion_0x00( MicroCodeCommand command )
 #endif
 	if( (command.inst.cmd0) == 0 && (command.inst.cmd1) )
 	{
-		u32 newaddr = RDPSegAddr((command.inst.cmd1));
+		u32 newaddr {RDPSegAddr((command.inst.cmd1))};
 		if( newaddr >= MAX_RAM_ADDRESS )
 		{
 			DLParser_PopDL();
 			return;
 		}
 
-		u32 pc1 = *(u32 *)(g_pu8RamBase + newaddr+8*1+4);
-		u32 pc2 = *(u32 *)(g_pu8RamBase + newaddr+8*4+4);
+		u32 pc1 {*(u32 *)(g_pu8RamBase + newaddr+8*1+4)};
+		u32 pc2 {*(u32 *)(g_pu8RamBase + newaddr+8*4+4)};
 		pc1 = RDPSegAddr(pc1);
 		pc2 = RDPSegAddr(pc2);
 
@@ -119,16 +119,16 @@ void DLParser_TexRect_Last_Legion( MicroCodeCommand command )
 	tex_rect.cmd3 = command2.inst.cmd1;
 
 	//Keep integers for as long as possible //Corn
-	s32 rect_x0 = tex_rect.x0;
-	s32 rect_y0 = tex_rect.y0;
-	s32 rect_x1 = tex_rect.x1;
-	s32 rect_y1 = tex_rect.y1;
+	s32 rect_x0 {tex_rect.x0};
+	s32 rect_y0 {tex_rect.y0};
+	s32 rect_x1 {tex_rect.x1};
+	s32 rect_y1 {tex_rect.y1};
 
-	s16 rect_s0 = tex_rect.s;
-	s16 rect_t0 = tex_rect.t;
+	s16 rect_s0 {tex_rect.s};
+	s16 rect_t0 {tex_rect.t};
 
-	s32 rect_dsdx = tex_rect.dsdx;
-	s32 rect_dtdy = tex_rect.dtdy;
+	s32 rect_dsdx {tex_rect.dsdx};
+	s32 rect_dtdy {tex_rect.dtdy};
 
 	//rect_s0 += (((u32)rect_dsdx >> 31) << 5);	//Fixes California Speed
 	//rect_t0 += (((u32)rect_dtdy >> 31) << 5);
@@ -148,8 +148,8 @@ void DLParser_TexRect_Last_Legion( MicroCodeCommand command )
 			break;
 	}
 
-	s16 rect_s1 = rect_s0 + (rect_dsdx * ( rect_x1 - rect_x0 ) >> 7);
-	s16 rect_t1 = rect_t0 + (rect_dtdy * ( rect_y1 - rect_y0 ) >> 7);
+	s16 rect_s1 {rect_s0 + (rect_dsdx * ( rect_x1 - rect_x0 ) >> 7)};
+	s16 rect_t1 {rect_t0 + (rect_dtdy * ( rect_y1 - rect_y0 ) >> 7)};
 
 	TexCoord st0( rect_s0, rect_t0 );
 	TexCoord st1( rect_s1, rect_t1 );

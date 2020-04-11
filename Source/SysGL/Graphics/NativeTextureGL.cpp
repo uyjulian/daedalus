@@ -115,7 +115,7 @@ namespace
 
 			T * p_dest_row( p_dest );
 
-			for ( u32 x = 0; x < width; ++x )
+			for ( auto x {0}; x < width; ++x )
 			{
 				switch ( color_type )
 				{
@@ -325,7 +325,7 @@ void CNativeTexture::SetData( void * data, void * palette )
 
 				for (u32 y = 0; y < mCorrectedHeight; ++y)
 				{
-					for (u32 x = 0; x < mCorrectedWidth; ++x)
+					for (auto x {0}; x < mCorrectedWidth; ++x)
 					{
 						NativePfCI44	colors  = pix_ptr[ x / 2 ];
 						u8				pal_idx = (x&1) ? colors.GetIdxA() : colors.GetIdxB();
@@ -358,7 +358,7 @@ void CNativeTexture::SetData( void * data, void * palette )
 
 				for (u32 y = 0; y < mCorrectedHeight; ++y)
 				{
-					for (u32 x = 0; x < mCorrectedWidth; ++x)
+					for (auto x {0}; x < mCorrectedWidth; ++x)
 					{
 						u8	pal_idx = pix_ptr[ x ].Bits;
 

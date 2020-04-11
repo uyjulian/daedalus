@@ -24,10 +24,9 @@ RendererGL *   gRendererGL = NULL;
 static bool gAccurateUVPipe = true;
 
 /* OpenGL 3.0 */
-typedef void (APIENTRY * PFN_glGenVertexArrays)(GLsizei n, GLuint *arrays);
-typedef void (APIENTRY * PFN_glBindVertexArray)(GLuint array);
-typedef void (APIENTRY * PFN_glDeleteVertexArrays)(GLsizei n, GLuint *arrays);
-
+using PFN_glGenVertexArrays = void (APIENTRY * (GLSizei n, GLuint *arrays);
+using PFN_glBindVertexArray = void (APIENTRY * (GLuint array);
+using PFN_glDeleteVertexArrays = void (APIENTRY * (GLsize n, GLuint *arrays);
 static PFN_glGenVertexArrays            pglGenVertexArrays = NULL;
 static PFN_glBindVertexArray            pglBindVertexArray = NULL;
 static PFN_glDeleteVertexArrays         pglDeleteVertexArrays = NULL;
@@ -570,7 +569,7 @@ static ShaderProgram * GetShaderForConfig(const ShaderConfiguration & config)
 {
 	DAEDALUS_ASSERT( gN64FramentLibrary != NULL, "Haven't initialised the n64 fragment library" );
 
-	for (u32 i = 0; i < gShaders.size(); ++i)
+	for (auto i {0}; i < gShaders.size(); ++i)
 	{
 		ShaderProgram * program = gShaders[i];
 		if (program->config == config)
@@ -948,7 +947,7 @@ void RendererGL::PrepareRenderState(const float (&mat_project)[16], bool disable
 extern u32 gRDPFrame;
 	glUniform1i(program->uloc_foo, gRDPFrame);
 
-	for (u32 i = 0; i < kNumTextures; ++i)
+	for (auto i {0}; i < kNumTextures; ++i)
 	{
 		if (!install_textures[i])
 			continue;
@@ -1026,7 +1025,7 @@ void RendererGL::RenderTriangles( DaedalusVtx * p_vertices, u32 num_vertices, bo
 				float y = (float)mTileTopLeft[0].t / 4.f;
 				float w = (float)texture->GetCorrectedWidth();
 				float h = (float)texture->GetCorrectedHeight();
-				for (u32 i = 0; i < num_vertices; ++i)
+				for (auto i {0}; i < num_vertices; ++i)
 				{
 					p_vertices[i].Texture.x = (p_vertices[i].Texture.x * w) + x;
 					p_vertices[i].Texture.y = (p_vertices[i].Texture.y * h) + y;

@@ -249,7 +249,7 @@ static inline CRefPtr<CNativeTexture> Load_ObjSprite( const uObjSprite *sprite, 
 	TextureInfo ti;
 
 	// When txtr is NULL, it means TLUT was loaded from ObjLoadTxtr ucode
-	if( txtr == NULL )
+	if( txtr == nullptr )
 	{
 		// Get ti info from TextureDescriptor since there's no txtr for tile or block (txtr = NULL)
 		ti = gRDPStateManager.GetUpdatedTextureDescriptor( gRenderer->GetTextureTile() );
@@ -300,18 +300,18 @@ static inline CRefPtr<CNativeTexture> Load_ObjSprite( const uObjSprite *sprite, 
 //*****************************************************************************
 static inline void Draw_ObjSprite( const uObjSprite *sprite, ESpriteMode mode, const CNativeTexture * texture )
 {
-	f32 imageW = sprite->imageW / 32.0f;
-	f32 imageH = sprite->imageH / 32.0f;
+	f32 imageW {sprite->imageW / 32.0f};
+	f32 imageH {sprite->imageH / 32.0f};
 
-	f32 scaleW = sprite->scaleW / 1024.0f;
-	f32 scaleH = sprite->scaleH / 1024.0f;
+	f32 scaleW {sprite->scaleW / 1024.0f};
+	f32 scaleH {sprite->scaleH / 1024.0f};
 
-	f32 objX = sprite->objX / 4.0f;
-	f32 objY = sprite->objY / 4.0f;
+	f32 objX {sprite->objX / 4.0f};
+	f32 objY {sprite->objY / 4.0f};
 
-	f32 objW = imageW / scaleW + objX;
-	f32 objH = imageH / scaleH + objY;
-
+	f32 objW {imageW / scaleW + objX};
+	f32 objH {imageH / scaleH + objY};
+// XXX Need to declare these
 	f32  x0, y0, x1, y1, x2, y2, x3, y3;
 
 	switch( mode )
@@ -350,10 +350,10 @@ static inline void Draw_ObjSprite( const uObjSprite *sprite, ESpriteMode mode, c
 
 		// Used by Worms
 		if( sprite->imageFlags&1 )
-			Swap< f32 >( x0, x1 );
+			std::swap( x0, x1 );
 
 		if( sprite->imageFlags&0x10 )
-			Swap< f32 >( y0, y1 );
+			std::swap( y0, y1 );
 
 		gRenderer->Draw2DTexture(x0, y0, x1, y1, 0, 0, imageW, imageH, texture);
 		break;
@@ -365,7 +365,7 @@ static inline void Draw_ObjSprite( const uObjSprite *sprite, ESpriteMode mode, c
 // Bomberman : Second Atatck uses this
 void DLParser_S2DEX_ObjSprite( MicroCodeCommand command )
 {
-	uObjSprite *sprite = (uObjSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjSprite *sprite {(uObjSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1))};
 
 	CRefPtr<CNativeTexture> texture = Load_ObjSprite( sprite, NULL );
 	Draw_ObjSprite( sprite, FULL_ROTATION, texture );
@@ -411,7 +411,7 @@ void DLParser_S2DEX_ObjRectangleR( MicroCodeCommand command )
 // Nintendo logo, shade, items, enemies & foes, sun, and pretty much everything in Yoshi
 void DLParser_S2DEX_ObjLdtxSprite( MicroCodeCommand command )
 {
-	uObjTxSprite *sprite = (uObjTxSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjTxSprite *sprite {(uObjTxSprite*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1))};
 
 	CRefPtr<CNativeTexture> texture = Load_ObjSprite( &sprite->sprite, &sprite->txtr );
 	Draw_ObjSprite( &sprite->sprite, FULL_ROTATION, texture );
@@ -447,12 +447,12 @@ void DLParser_S2DEX_ObjLdtxRectR( MicroCodeCommand command )
 // Used for Sprite rotation
 void DLParser_S2DEX_ObjMoveMem( MicroCodeCommand command )
 {
-	u32 addr = RDPSegAddr(command.inst.cmd1);
-	u32 index = command.inst.cmd0 & 0xFFFF;
+	u32 addr {RDPSegAddr(command.inst.cmd1)};
+	u32 index {command.inst.cmd0 & 0xFFFF};
 
 	if( index == 0 )	// Mtx
 	{
-		uObjMtx* mtx = (uObjMtx *)(addr+g_pu8RamBase);
+		uObjMtx* mtx {(uObjMtx *)(addr+g_pu8RamBase)};
 		mat2D.A = mtx->A/65536.0f;
 		mat2D.B = mtx->B/65536.0f;
 		mat2D.C = mtx->C/65536.0f;
@@ -481,7 +481,7 @@ void DLParser_S2DEX_ObjLoadTxtr( MicroCodeCommand command )
 	uObjTxtr* ObjTxtr = (uObjTxtr*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
 	if( ObjTxtr->block.type == S2DEX_OBJLT_TLUT )
 	{
-		uObjTxtrTLUT *ObjTlut = (uObjTxtrTLUT*)ObjTxtr;
+		uObjTxtrTLUT *ObjTlut {(uObjTxtrTLUT*)ObjTxtr};
 
 		// Store TLUT pointer
 		gTlutLoadAddresses[ (ObjTxtr->tlut.phead>>2) & 0x3F ] = (u32*)(g_pu8RamBase + RDPSegAddr(ObjTlut->image));
@@ -502,8 +502,8 @@ inline void DLParser_Yoshi_MemRect( MicroCodeCommand command )
 	//
 	// Fetch the next two instructions
 	//
-	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)( g_pu8RamBase + pc );
+	u32 pc {gDlistStack.address[gDlistStackPointer]};
+	u32 *pCmdBase {(u32 *)( g_pu8RamBase + pc )};
 	gDlistStack.address[gDlistStackPointer]+= 16;
 
 	RDP_MemRect mem_rect;
@@ -513,25 +513,25 @@ inline void DLParser_Yoshi_MemRect( MicroCodeCommand command )
 
 	const RDP_Tile & rdp_tile( gRDPStateManager.GetTile( mem_rect.tile_idx ) );
 
-	u32	x0 = mem_rect.x0;
-	u32	y0 = mem_rect.y0;
-	u32	y1 = mem_rect.y1;
+	u32	x0 {mem_rect.x0};
+	u32	y0 {mem_rect.y0};
+	u32	y1 {mem_rect.y1};
 
 	// Get base address of texture
-	u32 tile_addr = gRDPStateManager.GetTileAddress( rdp_tile.tmem );
+	u32 tile_addr {gRDPStateManager.GetTileAddress( rdp_tile.tmem )};
 
 	if (y1 > scissors.bottom)
 		y1 = scissors.bottom;
 			#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF ("    MemRect->Addr[0x%08x] (%d, %d -> %d, %d) Width[%d]", tile_addr, x0, y0, mem_rect.x1, y1, g_CI.Width);
 #endif
-#if 1	//1->Optimized, 0->Generic
-	// This assumes Yoshi always copy 16 bytes per line and dst is aligned and we force alignment on src!!! //Corn
-	u32 tex_width = rdp_tile.line << 3;
-	u32 texaddr = ((u32)g_pu8RamBase + tile_addr + tex_width * (mem_rect.s >> 5) + (mem_rect.t >> 5) + 3) & ~3;
-	u32 fbaddr = (u32)g_pu8RamBase + g_CI.Address + x0;
 
-	for (u32 y = y0; y < y1; y++)
+	// This assumes Yoshi always copy 16 bytes per line and dst is aligned and we force alignment on src!!! //Corn
+	u32 tex_width {rdp_tile.line << 3};
+	u32 texaddr {((u32)g_pu8RamBase + tile_addr + tex_width * (mem_rect.s >> 5) + (mem_rect.t >> 5) + 3) & ~3};
+	u32 fbaddr {(u32)g_pu8RamBase + g_CI.Address + x0};
+
+	for (u32 y {y0}; y < y1; y++)
 	{
 		u32 *src = (u32*)(texaddr + (y - y0) * tex_width);
 		u32 *dst = (u32*)(fbaddr + y * g_CI.Width);
@@ -541,27 +541,14 @@ inline void DLParser_Yoshi_MemRect( MicroCodeCommand command )
 		dst[2] = src[2];
 		dst[3] = src[3];
 	}
-#else
-	u32 width = x1 - x0;
-	u32 tex_width = rdp_tile.line << 3;
-	u8 * texaddr = g_pu8RamBase + tile_addr + tex_width * (mem_rect.s >> 5) + (mem_rect.t >> 5);
-	u8 * fbaddr = g_pu8RamBase + g_CI.Address + x0;
-
-	for (u32 y = y0; y < y1; y++)
-	{
-		u8 *src = texaddr + (y - y0) * tex_width;
-		u8 *dst = fbaddr + y * g_CI.Width;
-		memcpy(dst, src, width);
-	}
-#endif
 
 }
 
 static u16 YUVtoRGBA(u8 y, u8 u, u8 v)
 {
-	f32 r = y + (1.370705f * (v-128));
-	f32 g = y - (0.698001f * (v-128)) - (0.337633f * (u-128));
-	f32 b = y + (1.732446f * (u-128));
+	f32 r {y + (1.370705f * (v-128))};
+	f32 g {y - (0.698001f * (v-128)) - (0.337633f * (u-128))};
+	f32 b {y + (1.732446f * (u-128))};
 	r *= 0.125f;
 	g *= 0.125f;
 	b *= 0.125f;
@@ -580,47 +567,46 @@ static u16 YUVtoRGBA(u8 y, u8 u, u8 v)
 //Ogre Battle needs to copy YUV texture to frame buffer
 void DLParser_OB_YUV(const uObjSprite *sprite)
 {
-	f32 imageW = sprite->imageW / 32.0f;
-	f32 imageH = sprite->imageH / 32.0f;
-	f32 scaleW = sprite->scaleW / 1024.0f;
-	f32 scaleH = sprite->scaleH / 1024.0f;
+	f32 imageW {sprite->imageW / 32.0f};
+	f32 imageH {sprite->imageH / 32.0f};
+	f32 scaleW {sprite->scaleW / 1024.0f};
+	f32 scaleH {sprite->scaleH / 1024.0f};
 
-	f32 objX = sprite->objX / 4.0f;
-	f32 objY = sprite->objY / 4.0f;
+	f32 objX {sprite->objX / 4.0f};
+	f32 objY {sprite->objY / 4.0f};
 
-	u16 ul_x = (u16)(objX/mat2D.BaseScaleX + mat2D.X);
-	u16 lr_x = (u16)((objX + imageW/scaleW)/mat2D.BaseScaleX + mat2D.X);
-	u16 ul_y = (u16)(objY/mat2D.BaseScaleY + mat2D.Y);
-	u16 lr_y = (u16)((objY + imageH/scaleH)/mat2D.BaseScaleY + mat2D.Y);
+	u16 ul_x {(u16)(objX/mat2D.BaseScaleX + mat2D.X)};
+	u16 lr_x {(u16)((objX + imageW/scaleW)/mat2D.BaseScaleX + mat2D.X)};
+	u16 ul_y {(u16)(objY/mat2D.BaseScaleY + mat2D.Y)};
+	u16 lr_y {(u16)((objY + imageH/scaleH)/mat2D.BaseScaleY + mat2D.Y)};
 
-	u32 ci_width = g_CI.Width;
-	u32 ci_height = scissors.bottom;
+	u32 ci_width {g_CI.Width};
+	u32 ci_height {scissors.bottom};
 
 	if( (ul_x >= ci_width) || (ul_y >= ci_height) )
 		return;
 
-	u32 width = 16;
-	u32 height = 16;
+	u32 width {16}, height {16};
 
 	if (lr_x > ci_width)	width = ci_width - ul_x;
 	if (lr_y > ci_height)	height = ci_height - ul_y;
 
-	u32 * mb = (u32*)(g_pu8RamBase + g_TI.Address); //pointer to the first macro block
-	u16 * dst = (u16*)(g_pu8RamBase + g_CI.Address);
+	u32 * mb {(u32*)(g_pu8RamBase + g_TI.Address)}; //pointer to the first macro block
+	u16 * dst {(u16*)(g_pu8RamBase + g_CI.Address)};
 	dst += ul_x + ul_y * ci_width;
 
 	//yuv macro block contains 16x16 texture. we need to put it in the proper place inside cimg
-	for (u16 h = 0; h < 16; h++)
+	for (u16 h {0}; h < 16; h++)
 	{
-		for (u16 w = 0; w < 16; w+=2)
+		for (u16 w {0}; w < 16; w+=2)
 		{
-			u32 t = *(mb++); //each u32 contains 2 pixels
+			u32 t {*(mb++)}; //each u32 contains 2 pixels
 			if ((h < height) && (w < width)) //clipping. texture image may be larger than color image
 			{
-				u8 y0 = (u8)t&0xFF;
-				u8 v  = (u8)(t>>8)&0xFF;
-				u8 y1 = (u8)(t>>16)&0xFF;
-				u8 u  = (u8)(t>>24)&0xFF;
+				u8 y0 {(u8)t&0xFF};
+				u8 v  {(u8)(t>>8)&0xFF};
+				u8 y1 {(u8)(t>>16)&0xFF};
+				u8 u  {(u8)(t>>24)&0xFF};
 				*(dst++) = YUVtoRGBA(y0, u, v);
 				*(dst++) = YUVtoRGBA(y1, u, v);
 			}
@@ -673,18 +659,18 @@ void DLParser_S2DEX_BgCopy( MicroCodeCommand command )
 				#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF("    DLParser_S2DEX_BgCopy");
 #endif
-	uObjBg *objBg = (uObjBg*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjBg *objBg {(uObjBg*)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1))};
 
-	u16 imageX = objBg->imageX >> 5;
-	u16 imageY = objBg->imageY >> 5;
+	u16 imageX {objBg->imageX >> 5};
+	u16 imageY {objBg->imageY >> 5};
 
-	u16 imageW = objBg->imageW >> 2;
-	u16 imageH = objBg->imageH >> 2;
+	u16 imageW {objBg->imageW >> 2};
+	u16 imageH {objBg->imageH >> 2};
 
-	s16 frameX = objBg->frameX >> 2;
-	s16 frameY = objBg->frameY >> 2;
-	u16 frameW = (objBg->frameW >> 2) + frameX;
-	u16 frameH = (objBg->frameH >> 2) + frameY;
+	s16 frameX {objBg->frameX >> 2};
+	s16 frameY {objBg->frameY >> 2};
+	u16 frameW {(objBg->frameW >> 2) + frameX};
+	u16 frameH {(objBg->frameH >> 2) + frameY};
 
 	TextureInfo ti;
 
@@ -716,22 +702,22 @@ void DLParser_S2DEX_Bg1cyc( MicroCodeCommand command )
 	if( g_ROM.GameHacks == ZELDA_MM )
 		return;
 
-	uObjScaleBg *objBg = (uObjScaleBg *)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1));
+	uObjScaleBg *objBg {(uObjScaleBg *)(g_pu8RamBase + RDPSegAddr(command.inst.cmd1))};
 
-	f32 frameX = objBg->frameX / 4.0f;
-	f32 frameY = objBg->frameY / 4.0f;
+	f32 frameX {objBg->frameX / 4.0f};
+	f32 frameY {objBg->frameY / 4.0f};
 
-	f32 frameW = (objBg->frameW / 4.0f) + frameX;
-	f32 frameH = (objBg->frameH / 4.0f) + frameY;
+	f32 frameW {(objBg->frameW / 4.0f) + frameX};
+	f32 frameH {(objBg->frameH / 4.0f) + frameY};
 
-	f32 imageX = objBg->imageX / 32.0f;
-	f32 imageY = objBg->imageY / 32.0f;
+	f32 imageX {objBg->imageX / 32.0f};
+	f32 imageY {objBg->imageY / 32.0f};
 
-	f32 scaleX = objBg->scaleW/1024.0f;
-	f32 scaleY = objBg->scaleH/1024.0f;
+	f32 scaleX {objBg->scaleW/1024.0f};
+	f32 scaleY {objBg->scaleH/1024.0f};
 
-	f32 imageW = objBg->imageW/4.0f;
-	f32 imageH = objBg->imageH/4.0f;
+	f32 imageW {objBg->imageW/4.0f};
+	f32 imageH {objBg->imageH/4.0f};
 
 	TextureInfo ti;
 
@@ -753,18 +739,18 @@ void DLParser_S2DEX_Bg1cyc( MicroCodeCommand command )
 
 	if (g_ROM.GameHacks != YOSHI)
 	{
-		f32 s1 = (frameW-frameX)*scaleX + imageX;
-		f32 t1 = (frameH-frameY)*scaleY + imageY;
+		f32 s1 {(frameW-frameX)*scaleX + imageX};
+		f32 t1 {(frameH-frameY)*scaleY + imageY};
 
 		gRenderer->Draw2DTexture( frameX, frameY, frameW, frameH, imageX, imageY, s1, t1, texture );
 	}
 	else
 	{
-		f32 x2 = frameX + (imageW-imageX)/scaleX;
-		f32 y2 = frameY + (imageH-imageY)/scaleY;
+		f32 x2 {frameX + (imageW-imageX)/scaleX};
+		f32 y2 {frameY + (imageH-imageY)/scaleY};
 
-		f32 u1 = (frameW-x2)*scaleX;
-		f32 v1 = (frameH-y2)*scaleY;
+		f32 u1 {(frameW-x2) * scaleX};
+		f32 v1 {(frameH-y2) * scaleY};
 
 		gRenderer->Draw2DTexture(frameX, frameY, x2, y2, imageX, imageY, imageW, imageH, texture);
 		gRenderer->Draw2DTexture(x2, frameY, frameW, y2, 0, imageY, u1, imageH, texture);

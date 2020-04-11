@@ -51,17 +51,17 @@ static void RDP_DumpRSPCode(char * name, u32 crc, u32 * mem_base, u32 pc_base, u
 	Dump_GetDumpDirectory(filepath, "rsp_dumps");
 	IO::Path::Append(filepath, filename);
 
-	FILE * fp = fopen(filepath, "w");
+	FILE * fp = fopen {filepath, "w"};
 	if (fp == nullptr)
 		return;
 
-	for (u32 i = 0; i < len; i+=4)
+	for (auto i {0}; i < len; i+=4)
 	{
 		OpCode op;
-		u32 pc = i & 0x0FFF;
+		u32 pc  {i & 0x0FFF};
 		op._u32 = mem_base[i/4];
 
-		char opinfo[400];
+		char opinfo[400] {0};
 		SprintRSPOpCodeInfo( opinfo, pc + pc_base, op );
 
 		fprintf(fp, "0x%08x: <0x%08x> %s\n", pc + pc_base, op._u32, opinfo);
@@ -86,10 +86,10 @@ static void RDP_DumpRSPData(char * name, u32 crc, u32 * mem_base, u32 pc_base, u
 	if (fp == nullptr)
 		return;
 
-	for (u32 i = 0; i < len; i+=4)
+	for (auto i {0}; i < len; i+=4)
 	{
-		u32 pc = i & 0x0FFF;
-		u32 data = mem_base[i/4];
+		u32 pc {i & 0x0FFF};
+		u32 data {mem_base[i/4]};
 
 		fprintf(fp, "0x%08x: 0x%08x\n", pc + pc_base, data);
 	}
@@ -129,7 +129,7 @@ void RSP_HLE_Finished(u32 setbits)
 	//
 	// Set the SP flags appropriately. The RSP is not running anyway, no need to stop it
 	//
-	u32 status( Memory_SP_SetRegisterBits(SP_STATUS_REG, setbits) );
+	u32 status {Memory_SP_SetRegisterBits(SP_STATUS_REG, setbits)};
 
 	//
 	// We've set the SP_STATUS_BROKE flag - better check if it causes an interrupt
@@ -146,7 +146,9 @@ void RSP_HLE_Finished(u32 setbits)
 
 static EProcessResult RSP_HLE_Graphics()
 {
+	#ifdef DAEDALUS_PROFILE
 	DAEDALUS_PROFILE( "HLE: Graphics" );
+	#endif
 
 	if (gGraphicsEnabled && gGraphicsPlugin != nullptr)
 	{
@@ -187,7 +189,7 @@ static EProcessResult RSP_HLE_Audio()
 // RSP_HLE_Jpeg and RSP_HLE_CICX105 were borrowed from Mupen64plus
 static u32 sum_bytes(const u8 *bytes, u32 size)
 {
-    u32 sum {};
+    u32 sum {0};
     const u8 * const bytes_end = bytes + size;
 
     while (bytes != bytes_end)
@@ -205,7 +207,7 @@ void jpeg_decode_OB(OSTask *task);
 
 	// most ucode_boot procedure copy 0xf80 bytes of ucode whatever the ucode_size is.
 	// For practical purpose we use a ucode_size = min(0xf80, task->ucode_size)
-	u32 sum {sum_bytes(g_pu8RamBase + (u32)task->t.ucode , Min<u32>(task->t.ucode_size, 0xf80) >> 1)};
+	u32 sum {sum_bytes(g_pu8RamBase + (u32)task->t.ucode , std::min((u32)task->t.ucode_size, (u32)0xf80) >> 1)};
 
 	//DBGConsole_Msg(0, "JPEG Task: Sum=0x%08x", sum);
 	switch(sum)
@@ -235,7 +237,7 @@ EProcessResult RSP_HLE_CICX105(OSTask * task)
         case 0x9e2: /* CIC 6105 */
         case 0x9f2: /* CIC 7105 */
 			{
-				u32 i;
+
 				u8 * dst {g_pu8RamBase + 0x2fb1f0};
 				u8 * src {g_pu8SpImemBase + 0x120};
 
@@ -243,7 +245,7 @@ EProcessResult RSP_HLE_CICX105(OSTask * task)
 				memcpy(g_pu8SpImemBase + 0x120, g_pu8RamBase + 0x1e8, 0x1f0);
 
 				/* dma_write(0x1120, 0x2fb1f0, 0xfe817000) */
-				for (i = 0; i < 24; ++i)
+				for (auto i {0}; i < 24; ++i)
 				{
 					memcpy(dst, src, 8);
 					dst += 0xff0;
@@ -261,7 +263,7 @@ EProcessResult RSP_HLE_CICX105(OSTask * task)
 
 void RSP_HLE_ProcessTask()
 {
-	OSTask * pTask = (OSTask *)(g_pu8SpMemBase + 0x0FC0);
+	OSTask * pTask {(OSTask *)(g_pu8SpMemBase + 0x0FC0)};
 
 	EProcessResult	result( PR_NOT_STARTED );
 

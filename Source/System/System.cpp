@@ -59,21 +59,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Plugins/GraphicsPlugin.h"
 #include "Plugins/AudioPlugin.h"
 
-CGraphicsPlugin * gGraphicsPlugin   = NULL;
-CAudioPlugin	* gAudioPlugin		= NULL;
+CGraphicsPlugin * gGraphicsPlugin   = nullptr;
+CAudioPlugin	* gAudioPlugin		= nullptr;
 
 static bool InitAudioPlugin()
 {
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-	DAEDALUS_ASSERT( gAudioPlugin == NULL, "Why is there already an audio plugin?" );
+	DAEDALUS_ASSERT( gAudioPlugin == nullptr, "Why is there already an audio plugin?" );
 	#endif
 	CAudioPlugin * audio_plugin = CreateAudioPlugin();
-	if( audio_plugin != NULL )
+	if( audio_plugin != nullptr )
 	{
 		if( !audio_plugin->StartEmulation() )
 		{
 			delete audio_plugin;
-			audio_plugin = NULL;
+			audio_plugin = nullptr;
 		}
 		gAudioPlugin = audio_plugin;
 	}
@@ -83,15 +83,15 @@ static bool InitAudioPlugin()
 static bool InitGraphicsPlugin()
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
-	DAEDALUS_ASSERT( gGraphicsPlugin == NULL, "The graphics plugin should not be initialised at this point" );
+	DAEDALUS_ASSERT( gGraphicsPlugin == nullptr, "The graphics plugin should not be initialised at this point" );
 	#endif
 	CGraphicsPlugin * graphics_plugin = CreateGraphicsPlugin();
-	if( graphics_plugin != NULL )
+	if( graphics_plugin != nullptr )
 	{
 		if( !graphics_plugin->StartEmulation() )
 		{
 			delete graphics_plugin;
-			graphics_plugin = NULL;
+			graphics_plugin = nullptr;
 		}
 		gGraphicsPlugin = graphics_plugin;
 	}
@@ -100,22 +100,22 @@ static bool InitGraphicsPlugin()
 
 static void DisposeGraphicsPlugin()
 {
-	if ( gGraphicsPlugin != NULL )
+	if ( gGraphicsPlugin != nullptr )
 	{
 		gGraphicsPlugin->RomClosed();
 		delete gGraphicsPlugin;
-		gGraphicsPlugin = NULL;
+		gGraphicsPlugin = nullptr;
 	}
 }
 
 static void DisposeAudioPlugin()
 {
-	// Make a copy of the plugin, and set the global pointer to NULL;
+	// Make a copy of the plugin, and set the global pointer to nullptr;
 	// This stops other threads from trying to access the plugin
 	// while we're in the process of shutting it down.
 	CAudioPlugin * audio_plugin = gAudioPlugin;
-	gAudioPlugin = NULL;
-	if (audio_plugin != NULL)
+	gAudioPlugin = nullptr;
+	if (audio_plugin != nullptr)
 	{
 		audio_plugin->StopEmulation();
 		delete audio_plugin;
@@ -141,14 +141,14 @@ static bool Profiler_Init()
 	if (!CProfiler::Create())
 		return false;
 
-	CPU_RegisterVblCallback(&ProfilerVblCallback, NULL);
+	CPU_RegisterVblCallback(&ProfilerVblCallback, nullptr);
 
 	return true;
 }
 
 static void Profiler_Fini()
 {
-	CPU_UnregisterVblCallback(&ProfilerVblCallback, NULL);
+	CPU_UnregisterVblCallback(&ProfilerVblCallback, nullptr);
 	CProfiler::Destroy();
 }
 #endif
@@ -168,11 +168,11 @@ static const SysEntityEntry gSysInitTable[] =
 	{"ROM Settings",		CRomSettingsDB::Create,		CRomSettingsDB::Destroy},
 	{"InputManager",		CInputManager::Create,		CInputManager::Destroy},
 #ifdef DAEDALUS_PSP
-	{"VideoMemory",			CVideoMemoryManager::Create, NULL},
+	{"VideoMemory",			CVideoMemoryManager::Create, nullptr},
 #endif
 	{"GraphicsContext",		CGraphicsContext::Create,	CGraphicsContext::Destroy},
 #ifdef DAEDALUS_PSP
-	{"Language",			Translate_Init,				NULL},
+	{"Language",			Translate_Init,				nullptr},
 #endif
 	{"Preference",			CPreferences::Create,		CPreferences::Destroy},
 	{"Memory",				Memory_Init,				Memory_Fini},
@@ -183,8 +183,8 @@ static const SysEntityEntry gSysInitTable[] =
 #if defined(DAEDALUS_OSX) || defined(DAEDALUS_W32)
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	{"WebDebug",			WebDebug_Init, 				WebDebug_Fini},
-	{"TextureCacheWebDebug",TextureCache_RegisterWebDebug, 	NULL},
-	{"DLDebuggerWebDebug",	DLDebugger_RegisterWebDebug, 	NULL},
+	{"TextureCacheWebDebug",TextureCache_RegisterWebDebug, 	nullptr},
+	{"DLDebuggerWebDebug",	DLDebugger_RegisterWebDebug, 	nullptr},
 #endif
 #endif
 
@@ -208,8 +208,8 @@ static const RomEntityEntry gRomInitTable[] =
 	{"Memory",				Memory_Reset,			Memory_Cleanup},
 	{"Audio",				InitAudioPlugin,		DisposeAudioPlugin},
 	{"Graphics",			InitGraphicsPlugin,		DisposeGraphicsPlugin},
-	{"FramerateLimiter",	FramerateLimiter_Reset,	NULL},
-	//{"RSP", RSP_Reset, NULL},
+	{"FramerateLimiter",	FramerateLimiter_Reset,	nullptr},
+	//{"RSP", RSP_Reset, nullptr},
 	{"CPU",					CPU_RomOpen},
 	{"ROM",					ROM_ReBoot,				ROM_Unload},
 	{"Controller",			CController::Reset,		CController::RomClose},
@@ -225,7 +225,7 @@ bool System_Init()
 	{
 		const SysEntityEntry & entry = gSysInitTable[i];
 
-		if (entry.init == NULL)
+		if (entry.init == nullptr)
 			continue;
 
 		if (entry.init())
@@ -253,7 +253,7 @@ bool System_Open(const char * filename)
 	{
 		const RomEntityEntry & entry = gRomInitTable[i];
 
-		if (entry.open == NULL)
+		if (entry.open == nullptr)
 			continue;
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 		DBGConsole_Msg(0, "==>Open %s", entry.name);
@@ -276,7 +276,7 @@ void System_Close()
 	{
 		const RomEntityEntry & entry = gRomInitTable[i];
 
-		if (entry.close == NULL)
+		if (entry.close == nullptr)
 			continue;
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 		DBGConsole_Msg(0, "==>Close %s", entry.name);
@@ -291,7 +291,7 @@ void System_Finalize()
 	{
 		const SysEntityEntry & entry = gSysInitTable[i];
 
-		if (entry.final == NULL)
+		if (entry.final == nullptr)
 			continue;
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 		DBGConsole_Msg(0, "==>Finalize %s", entry.name);

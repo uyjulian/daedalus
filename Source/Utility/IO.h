@@ -84,11 +84,13 @@ namespace IO
 	};
 
 #if defined( DAEDALUS_PSP )
-	typedef SceUID FindHandleT;
+using FindHandleT = SceUID;
 #elif defined( DAEDALUS_W32 )
-	typedef intptr_t FindHandleT;
+using FindHandleT = intptr_t;
+
 #elif defined( DAEDALUS_OSX ) || defined( DAEDALUS_LINUX )
-	typedef void * FindHandleT;
+	using FindHandleT = void *;
+
 #else
 #error Need to define FindHandleT for this platform
 #endif
