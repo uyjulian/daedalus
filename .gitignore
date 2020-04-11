@@ -1,4 +1,4 @@
-SW*.DS_Store
+*.DS_Store
 *.d
 *.o
 *.prx
@@ -13,9 +13,6 @@ Source/SysPSP/KernelButtonsPrx/imposectrl.S
 Source/SysPSP/MediaEnginePRX/MediaEngine.S
 DaedalusX64/
 daedbuild/
-
-
-
 out/
 preferences.ini
 rom.db
