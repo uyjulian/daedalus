@@ -948,7 +948,7 @@ static void Patch_FlushCache()
 {
 	IO::Filename name;
 
-	Dump_GetSaveDirectory(name, g_ROM.mFileName, ".hle");
+	Dump_GetCacheDirectory(name, g_ROM.mFileName, ".hle");
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 	DBGConsole_Msg(0, "Write OSHLE cache: %s", name);
 #endif

@@ -46,11 +46,7 @@ void Dump_GetDumpDirectory(char * rootdir, const char * subdir)
 	if (gDumpDir[0] == '\0')
 	{
 		// Initialise
-#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || !defined(DAEDALUS_SILENT)
 		IO::Path::Combine(gDumpDir, gDaedalusExePath, "Dumps");
-#else
-		IO::Path::Combine(gDumpDir, gDaedalusExePath, "ms0:/PICTURE/");
-#endif
 	}
 
 	// If a subdirectory was specified, append
@@ -91,7 +87,7 @@ void Dump_GetSaveDirectory(char * rootdir, const char * rom_filename, const char
 			IO::Path::Assign(g_DaedalusConfig.mSaveDir, rom_filename);
 			IO::Path::RemoveFileSpec(g_DaedalusConfig.mSaveDir);
 #ifndef DAEDALUS_PSP
-			// FIXME(strmnnrmn): for OSX I generate savegames in a subdir Save, to make it easier to clean up.
+			// FIXME(strmnnrmn): for OSX I generate savegames in a subdir Save, to make it easier to clean up, will remove this when we get a new UI
 			IO::Path::Append(g_DaedalusConfig.mSaveDir, "Save");
 #endif
 
@@ -103,15 +99,34 @@ void Dump_GetSaveDirectory(char * rootdir, const char * rom_filename, const char
 #endif
 		}
 	}
+}
 
-	IO::Directory::EnsureExists(g_DaedalusConfig.mSaveDir);
+// Quick and dirty hackup to move .hle to different directory
+	void Dump_GetCacheDirectory(char * rootdir, const char * rom_filename, const char * extension)
+	{
+		// If the Save path has not yet been set up, prompt user
+		if (strlen(g_DaedalusConfig.mCacheDir) == 0)
+		{
+			// FIXME: missing prompt here!
+
+			// User may have cancelled
+			if (strlen(g_DaedalusConfig.mCacheDir) == 0)
+			{
+				// Default to rom path
+				IO::Path::Assign(g_DaedalusConfig.mCacheDir, rom_filename);
+				IO::Path::RemoveFileSpec(g_DaedalusConfig.mCacheDir);
+
+			}
+		}
+
+	IO::Directory::EnsureExists(g_DaedalusConfig.mCacheDir);
 
 	// Form the filename from the file spec (i.e. strip path and replace the extension)
 	IO::Filename file_name;
 	IO::Path::Assign(file_name, IO::Path::FindFileName(rom_filename));
 	IO::Path::SetExtension(file_name, extension);
 
-	IO::Path::Combine(rootdir, g_DaedalusConfig.mSaveDir, file_name);
+	IO::Path::Combine(rootdir, g_DaedalusConfig.mCacheDir, file_name);
 }
 
 #ifndef DAEDALUS_SILENT
@@ -343,4 +358,3 @@ void Dump_Strings( const char * p_file_name )
 	fclose(fp);
 }
 #endif
-
