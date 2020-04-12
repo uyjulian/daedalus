@@ -46,11 +46,7 @@ void Dump_GetDumpDirectory(char * rootdir, const char * subdir)
 	if (gDumpDir[0] == '\0')
 	{
 		// Initialise
-#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || !defined(DAEDALUS_SILENT)
 		IO::Path::Combine(gDumpDir, gDaedalusExePath, "Dumps");
-#else
-		IO::Path::Combine(gDumpDir, gDaedalusExePath, "ms0:/PICTURE/");
-#endif
 	}
 
 	// If a subdirectory was specified, append
@@ -91,7 +87,7 @@ void Dump_GetSaveDirectory(char * rootdir, const char * rom_filename, const char
 			IO::Path::Assign(g_DaedalusConfig.mSaveDir, rom_filename);
 			IO::Path::RemoveFileSpec(g_DaedalusConfig.mSaveDir);
 #ifndef DAEDALUS_PSP
-			// FIXME(strmnnrmn): for OSX I generate savegames in a subdir Save, to make it easier to clean up.
+			// FIXME(strmnnrmn): for OSX I generate savegames in a subdir Save, to make it easier to clean up, will remove this when we get a new UI
 			IO::Path::Append(g_DaedalusConfig.mSaveDir, "Save");
 #endif
 
@@ -103,15 +99,34 @@ void Dump_GetSaveDirectory(char * rootdir, const char * rom_filename, const char
 #endif
 		}
 	}
+}
 
-	IO::Directory::EnsureExists(g_DaedalusConfig.mSaveDir);
+// Quick and dirty hackup to move .hle to different directory
+	void Dump_GetCacheDirectory(char * rootdir, const char * rom_filename, const char * extension)
+	{
+		// If the Save path has not yet been set up, prompt user
+		if (strlen(g_DaedalusConfig.mCacheDir) == 0)
+		{
+			// FIXME: missing prompt here!
+
+			// User may have cancelled
+			if (strlen(g_DaedalusConfig.mCacheDir) == 0)
+			{
+				// Default to rom path
+				IO::Path::Assign(g_DaedalusConfig.mCacheDir, rom_filename);
+				IO::Path::RemoveFileSpec(g_DaedalusConfig.mCacheDir);
+
+			}
+		}
+
+	IO::Directory::EnsureExists(g_DaedalusConfig.mCacheDir);
 
 	// Form the filename from the file spec (i.e. strip path and replace the extension)
 	IO::Filename file_name;
 	IO::Path::Assign(file_name, IO::Path::FindFileName(rom_filename));
 	IO::Path::SetExtension(file_name, extension);
 
-	IO::Path::Combine(rootdir, g_DaedalusConfig.mSaveDir, file_name);
+	IO::Path::Combine(rootdir, g_DaedalusConfig.mCacheDir, file_name);
 }
 
 #ifndef DAEDALUS_SILENT
@@ -120,11 +135,11 @@ void Dump_GetSaveDirectory(char * rootdir, const char * rom_filename, const char
 //*****************************************************************************
 void Dump_DisassembleMIPSRange(FILE * fh, u32 address_offset, const OpCode * b, const OpCode * e)
 {
-	u32 address( address_offset );
-	const OpCode * p( b );
+	u32 address {address_offset};
+	const OpCode * p {b};
 	while( p < e )
 	{
-		char opinfo[400];
+		char opinfo[400] {0};
 
 		OpCode op( GetCorrectOp( *p ) );
 #if 0
@@ -157,7 +172,7 @@ void Dump_Disassemble(u32 start, u32 end, const char * p_file_name)
 	if (end < start)
 		end = start + end;
 
-	if (p_file_name == NULL || strlen(p_file_name) == 0)
+	if (p_file_name == nullptr || strlen(p_file_name) == 0)
 	{
 		Dump_GetDumpDirectory(file_path, "");
 		IO::Path::Append(file_path, "dis.txt");
@@ -167,15 +182,15 @@ void Dump_Disassemble(u32 start, u32 end, const char * p_file_name)
 		IO::Path::Assign(file_path, p_file_name);
 	}
 
-	u8 * p_base;
+	u8 *p_base {0};
 	if (!Memory_GetInternalReadAddress(start, (void**)&p_base))
 	{
 		DBGConsole_Msg(0, "[Ydis: Invalid base 0x%08x]", start);
 		return;
 	}
 
-	FILE * fp( fopen(file_path, "w") );
-	if (fp == NULL)
+	FILE * fp {fopen(file_path, "w")};
+	if (fp == nullptr)
 		return;
 
 	DBGConsole_Msg(0, "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path);
@@ -197,16 +212,16 @@ void Dump_Disassemble(u32 start, u32 end, const char * p_file_name)
 //*****************************************************************************
 void Dump_MemoryRange(FILE * fh, u32 address_offset, const u32 * b, const u32 * e)
 {
-	u32 address( address_offset );
-	const u32 * p( b );
+	u32 address {address_offset};
+	const u32 * p {b};
 	while( p < e )
 	{
 		fprintf(fh, "0x%08x: %08x %08x %08x %08x ", address, p[0], p[1], p[2], p[3]);
 
-		const u8 * p8( reinterpret_cast< const u8 * >( p ) );
-		for (u32 i = 0; i < 16; i++)
+		const u8 * p8 {reinterpret_cast< const u8 * >( p )};
+		for (auto i {0}; i < 16; i++)
 		{
-			u8 c( p8[i ^ U8_TWIDDLE] );
+			u8 c {p8[i ^ U8_TWIDDLE]};
 			if (c >= 32 && c < 128)
 				fprintf(fh, "%c", c);
 			else
@@ -224,8 +239,8 @@ void Dump_MemoryRange(FILE * fh, u32 address_offset, const u32 * b, const u32 * 
 
 void Dump_DisassembleRSPRange(FILE * fh, u32 address_offset, const OpCode * b, const OpCode * e)
 {
-	u32 address( address_offset );
-	const OpCode * p( b );
+	u32 address {address_offset};
+	const OpCode * p {b};
 	while( p < e )
 	{
 		char opinfo[400];
@@ -239,9 +254,9 @@ void Dump_DisassembleRSPRange(FILE * fh, u32 address_offset, const OpCode * b, c
 
 void Dump_RSPDisassemble(const char * p_file_name)
 {
-	u8 * base;
-	u32 start = 0xa4000000;
-	u32 end = 0xa4002000;
+	u8 *base {0};
+	u32 start {0xa4000000};
+	u32 end {0xa4002000};
 
 	if (!Memory_GetInternalReadAddress(start, (void**)&base))
 	{
@@ -251,7 +266,7 @@ void Dump_RSPDisassemble(const char * p_file_name)
 
 	IO::Filename file_path;
 
-	if (p_file_name == NULL || strlen(p_file_name) == 0)
+	if (p_file_name == nullptr || strlen(p_file_name) == 0)
 	{
 		Dump_GetDumpDirectory(file_path, "");
 		IO::Path::Append(file_path, "rdis.txt");
@@ -263,17 +278,17 @@ void Dump_RSPDisassemble(const char * p_file_name)
 
 	DBGConsole_Msg(0, "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path);
 
-	FILE * fp( fopen(file_path, "w") );
-	if (fp == NULL)
+	FILE * fp {fopen(file_path, "w")};
+	if (fp == nullptr)
 		return;
 
-	const u32 * mem_start( reinterpret_cast< const u32 * >( base + 0x0000 ) );
-	const u32 * mem_end(   reinterpret_cast< const u32 * >( base + 0x1000 ) );
+	const u32 *mem_start {reinterpret_cast< const u32 * >( base + 0x0000 )};
+	const u32 *mem_end {reinterpret_cast< const u32 * >( base + 0x1000 )};
 
 	Dump_MemoryRange( fp, start, mem_start, mem_end );
 
-	const OpCode * op_start( reinterpret_cast< const OpCode * >( base + 0x1000 ) );
-	const OpCode * op_end(   reinterpret_cast< const OpCode * >( base + 0x2000 ) );
+	const OpCode * op_start {reinterpret_cast< const OpCode * >( base + 0x1000 )};
+	const OpCode * op_end {reinterpret_cast< const OpCode * >( base + 0x2000 )};
 
 	Dump_DisassembleRSPRange( fp, start + 0x1000, op_start, op_end );
 
@@ -288,11 +303,11 @@ void Dump_RSPDisassemble(const char * p_file_name)
 void Dump_Strings( const char * p_file_name )
 {
 	IO::Filename file_path;
-	FILE * fp;
+
 
 	static const u32 MIN_LENGTH = 5;
 
-	if (p_file_name == NULL || strlen(p_file_name) == 0)
+	if (p_file_name == nullptr || strlen(p_file_name) == 0)
 	{
 		Dump_GetDumpDirectory(file_path, "");
 		IO::Path::Append(file_path, "strings.txt");
@@ -305,14 +320,14 @@ void Dump_Strings( const char * p_file_name )
 	DBGConsole_Msg(0, "Dumping strings in rom ([C%s])", file_path);
 
 	// Overwrite here
-	fp = fopen(file_path, "w");
+	FILE *fp {fopen(file_path, "w")};
 	if (fp == NULL)
 		return;
 
 	// Memory dump
-	u32 ascii_start = 0;
-	u32 ascii_count = 0;
-	for ( u32 i = 0; i < RomBuffer::GetRomSize(); i ++)
+	u32 ascii_start {0};
+	u32 ascii_count {0};
+	for (auto i {0}; i < RomBuffer::GetRomSize(); i ++)
 	{
 		if ( RomBuffer::ReadValueRaw< u8 >( i ^ 0x3 ) >= ' ' &&
 			 RomBuffer::ReadValueRaw< u8 >( i ^ 0x3 ) < 200 )
@@ -329,7 +344,7 @@ void Dump_Strings( const char * p_file_name )
 			{
 				fprintf( fp, "0x%08x: ", ascii_start );
 
-				for ( u32 j = 0; j < ascii_count; j++ )
+				for ( auto j {0}; j < ascii_count; j++ )
 				{
 					fprintf( fp, "%c", RomBuffer::ReadValueRaw< u8 >( (ascii_start + j ) ^ 0x3 ) );
 				}
@@ -343,4 +358,3 @@ void Dump_Strings( const char * p_file_name )
 	fclose(fp);
 }
 #endif
-

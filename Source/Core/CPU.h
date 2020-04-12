@@ -177,8 +177,7 @@ bool	CPU_IsRunning();
 void	CPU_AddEvent( s32 count, ECPUEventType event_type );
 void	CPU_SkipToNextEvent();
 bool	CPU_CheckStuffToDo();
-
-typedef void (*VblCallbackFn)(void * arg);
+using VblCallbackFn = void (*)(void * arg);
 void CPU_RegisterVblCallback(VblCallbackFn fn, void * arg);
 void CPU_UnregisterVblCallback(VblCallbackFn fn, void * arg);
 

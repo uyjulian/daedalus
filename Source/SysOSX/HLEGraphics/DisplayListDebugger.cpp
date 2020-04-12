@@ -196,7 +196,7 @@ void DLDebugger_ProcessDebugTask()
 				connection->WriteF("\t\"blendColour\": \"0x%08x\",\n", gRenderer->GetBlendColour().GetColour());
 				connection->WriteF("\t\"fogColor\": \"0x%08x\",\n", gRenderer->GetFogColour().GetColour());
 				connection->WriteString("\t\"tiles\": [\n");
-				for (u32 i = 0; i < 8; ++i)
+				for (auto i {0}; i < 8; ++i)
 				{
 					if (i > 0)
 						connection->WriteString(",\n");

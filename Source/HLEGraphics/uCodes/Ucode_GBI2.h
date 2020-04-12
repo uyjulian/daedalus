@@ -27,11 +27,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //*****************************************************************************
 void DLParser_GBI2_Vtx( MicroCodeCommand command )
 {
-	u32 address = RDPSegAddr(command.vtx2.addr);
+	u32 address {RDPSegAddr(command.vtx2.addr)};
 
-	u32 vend   = command.vtx2.vend >> 1;
-	u32 n      = command.vtx2.n;
-	u32 v0	   = vend - n;
+	u32 vend   {command.vtx2.vend >> 1};
+	u32 n      {command.vtx2.n};
+	u32 v0	   {vend - n};
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF( "    Address[0x%08x] vEnd[%d] v0[%d] Num[%d]", address, vend, v0, n );
@@ -91,7 +91,7 @@ void DLParser_GBI2_PopMtx( MicroCodeCommand command )
 	DL_PF("    Command: (%s)",	command.inst.cmd1 ? "Projection" : "ModelView");
 	#endif
 	// Banjo Tooie, pops more than one matrix
-	u32 num = command.inst.cmd1>>6;
+	u32 num {command.inst.cmd1>>6};
 
 	// Just pop the worldview matrix
 	gRenderer->PopWorldView(num);
@@ -139,8 +139,8 @@ void DLParser_GBI2_MoveWord( MicroCodeCommand command )
 */
 	case G_MW_SEGMENT:
 		{
-			u32 segment = command.mw2.offset >> 2;
-			u32 address	= command.mw2.value;
+			u32 segment {command.mw2.offset >> 2};
+			u32 address	{command.mw2.value};
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 			DL_PF( "    G_MW_SEGMENT Segment[%d] = 0x%08x", segment, address );
 #endif
@@ -151,18 +151,18 @@ void DLParser_GBI2_MoveWord( MicroCodeCommand command )
 	case G_MW_FOG: // WIP, only works for the PSP
 		{
 #ifdef DAEDALUS_PSP
-			f32 mul = (f32)(s16)(command.mw2.value >> 16);	//Fog mult
-			f32 offs = (f32)(s16)(command.mw2.value & 0xFFFF);	//Fog Offset
+			f32 mul {(f32)(s16)(command.mw2.value >> 16)};	//Fog mult
+			f32 offs {(f32)(s16)(command.mw2.value & 0xFFFF)};	//Fog Offset
 
 			gRenderer->SetFogMultOffs(mul, offs);
 
 			// HW fog, only works for a few games
 #if 0
-			f32 a = (f32)(command.mw2.value >> 16);
-			f32 b = (f32)(command.mw2.value & 0xFFFF);
+			f32 a {(f32)(command.mw2.value >> 16)};
+			f32 b {(f32)(command.mw2.value & 0xFFFF)};
 
-			f32 fog_near = a / 256.0f;
-			f32 fog_far = b / 6.0f;
+			f32 fog_near {a / 256.0f};
+			f32 fog_far {b / 6.0f};
 
 			gRenderer->SetFogMinMax(fog_near, fog_far);
 #endif
@@ -174,16 +174,16 @@ void DLParser_GBI2_MoveWord( MicroCodeCommand command )
 
 	case G_MW_LIGHTCOL:
 		{
-			u32 light_idx = command.mw2.offset / 0x18;
-			u32 field_offset = (command.mw2.offset & 0x7);
+			u32 light_idx {command.mw2.offset / 0x18};
+			u32 field_offset {(command.mw2.offset & 0x7)};
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 			DL_PF("    G_MW_LIGHTCOL/0x%08x: 0x%08x", command.mw2.offset, command.mw2.value);
 #endif
 			if (field_offset == 0)
 			{
-				u8 r = ((command.mw2.value>>24)&0xFF);
-				u8 g = ((command.mw2.value>>16)&0xFF);
-				u8 b = ((command.mw2.value>>8)&0xFF);
+				u8 r {((command.mw2.value>>24)&0xFF)};
+				u8 g {((command.mw2.value>>16)&0xFF)};
+				u8 b {((command.mw2.value>>8)&0xFF)};
 				gRenderer->SetLightCol(light_idx, r, g, b);
 			}
 		}
@@ -263,9 +263,9 @@ ZeldaMoveMem: 0xdc080008 0x8010e3c0 Type: 08 Len: 08 Off: 4000
 //*****************************************************************************
 void DLParser_GBI2_MoveMem( MicroCodeCommand command )
 {
-	u32 address	 = RDPSegAddr(command.inst.cmd1);
+	u32 address	 {RDPSegAddr(command.inst.cmd1)};
+	u32 type	 {(command.inst.cmd0     ) & 0xFE};
 	//u32 offset = (command.inst.cmd0 >> 8) & 0xFFFF;
-	u32 type	 = (command.inst.cmd0     ) & 0xFE;
 	//u32 length  = (command.inst.cmd0 >> 16) & 0xFF;
 
 	switch (type)
@@ -278,8 +278,8 @@ void DLParser_GBI2_MoveMem( MicroCodeCommand command )
 
 	case G_GBI2_MV_LIGHT:
 		{
-			u32 offset2 = (command.inst.cmd0 >> 5) & 0x7F8;
-			u32 light_idx = offset2 / 24;
+			u32 offset2 {(command.inst.cmd0 >> 5) & 0x7F8};
+			u32 light_idx {offset2 / 24};
 			if (light_idx < 2)
 			{
 				#ifdef DAEDALUS_DEBUG_DISPLAYLIST
@@ -351,7 +351,7 @@ void DLParser_GBI2_MoveMem( MicroCodeCommand command )
 //*****************************************************************************
 void DLParser_GBI2_DL_Count( MicroCodeCommand command )
 {
-	u32 address  = RDPSegAddr(command.inst.cmd1);
+	u32 address  {RDPSegAddr(command.inst.cmd1)};
 	//u32 count	 = command.inst.cmd0 & 0xFFFF;
 
 	// For SSB and Kirby, otherwise we'll end up scrapping the pc
@@ -412,7 +412,7 @@ void DLParser_GBI2_GeometryMode( MicroCodeCommand command )
 void DLParser_GBI2_SetOtherModeL( MicroCodeCommand command )
 {
 	// Mask is constructed slightly differently
-	const u32 mask = (u32)((s32)(0x80000000) >> command.othermode.len) >> command.othermode.sft;
+	const u32 mask {(u32)((s32)(0x80000000) >> command.othermode.len) >> command.othermode.sft};
 
 	gRDPOtherMode.L = (gRDPOtherMode.L & ~mask) | command.othermode.data;
 
@@ -427,7 +427,7 @@ void DLParser_GBI2_SetOtherModeL( MicroCodeCommand command )
 void DLParser_GBI2_SetOtherModeH( MicroCodeCommand command )
 {
 	// Mask is constructed slightly differently
-	const u32 mask = (u32)((s32)(0x80000000) >> command.othermode.len) >> command.othermode.sft;
+	const u32 mask {(u32)((s32)(0x80000000) >> command.othermode.len) >> command.othermode.sft};
 
 	gRDPOtherMode.H = (gRDPOtherMode.H & ~mask) | command.othermode.data;
 
@@ -447,8 +447,8 @@ void DLParser_GBI2_Texture( MicroCodeCommand command )
 	gRenderer->SetTextureTile( command.texture.tile );
 	gRenderer->SetTextureEnable( command.texture.enable_gbi2 );
 
-	f32 scale_s = f32(command.texture.scaleS) / (65535.0f * 32.0f);
-	f32 scale_t = f32(command.texture.scaleT)  / (65535.0f * 32.0f);
+	f32 scale_s {f32(command.texture.scaleS) / (65535.0f * 32.0f)};
+	f32 scale_t {f32(command.texture.scaleT)  / (65535.0f * 32.0f)};
 	#ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	DL_PF("    ScaleS[%0.4f], ScaleT[%0.4f]", scale_s*32.0f, scale_t*32.0f);
 	#endif
@@ -471,25 +471,25 @@ void DLParser_GBI2_DMA_IO( MicroCodeCommand command )
 void DLParser_GBI2_Quad( MicroCodeCommand command )
 {
 	// While the next command pair is Tri2, add vertices
-	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 pc {gDlistStack.address[gDlistStackPointer]};
+	u32 * pCmdBase {(u32 *)(g_pu8RamBase + pc)};
 
-	bool tris_added = false;
+	bool tris_added {false};
 
 	do
 	{
 		//DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_QUAD");
 
 		// Vertex indices are multiplied by 2
-		u32 v0_idx = command.gbi2line3d.v0 >> 1;
-		u32 v1_idx = command.gbi2line3d.v1 >> 1;
-		u32 v2_idx = command.gbi2line3d.v2 >> 1;
+		u32 v0_idx {command.gbi2line3d.v0 >> 1};
+		u32 v1_idx {command.gbi2line3d.v1 >> 1};
+		u32 v2_idx {command.gbi2line3d.v2 >> 1};
 
 		tris_added |= gRenderer->AddTri(v0_idx, v1_idx, v2_idx);
 
-		u32 v3_idx = command.gbi2line3d.v3 >> 1;
-		u32 v4_idx = command.gbi2line3d.v4 >> 1;
-		u32 v5_idx = command.gbi2line3d.v5 >> 1;
+		u32 v3_idx {command.gbi2line3d.v3 >> 1};
+		u32 v4_idx {command.gbi2line3d.v4 >> 1};
+		u32 v5_idx {command.gbi2line3d.v5 >> 1};
 
 		tris_added |= gRenderer->AddTri(v3_idx, v4_idx, v5_idx);
 
@@ -515,8 +515,8 @@ void DLParser_GBI2_Quad( MicroCodeCommand command )
 void DLParser_GBI2_Line3D( MicroCodeCommand command )
 {
 	// While the next command pair is Tri2, add vertices
-	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 pc {gDlistStack.address[gDlistStackPointer]};
+	u32 *pCmdBase {(u32 *)(g_pu8RamBase + pc)};
 
 	bool tris_added = false;
 
@@ -524,15 +524,15 @@ void DLParser_GBI2_Line3D( MicroCodeCommand command )
 	{
 		//DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_LINE3D");
 
-		u32 v0_idx = command.gbi2line3d.v0 >> 1;
-		u32 v1_idx = command.gbi2line3d.v1 >> 1;
-		u32 v2_idx = command.gbi2line3d.v2 >> 1;
+		u32 v0_idx {command.gbi2line3d.v0 >> 1};
+		u32 v1_idx {command.gbi2line3d.v1 >> 1};
+		u32 v2_idx {command.gbi2line3d.v2 >> 1};
 
 		tris_added |= gRenderer->AddTri(v0_idx, v1_idx, v2_idx);
 
-		u32 v3_idx = command.gbi2line3d.v3 >> 1;
-		u32 v4_idx = command.gbi2line3d.v4 >> 1;
-		u32 v5_idx = command.gbi2line3d.v5 >> 1;
+		u32 v3_idx {command.gbi2line3d.v3 >> 1};
+		u32 v4_idx {command.gbi2line3d.v4 >> 1};
+		u32 v5_idx {command.gbi2line3d.v5 >> 1};
 
 		tris_added |= gRenderer->AddTri(v3_idx, v4_idx, v5_idx);
 
@@ -556,18 +556,18 @@ void DLParser_GBI2_Tri1( MicroCodeCommand command )
 {
 
 	// While the next command pair is Tri1, add vertices
-	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 pc {gDlistStack.address[gDlistStackPointer]};
+	u32 *pCmdBase {(u32 *)(g_pu8RamBase + pc)};
 
-	bool tris_added = false;
+	bool tris_added {false};
 
 	do
 	{
 		//DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_TRI1");
 
-		u32 v0_idx = command.gbi2tri1.v0 >> 1;
-		u32 v1_idx = command.gbi2tri1.v1 >> 1;
-		u32 v2_idx = command.gbi2tri1.v2 >> 1;
+		u32 v0_idx {command.gbi2tri1.v0 >> 1};
+		u32 v1_idx {command.gbi2tri1.v1 >> 1};
+		u32 v2_idx {command.gbi2tri1.v2 >> 1};
 
 		tris_added |= gRenderer->AddTri(v0_idx, v1_idx, v2_idx);
 
@@ -590,25 +590,25 @@ void DLParser_GBI2_Tri1( MicroCodeCommand command )
 void DLParser_GBI2_Tri2( MicroCodeCommand command )
 {
 
-	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 pc {gDlistStack.address[gDlistStackPointer]};
+	u32 * pCmdBase {(u32 *)(g_pu8RamBase + pc)};
 
-	bool tris_added = false;
+	bool tris_added {false};
 
 	do
 	{
 		//DL_PF("    0x%08x: %08x %08x %-10s", pc-8, command.inst.cmd0, command.inst.cmd1, "G_GBI2_TRI2");
 
 		// Vertex indices already divided in ucodedef
-		u32 v0_idx = command.gbi2tri2.v0;
-		u32 v1_idx = command.gbi2tri2.v1;
-		u32 v2_idx = command.gbi2tri2.v2;
+		u32 v0_idx {command.gbi2tri2.v0};
+		u32 v1_idx {command.gbi2tri2.v1};
+		u32 v2_idx {command.gbi2tri2.v2};
 
 		tris_added |= gRenderer->AddTri(v0_idx, v1_idx, v2_idx);
 
-		u32 v3_idx = command.gbi2tri2.v3;
-		u32 v4_idx = command.gbi2tri2.v4;
-		u32 v5_idx = command.gbi2tri2.v5;
+		u32 v3_idx {command.gbi2tri2.v3};
+		u32 v4_idx {command.gbi2tri2.v4};
+		u32 v5_idx {command.gbi2tri2.v5};
 
 		tris_added |= gRenderer->AddTri(v3_idx, v4_idx, v5_idx);
 

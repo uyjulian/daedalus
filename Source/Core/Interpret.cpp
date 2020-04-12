@@ -46,7 +46,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //*****************************************************************************
 template< bool TranslateOp > DAEDALUS_FORCEINLINE void CPU_EXECUTE_OP()
 {
-	u8 * p_Instruction {};
+	u8 *p_Instruction {0};
 
 	CPU_FETCH_INSTRUCTION( p_Instruction, gCPUState.CurrentPC );
 	OpCode op_code = *(OpCode*)p_Instruction;
@@ -62,7 +62,7 @@ template< bool TranslateOp > DAEDALUS_FORCEINLINE void CPU_EXECUTE_OP()
 		{
 			// Turn temporary disable on to allow instr to be processed
 			// Entry is in lower 26 bits...
-			u32	breakpoint( op_code.bp_index );
+			u32	breakpoint {op_code.bp_index};
 
 			if ( breakpoint < g_BreakPoints.size() )
 			{
@@ -143,7 +143,7 @@ void CPU_Go()
 		//
 		// Keep executing ops as long as there's nothing to do
 		//
-		u32	stuff_to_do( gCPUState.GetStuffToDo() );
+		u32	stuff_to_do {gCPUState.GetStuffToDo()};
 		while(stuff_to_do == 0)
 		{
 			CPU_EXECUTE_OP< false >();

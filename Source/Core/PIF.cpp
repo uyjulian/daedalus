@@ -241,7 +241,7 @@ IController::IController() :
 #ifdef DAEDALUS_DEBUG_PIF
 	mDebugFile = fopen( "controller.txt", "w" );
 #endif
-	for ( u32 i {}; i < NUM_CONTROLLERS; i++ )
+	for ( auto i {0}; i < NUM_CONTROLLERS; i++ )
 	{
 		mContPresent[ i ] = false;
 		mContMemPackPresent[ i ] = false;
@@ -304,7 +304,7 @@ bool IController::OnRomOpen()
 	}
 
 
-	for ( u32 channel {}; channel < NUM_CONTROLLERS; channel++ )
+	for ( auto channel {0}; channel < NUM_CONTROLLERS; channel++ )
 	{
 		mMemPack[channel] = (u8*)g_pMemoryBuffers[MEM_MEMPACK] + channel * 0x400 * 32;
 	}
@@ -324,7 +324,7 @@ void IController::Process()
 	DPF_PIF("**                                         **");
 #endif
 
-	u32 count {}, channel {};
+
 	u32 *tmp {(u32*)mpPifRam};
 	if ((tmp[0] == 0xFFFFFFFF) &&
 		(tmp[1] == 0xFFFFFFFF) &&
@@ -340,7 +340,7 @@ void IController::Process()
 
 	// Read controller data here (here gets called fewer times than CONT_READ_CONTROLLER)
 	CInputManager::Get()->GetState( mContPads );
-
+u32 count {0}, channel {0};
 	while(count < 64)
 	{
 		u8 *cmd {&mpPifRam[count]};
@@ -399,7 +399,7 @@ void IController::Process()
 #ifdef DAEDALUS_DEBUG_PIF
 	DPF_PIF("Before | After:");
 
-	for ( u32 x {}; x < 64; x+=8 )
+	for ( auto x {0}; x < 64; x+=8 )
 	{
 		DPF_PIF( "0x%02x%02x%02x%02x : 0x%02x%02x%02x%02x  |  0x%02x%02x%02x%02x : 0x%02x%02x%02x%02x",
 			mpInput[(x + 0)],  mpInput[(x + 1)],  mpInput[(x + 2)],  mpInput[(x + 3)],
@@ -421,7 +421,7 @@ void IController::Process()
 void IController::DumpInput() const
 {
 	DBGConsole_Msg( 0, "PIF:" );
-	for ( u32 x = 0; x < 64; x+=8 )
+	for ( auto x {0}; x < 64; x+=8 )
 	{
 		DBGConsole_Msg( 0, "0x%02x%02x%02x%02x : 0x%02x%02x%02x%02x",
 			mpInput[(x + 0)],  mpInput[(x + 1)],  mpInput[(x + 2)],  mpInput[(x + 3)],
@@ -580,12 +580,10 @@ void	IController::CommandWriteEeprom(u8* cmd)
 
 
 //
-
-#if 1	//1-> Unrolled fast 0-> old way //Corn
 u8 IController::CalculateDataCrc(const u8 * pBuf)
 {
-	u32 c {};
-	for (u32 i {}; i < 32; i++)
+	u32 c {0};
+	for (auto i {0}; i < 32; i++)
 	{
 		u32 s {pBuf[i]};
 
@@ -599,7 +597,7 @@ u8 IController::CalculateDataCrc(const u8 * pBuf)
 		c = (((c << 1) | ((s >> 0) & 1))) ^ ((c & 0x80) ? 0x85 : 0);
 	}
 
-	for (u32 i {8}; i != 0; i--)
+	for (auto i {8}; i != 0; i--)
 	{
 		c = (c << 1) ^ ((c & 0x80) ? 0x85 : 0);
 	}
@@ -607,36 +605,6 @@ u8 IController::CalculateDataCrc(const u8 * pBuf)
 	return c;
 }
 
-#else
-u8 IController::CalculateDataCrc(u8 * pBuf)
-{
-	u8 c {}, x {}, s {}, i {};
-	s8 z {};
-
-	c = 0;
-	for (i {}; i < 33; i++)
-	{
-		s = pBuf[i];
-
-		for (z {7}; z >= 0; z--)
-		{
-			x = (c & 0x80) ? 0x85 : 0;
-
-			c <<= 1;
-
-			if (i < 32)
-			{
-				if (s & (1<<z))
-					c |= 1;
-			}
-
-			c = c ^ x;
-		}
-	}
-
-	return c;
-}
-#endif
 
 
 // Returns new position to continue reading
@@ -793,7 +761,7 @@ void IController::n64_cic_nus_6105()
 		0xC, 0x9, 0x8, 0x5, 0x6, 0x3, 0xC, 0x9
 	};
 	char challenge[30] {}, response[30] {};
-	u32 i {};
+	auto i {0};
 	switch (mpPifRam[0x3F])
 	{
 	case 0x02:
@@ -805,8 +773,8 @@ void IController::n64_cic_nus_6105()
 			challenge[i*2+1] =  mpPifRam[48+i]       & 0x0f;
 		}
 
-		char key {}, *lut {};
-		int sgn {}, mag {}, mod {};
+		char key {0}, *lut {0};
+		int sgn {0}, mag {0}, mod {0};
 
 		for (key = 0xB, lut = lut0, i = 0; i < (CHL_LEN - 2); i++)
 		{

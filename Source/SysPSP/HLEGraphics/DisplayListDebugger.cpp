@@ -962,8 +962,7 @@ void IDisplayListDebugger::Run()
 	float freq_inv = 1.0f / f32( freq );
 
 	CTimer		timer;
-
-	typedef std::vector< CDebugMenuOption * > DebugMenuOptionVector;
+using DebugMenuOptionVector = std::vector <CDebugMenuOption * >;
 	DebugMenuOptionVector	menu_options;
 
 	u32		total_instruction_count = gNumInstructionsExecuted;
@@ -1015,7 +1014,7 @@ void IDisplayListDebugger::Run()
 			sort( snapshot.begin(), snapshot.end(), &OrderTextures );
 
 			// Dump each in turn
-			for( u32 i = 0; i < snapshot.size(); ++i )
+			for( auto i {0}; i < snapshot.size(); ++i )
 			{
 				CachedTexture::DumpTexture( snapshot[i].Info, snapshot[i].Texture );
 			}

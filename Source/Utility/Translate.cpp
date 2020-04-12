@@ -105,7 +105,7 @@ const char * Translate_String(const char *original)
 void Translate_Unload()
 {
 	// Clear translations
-	for( u32 i = 0; i < ARRAYSIZE(text); ++i )
+	for( auto i {0}; i < ARRAYSIZE(text); ++i )
 	{
 		if( text[i].translated != NULL )
 		{
@@ -184,7 +184,7 @@ u32 Translate_Number()
 //*****************************************************************************
 u32	Translate_IndexFromName( const char * name )
 {
-	for( u32 i = 0; i < gLanguage.size(); ++i )
+	for( auto i {0}; i < gLanguage.size(); ++i )
 	{
 		if( _strcmpi(  gLanguage[ i ].c_str(), name ) == 0 )
 		{
@@ -215,7 +215,7 @@ const char * Translate_NameFromIndex( u32 idx )
 //*****************************************************************************
 const char * Restore(char *s, u32 len)
 {
-	for (u32 i = 0; i < len; i++)
+	for (auto i {0}; i < len; i++)
 	{
 		if (s[i] == '\\')
 		{

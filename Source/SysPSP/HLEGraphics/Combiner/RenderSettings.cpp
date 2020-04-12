@@ -396,7 +396,7 @@ CBlendStates::CBlendStates()
 CBlendStates::~CBlendStates()
 {
 	delete mAlphaSettings;
-	for( u32 i = 0; i < mColourSettings.size(); ++i )
+	for( auto i {0}; i < mColourSettings.size(); ++i )
 	{
 		delete mColourSettings[ i ];
 	}
@@ -412,7 +412,7 @@ bool	CBlendStates::IsInexact() const
 		return true;
 	}
 
-	for( u32 i = 0; i < mColourSettings.size(); ++i )
+	for( auto i {0}; i < mColourSettings.size(); ++i )
 	{
 		const CRenderSettings *		settings( mColourSettings[ i ] );
 
@@ -440,7 +440,7 @@ void	CBlendStates::Print() const
 		printf( "Alpha: %s\n", mAlphaSettings->GetDescription() );
 	}
 
-	for( u32 i = 0; i < mColourSettings.size(); ++i )
+	for( auto i {0}; i < mColourSettings.size(); ++i )
 	{
 		const CRenderSettings *		settings( mColourSettings[ i ] );
 

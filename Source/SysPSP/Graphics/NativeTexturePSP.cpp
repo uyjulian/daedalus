@@ -87,9 +87,9 @@ EPspTextureFormat	GetPspTextureFormat( ETextureFormat texture_format )
 {
 	u32 rowblocks = (width / 16);
 
-	for (u32 j = 0; j < height; ++j)
+	for (auto j {0}; j < height; ++j)
 	{
-		for (u32 i = 0; i < width; ++i)
+		for (auto i {0}; i < width; ++i)
 		{
 			u32 blockx = i / 16;
 			u32 blocky = j / 8;
@@ -119,11 +119,11 @@ inline void swizzle_fast(u8* out, const u8* in, u32 width, u32 height)
 	u32 block_address = 0;
 	u32 *src = (u32*)in;
 
-	for (u32 j = 0; j < height; j++,block_address+=16)
+	for (auto j {0}; j < height; j++,block_address+=16)
 	{
 		u32 *block = (u32*)&out[block_address];
 
-		for (u32 i = 0; i < rowblocks; i++)
+		for (auto i {0}; i < rowblocks; i++)
 		{
 			*block++ = *src++;
 			*block++ = *src++;
@@ -150,7 +150,7 @@ inline void swizzle_fast(u8* out, const u8* in, u32 width, u32 height)
 		for (u32 blockx = 0; blockx < width_blocks; ++blockx)
 		{
 			const u32* src = (u32*)xsrc;
-			for (u32 j = 0; j < 8; ++j)
+			for (auto j {0}; j < 8; ++j)
 			{
 				*(dst++) = *(src++);
 				*(dst++) = *(src++);
@@ -250,7 +250,7 @@ u32	GetTextureBlockWidth( u32 dimension, ETextureFormat texture_format )
 u32	CorrectDimension( u32 dimension )
 {
 	static const u32 MIN_TEXTURE_DIMENSION = 1;
-	return Max( GetNextPowerOf2( dimension ), MIN_TEXTURE_DIMENSION );
+	return std::max( GetNextPowerOf2( dimension ), MIN_TEXTURE_DIMENSION );
 }
 
 }
@@ -397,7 +397,7 @@ namespace
 
 			T * p_dest_row( p_dest );
 
-			for ( u32 x = 0; x < width; ++x )
+			for ( auto x {0}; x < width; ++x )
 			{
 				switch ( color_type )
 				{

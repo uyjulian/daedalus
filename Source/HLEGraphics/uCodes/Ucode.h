@@ -29,7 +29,7 @@
 #define MAX_UCODE_TABLE		5
 #define IS_CUSTOM_UCODE(x)	(x>=MAX_UCODE_TABLE)
 
-typedef void(*MicroCodeInstruction)(MicroCodeCommand);
+using MicroCodeInstruction = void (*)(MicroCodeCommand);
 #define UcodeFunc(name)	void name(MicroCodeCommand)
 
 extern const u32 ucode_stride[];

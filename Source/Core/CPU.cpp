@@ -102,7 +102,7 @@ ALIGNED_GLOBAL(SCPUState, gCPUState, CACHE_ALIGN);
 static bool	CPU_IsStateSimple()		   DAEDALUS_ATTRIBUTE_CONST;
 void (* g_pCPUCore)();
 
-typedef void (*VblCallbackFn)(void * arg);
+using VblCallbackFn = void (*)(void * arg);
 struct VblCallback
 {
 	VblCallbackFn		Fn;
@@ -157,8 +157,8 @@ void CPU_AddEvent( s32 count, ECPUEventType event_type )
 	DAEDALUS_ASSERT( count > 0, "Count is invalid" );
 	DAEDALUS_ASSERT( gCPUState.NumEvents < MAX_CPU_EVENTS, "Too many events" );
 #endif
-	u32 event_idx {};
-	for( event_idx = 0; event_idx < gCPUState.NumEvents; ++event_idx )
+u32 event_idx {0};
+	for(event_idx = 0; event_idx < gCPUState.NumEvents; ++event_idx )
 	{
 		CPUEvent & event = gCPUState.Events[ event_idx ];
 
@@ -202,7 +202,7 @@ static void CPU_SetCompareEvent( s32 count )
 		//
 		//	Remove any existing compare events. Need to adjust any subsequent timer's count.
 		//
-		for( u32 i {}; i < gCPUState.NumEvents; ++i )
+		for( auto i {0}; i < gCPUState.NumEvents; ++i )
 		{
 			if( gCPUState.Events[ i ].mEventType == CPU_EVENT_COMPARE )
 			{
@@ -249,7 +249,7 @@ static ECPUEventType CPU_PopEvent()
 // XXXX This is for savestate. Looks very suspicious to me
 u32 CPU_GetVideoInterruptEventCount()
 {
-	for( u32 i {}; i < gCPUState.NumEvents; ++i )
+	for( auto i {0}; i < gCPUState.NumEvents; ++i )
 	{
 		if(gCPUState.Events[ i ].mEventType == CPU_EVENT_VBL)
 		{
@@ -263,7 +263,7 @@ u32 CPU_GetVideoInterruptEventCount()
 // XXXX This is for savestate. Looks very suspicious to me
 void CPU_SetVideoInterruptEventCount( u32 count )
 {
-	for( u32 i {}; i < gCPUState.NumEvents; ++i )
+	for( auto i {0}; i < gCPUState.NumEvents; ++i )
 	{
 		if(gCPUState.Events[ i ].mEventType == CPU_EVENT_VBL)
 		{
@@ -281,7 +281,7 @@ void SCPUState::ClearStuffToDo()
 
 void SCPUState::AddJob( u32 job )
 {
-	u32 stuff( AtomicBitSet( &StuffToDo, 0xffffffff, job ) );
+	u32 stuff {AtomicBitSet( &StuffToDo, 0xffffffff, job )};
 	if( stuff != 0 )
 	{
 		Dynarec_SetCPUStuffToDo();
@@ -290,7 +290,7 @@ void SCPUState::AddJob( u32 job )
 
 void SCPUState::ClearJob( u32 job )
 {
-	u32 stuff( AtomicBitSet( &StuffToDo, ~job, 0x00000000 ) );
+	u32 stuff {AtomicBitSet( &StuffToDo, ~job, 0x00000000 )};
 	if( stuff == 0 )
 	{
 		Dynarec_ClearedCPUStuffToDo();
@@ -305,8 +305,9 @@ static const char * const kRegisterNames[] =
 	"s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7",
 	"t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra"
 };
+#ifdef DAEDALUS_DEBUG_CONSOLE
 DAEDALUS_STATIC_ASSERT(ARRAYSIZE(kRegisterNames) == 32);
-
+#endif
 void SCPUState::Dump()
 {
 
@@ -345,7 +346,7 @@ bool CPU_RomOpen()
 	gCPUState.MultHi._u64 = 0;
 	gCPUState.MultLo._u64 = 0;
 
-	for(u32 i {}; i < 32; i++)
+	for(auto i {0}; i < 32; i++)
 	{
 		gCPUState.CPU[i]._u64        = 0;
 		gCPUState.CPUControl[i]._u32 = 0;
@@ -354,7 +355,7 @@ bool CPU_RomOpen()
 	}
 
 	// Init TLBs:
-	for (u32 i {}; i < 32; i++)
+	for (auto i {0}; i < 32; i++)
 	{
 		g_TLBs[i].Reset();
 	}
@@ -395,7 +396,7 @@ bool CPU_RomOpen()
 
 static bool	CPU_IsStateSimple()
 {
-	bool rsp_halted = !RSP_IsRunning();
+	bool rsp_halted {!RSP_IsRunning()};
 
 	return rsp_halted && (gCPUState.Delay == NO_DELAY);
 }
@@ -628,7 +629,7 @@ void CPU_EnableBreakPoint( u32 address, bool enable )
 		}
 
 		// Entry is in lower 26 bits...
-		u32 breakpoint_idx = op_code.bp_index;
+		u32 breakpoint_idx {op_code.bp_index};
 
 		if (breakpoint_idx < g_BreakPoints.size())
 		{
@@ -773,7 +774,7 @@ void CPU_SetCompare(u32 value)
 #ifdef DAEDALUS_ENABLE_SYNCHRONISATION
 u32	CPU_ProduceRegisterHash()
 {
-	u32	hash = 0;
+	u32	hash {0};
 
 	if ( DAED_SYNC_MASK & DAED_SYNC_REG_GPR )
 	{
@@ -857,7 +858,7 @@ void CPU_UpdateCounterNoInterrupt( u32 ops_executed )
 		gCPUState.CPUControl[C0_COUNT]._u32 += cycles;
 
 #ifdef DAEDALUS_ENABLE_ASSERTS
-		bool	ready = CPU_ProcessEventCycles( cycles );
+		bool	ready {CPU_ProcessEventCycles( cycles )};
 		use( ready );
 		DAEDALUS_ASSERT(!ready, "Ignoring Count interrupt");	// Just a test - remove eventually (needs to handle this)
 #endif

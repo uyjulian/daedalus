@@ -249,7 +249,7 @@ u32 AudioPluginOSX::AudioThread(void * arg)
 	AudioQueueBufferRef		buffers[kNumBuffers];
 	AudioQueueNewOutput(&format, &AudioCallback, plugin, CFRunLoopGetCurrent(), kCFRunLoopCommonModes, 0, &queue);
 
-	for (u32 i = 0; i < kNumBuffers; ++i)
+	for (auto i {0}; i < kNumBuffers; ++i)
 	{
 		AudioQueueAllocateBuffer(queue, kAudioQueueBufferLength, &buffers[i]);
 
@@ -265,7 +265,7 @@ u32 AudioPluginOSX::AudioThread(void * arg)
 	AudioQueueStop(queue, false);
 	AudioQueueDispose(queue, false);
 
-	for (u32 i = 0; i < kNumBuffers; ++i)
+	for (auto i {0}; i < kNumBuffers; ++i)
 	{
 		AudioQueueFreeBuffer(queue, buffers[i]);
 		buffers[i] = NULL;

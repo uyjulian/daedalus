@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //	savestate format, which is partially documented here: http://www.hcs64.com/usf/usf.txt
 //
 
-const u32 SAVESTATE_PROJECT64_MAGIC_NUMBER = 0x23D8A6C8;
+const u32 SAVESTATE_PROJECT64_MAGIC_NUMBER {0x23D8A6C8};
 
 class SaveState_ostream_gzip
 {
@@ -59,7 +59,7 @@ public:
 
 	inline void write_memory_buffer(int buffernum, u32 size = 0)
 	{
-		write(g_pMemoryBuffers[buffernum], size ? Min(MemoryRegionSizes[buffernum], size) : MemoryRegionSizes[buffernum]);
+		write(g_pMemoryBuffers[buffernum], size ? std::min(MemoryRegionSizes[buffernum], size) : MemoryRegionSizes[buffernum]);
 		if(size > MemoryRegionSizes[buffernum])
 			skip(size - MemoryRegionSizes[buffernum]);
 	}
@@ -67,7 +67,7 @@ public:
 	// I had to add this as the PIF ram now lies in the same chunk as the PIF rom.
 	inline void write_memory_buffer_offset(int buffernum, u32 offset, u32 size )
 	{
-		write((u8*)g_pMemoryBuffers[buffernum] + offset, size ? Min(MemoryRegionSizes[buffernum], size) : MemoryRegionSizes[buffernum]);
+		write((u8*)g_pMemoryBuffers[buffernum] + offset, size ? std::min(MemoryRegionSizes[buffernum], size) : MemoryRegionSizes[buffernum]);
 		if(size > MemoryRegionSizes[buffernum])
 			skip(size - MemoryRegionSizes[buffernum]);
 	}
@@ -79,8 +79,8 @@ public:
 
 	void skip( size_t size )
 	{
-		const size_t	MAX_ZEROES = 512;
-		char			zeroes[ MAX_ZEROES ];
+		const size_t	MAX_ZEROES {512};
+		char			zeroes[ MAX_ZEROES ] {0};
 		if( mStream.IsOpen() )
 		{
 			memset( zeroes, 0, sizeof( zeroes ) );
@@ -88,7 +88,7 @@ public:
 			size_t	remaining( size );
 			while( remaining > 0 )
 			{
-				u32		max_to_write( Min( remaining, MAX_ZEROES ) );
+				u32		max_to_write {std::min( remaining, MAX_ZEROES )};
 
 				mStream.WriteData( zeroes, max_to_write );
 
@@ -133,21 +133,21 @@ public:
 
 	inline void read_memory_buffer(int buffernum, u32 size = 0)
 	{
-		read(g_pMemoryBuffers[buffernum], size ? Min(MemoryRegionSizes[buffernum], size) : MemoryRegionSizes[buffernum]);
+		read(g_pMemoryBuffers[buffernum], size ? std::min(MemoryRegionSizes[buffernum], size) : MemoryRegionSizes[buffernum]);
 		if(size > MemoryRegionSizes[buffernum])
 			skip(size - MemoryRegionSizes[buffernum]);
 	}
 
 	inline void read_memory_buffer_offset(int buffernum, u32 offset, u32 size )
 	{
-		read((u8*)g_pMemoryBuffers[buffernum] + offset, size ? Min(MemoryRegionSizes[buffernum], size) : MemoryRegionSizes[buffernum]);
+		read((u8*)g_pMemoryBuffers[buffernum] + offset, size ? std::min(MemoryRegionSizes[buffernum], size) : MemoryRegionSizes[buffernum]);
 		if(size > MemoryRegionSizes[buffernum])
 			skip(size - MemoryRegionSizes[buffernum]);
 	}
 
 	inline void read_memory_buffer_write_value(int buffernum, int address)
 	{
-		for( u32 i = 0; i < MemoryRegionSizes[buffernum]; i += 4 )
+		for( auto i {0}; i < MemoryRegionSizes[buffernum]; i += 4 )
 		{
 			u32 value;
 			*this >> value;
@@ -159,13 +159,13 @@ public:
 	{
 		if( mStream.IsOpen() )
 		{
-			const size_t	BUFFER_SIZE = 512;
-			u8				buffer[ BUFFER_SIZE ];
+			const size_t	BUFFER_SIZE {512};
+			u8				buffer[ BUFFER_SIZE ] {0};
 
-			size_t		remaining( size );
+			size_t		remaining {size};
 			while( remaining > 0 )
 			{
-				u32		max_to_read( Min( remaining, BUFFER_SIZE ) );
+				u32		max_to_read {std::min( remaining, BUFFER_SIZE )};
 
 				mStream.ReadData( buffer, max_to_read );
 
@@ -201,11 +201,11 @@ bool SaveState_SaveToFile( const char * filename )
 	memcpy(&rom_header, &g_ROM.rh, 64);
 	ROMFile::ByteSwap_3210(&rom_header, 64);
 	stream << rom_header;
-	stream << Max< u32 >(CPU_GetVideoInterruptEventCount(), 1);
+	stream << std::max(CPU_GetVideoInterruptEventCount(), (u32)1);
 
 	stream << gCPUState.CurrentPC;
 	stream.write(gGPR, 256);
-	u32 i;
+	u32 i {0};
 	for(i = 0; i < 32; i++)
 	{
 		stream << gCPUState.FPU[i]._u32;
@@ -255,7 +255,7 @@ bool SaveState_SaveToFile( const char * filename )
 // Now that is fixed this been added for compatibility reasons for any ss created within those revs..
 static void Swap_PIF()
 {
-	u8 * pPIFRam = (u8 *)g_pMemoryBuffers[MEM_PIF_RAM];
+	u8 * pPIFRam {(u8 *)g_pMemoryBuffers[MEM_PIF_RAM]};
 
 	if(pPIFRam[0] & 0xC0)
 	{
@@ -266,7 +266,7 @@ static void Swap_PIF()
 	u8 temp[64];
 	memcpy( temp, pPIFRam, 64 );
 
-	for (u32 i = 0; i < 64; i++)
+	for (auto i {0}; i < 64; i++)
 	{
 		pPIFRam[i] = temp[ i ^ U8_TWIDDLE ];
 	}
@@ -279,7 +279,7 @@ bool SaveState_LoadFromFile( const char * filename )
 	if( !stream.IsValid() )
 		return false;
 
-	u32 value;
+	u32 value {0};
 	stream >> value;
 	if(value != SAVESTATE_PROJECT64_MAGIC_NUMBER)
 	{
@@ -307,7 +307,7 @@ bool SaveState_LoadFromFile( const char * filename )
 		return false;
 	}
 
-	u32 count = 0;
+	u32 count {0};
 	stream >> count;
 	CPU_SetVideoInterruptEventCount( count );
 	stream >> value;
@@ -320,7 +320,7 @@ bool SaveState_LoadFromFile( const char * filename )
 		gCPUState.FPU[i]._u32 = value;
 	}
 	stream.skip(0x80); // used when FPU is in 64-bit mode
-	u32 g_dwNewCPR0[32];
+	u32 g_dwNewCPR0[32] {0};
 	for(i = 0; i < 32; i++)
 	{
 		stream >> g_dwNewCPR0[i];
@@ -363,7 +363,7 @@ bool SaveState_LoadFromFile( const char * filename )
 	for(i = 0; i < 32; i++)
 	{
 		stream.skip(4); // boolean that tells whether the entry is defined - seems redundant
-		int pagemask, hi, lo0, lo1;
+		u32 pagemask {0}, hi {0}, lo0 {0}, lo1 {0};
 		stream >> pagemask;
 		stream >> hi;
 		stream >> lo0;
@@ -408,12 +408,12 @@ RomID SaveState_GetRomID( const char * filename )
 	if( !stream.IsValid() )
 		return RomID();
 
-	u32 value;
+	u32 value {0};
 	stream >> value;
 	if(value != SAVESTATE_PROJECT64_MAGIC_NUMBER)
 		return RomID();
 
-	u32 ram_size;
+	u32 ram_size {0};
 	stream >> ram_size;
 
 	ROMHeader rom_header;
@@ -430,12 +430,12 @@ const char* SaveState_GetRom( const char * filename )
 	if( !stream.IsValid() )
 		return nullptr;
 
-	u32 value;
+	u32 value {0};
 	stream >> value;
 	if(value != SAVESTATE_PROJECT64_MAGIC_NUMBER)
 		return nullptr;
 
-	u32 ram_size;
+	u32 ram_size {0};
 	stream >> ram_size;
 
 	ROMHeader rom_header;

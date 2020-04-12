@@ -1,4 +1,4 @@
-#define TEST_DISABLE_SI_FUNCS DAEDALUS_PROFILE(__FUNCTION__);
+#define TEST_DISABLE_SI_FUNCS //DAEDALUS_PROFILE(__FUNCTION__);
 
 //*****************************************************************************
 //

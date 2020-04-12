@@ -28,7 +28,7 @@ static u64 GetNow()
 class CProfileItem
 {
 	public:
-		typedef std::vector< CProfileItem * > ItemVector;
+		using ItemVecotr = std::vector <CProfileItem *>
 
 		CProfileItem( const char * p_str )
 			:	mName( p_str )
@@ -126,13 +126,13 @@ class CProfilerImpl
 		CProfileCallstack *		GetActiveStats();
 
 	private:
-		typedef std::vector< CProfileItem * >			ProfileItemList;
-		typedef std::stack< CProfileItem * >			ProfileItemStack;
+		using ProfileItemList = std::vector< CProfileItem *>;
+		using ProfileItemStack = std::stack< CProfileItem *>;
 
 		std::vector< CProfileItem * >	mActiveItems;
 		std::vector< CProfileCallstack * >	mActiveCallstacks;
 
-		typedef std::map< u32, CProfileCallstack * >	CallstackStatsMap;
+ 	using mCallstackStatsMap = std::map< u32, CProfileCallstack * >;
 		CallstackStatsMap		mCallstackStatsMap;
 
 		f32						mFrequencyInv;
@@ -211,7 +211,7 @@ void CProfilerImpl::Update()
 	DAEDALUS_ASSERT( mActiveCallstacks.size() == mActiveItems.size(), "Why are there different numbers of callstacks/items?" );
 
 	u64 now = GetNow();
-	for( u32 i = 0; i < mActiveCallstacks.size(); ++i )
+	for( auto i {0}; i < mActiveCallstacks.size(); ++i )
 	{
 		mActiveCallstacks[ i ]->StopTiming( now );
 	}
@@ -248,7 +248,7 @@ void CProfilerImpl::Update()
 	//       012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
 	printf( " Function                                         Time us  Parent Overall  Hits\n" );
 
-	for( u32 i = 0; i < active_callstacks.size(); ++i )
+	for( auto i {0}; i < active_callstacks.size(); ++i )
 	{
 		const CProfileCallstack * callstack = active_callstacks[ i ];
 
@@ -294,7 +294,7 @@ void CProfilerImpl::Update()
 		callstack->Reset();
 	}
 
-	for( u32 i = 0; i < mActiveCallstacks.size(); ++i )
+	for( auto i {0}; i < mActiveCallstacks.size(); ++i )
 	{
 		mActiveCallstacks[ i ]->StartTiming();
 	}

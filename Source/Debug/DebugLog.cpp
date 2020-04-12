@@ -30,8 +30,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //*****************************************************************************
 //
 //*****************************************************************************
-static bool			g_bLog = false;
-static FILE *		g_hOutputLog	= NULL;
+static bool			g_bLog {false};
+static FILE *		g_hOutputLog	{nullptr};
 
 //*****************************************************************************
 //
@@ -52,7 +52,7 @@ bool Debug_InitLogging()
 #endif
 	g_hOutputLog = fopen( log_filename, "w" );
 
-	return g_hOutputLog != NULL;
+	return g_hOutputLog != nullptr;
 }
 
 //*****************************************************************************
@@ -63,7 +63,7 @@ void Debug_FinishLogging()
 	if( g_hOutputLog )
 	{
 		fclose( g_hOutputLog );
-		g_hOutputLog = NULL;
+		g_hOutputLog = nullptr;
 	}
 }
 
@@ -72,10 +72,10 @@ void Debug_FinishLogging()
 //*****************************************************************************
 void Debug_Print( const char * format, ... )
 {
-	if(g_bLog && format != NULL )
+	if(g_bLog && format != nullptr )
 	{
-		char buffer[1024+1];
-		char * p = buffer;
+		char buffer[1024+1] {0};
+		char * p {buffer};
 		va_list va;
 		// Parse the buffer:
 		// Format the output
@@ -93,7 +93,7 @@ void Debug_Print( const char * format, ... )
 //*****************************************************************************
 bool		Debug_GetLoggingEnabled()
 {
-	return g_bLog && (g_hOutputLog != NULL);
+	return g_bLog && (g_hOutputLog != nullptr);
 }
 
 //*****************************************************************************

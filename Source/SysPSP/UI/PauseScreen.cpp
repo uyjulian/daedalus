@@ -123,7 +123,7 @@ IPauseScreen::IPauseScreen( CUIContext * p_context )
 ,	mIsFinished( false )
 ,	mCurrentOption( MO_PAUSE_OPTIONS )
 {
-	for( u32 i = 0; i < NUM_MENU_OPTIONS; ++i )
+	for( auto i {0}; i < NUM_MENU_OPTIONS; ++i )
 	{
 		mOptionComponents[ i ] = NULL;
 	}
@@ -133,7 +133,7 @@ IPauseScreen::IPauseScreen( CUIContext * p_context )
 	mOptionComponents[ MO_ABOUT ]			= CAboutComponent::Create( mpContext );
 
 #ifdef DAEDALUS_ENABLE_ASSERTS
-	for( u32 i = 0; i < NUM_MENU_OPTIONS; ++i )
+	for( auto i {0}; i < NUM_MENU_OPTIONS; ++i )
 	{
 		DAEDALUS_ASSERT( mOptionComponents[ i ] != NULL, "Unhandled screen" );
 	}
@@ -142,7 +142,7 @@ IPauseScreen::IPauseScreen( CUIContext * p_context )
 
 IPauseScreen::~IPauseScreen()
 {
-	for( u32 i = 0; i < NUM_MENU_OPTIONS; ++i )
+	for( auto i {0}; i < NUM_MENU_OPTIONS; ++i )
 	{
 		delete mOptionComponents[ i ];
 	}

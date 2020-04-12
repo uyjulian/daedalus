@@ -98,7 +98,7 @@ static const CBlendConstantExpression * BuildConstantExpression( const CCombiner
 
 		const CBlendConstantExpression *	sum_expr( NULL );
 
-		for( u32 i = 0; i < sum->GetNumOperands(); ++i )
+		for( auto i {0}; i < sum->GetNumOperands(); ++i )
 		{
 			const CCombinerOperand *			sum_term( sum->GetOperand( i ) );
 			const CBlendConstantExpression *	lhs( sum_expr );
@@ -140,7 +140,7 @@ static const CBlendConstantExpression * BuildConstantExpression( const CCombiner
 
 		const CBlendConstantExpression *	product_expr( NULL );
 
-		for( u32 i = 0; i < product->GetNumOperands(); ++i )
+		for( auto i {0}; i < product->GetNumOperands(); ++i )
 		{
 			const CCombinerOperand *			product_term( product->GetOperand( i ) );
 			const CBlendConstantExpression *	lhs( product_expr );
@@ -375,7 +375,7 @@ CAlphaRenderSettings * CCombinerTree::GenerateAlphaRenderSettings( const CCombin
 	if(operand->IsProduct())
 	{
 		const CCombinerProduct *	product( static_cast< const CCombinerProduct * >( operand ) );
-		for( u32 i = 0; i < product->GetNumOperands(); ++i )
+		for( auto i {0}; i < product->GetNumOperands(); ++i )
 		{
 			ApplyAlphaModulateTerm( settings, product->GetOperand( i ) );
 		}
@@ -488,7 +488,7 @@ void	CCombinerTree::GenerateRenderSettings( CBlendStates * states, const CCombin
 	{
 		const CCombinerSum *	sum( static_cast< const CCombinerSum * >( operand ) );
 
-		for( u32 i = 0; i < sum->GetNumOperands(); ++i )
+		for( auto i {0}; i < sum->GetNumOperands(); ++i )
 		{
 			const CCombinerOperand *	sum_term( sum->GetOperand( i ) );
 
@@ -516,7 +516,7 @@ void	CCombinerTree::GenerateRenderSettings( CBlendStates * states, const CCombin
 
 		CRenderSettingsModulate *	settings( new CRenderSettingsModulate( str.c_str() ) );
 
-		for( u32 i = 0; i < product->GetNumOperands(); ++i )
+		for( auto i {0}; i < product->GetNumOperands(); ++i )
 		{
 			ApplyModulateTerm( settings, product->GetOperand( i ) );
 		}
