@@ -24,15 +24,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class AudioOutput;
 
-class CAudioPluginPsp : public CAudioPlugin
+class CAudioPluginPSP : public CAudioPlugin
 {
 private:
-	CAudioPluginPsp();
+	CAudioPluginPSP();
 public:
-	static CAudioPluginPsp *		Create();
+	static CAudioPluginPSP *		Create();
 
 
-	virtual ~CAudioPluginPsp();
+	virtual ~CAudioPluginPSP();
 	virtual bool			StartEmulation();
 	virtual void			StopEmulation();
 
@@ -49,4 +49,3 @@ private:
 
 
 #endif // SYSPSP_HLEAUDIO_AUDIOPLUGINPSP_H_
-

@@ -46,14 +46,8 @@ class AudioOutput
 		void				StopAudio( );						// Stops the Audio PlayBack (as if paused)
 		void				StartAudio( );						// Starts the Audio PlayBack (as if unpaused)
 
-	public:
-		void				FillBuffer( Sample * buffer, u32 num_samples );
-
-	public:
-		CAudioBuffer *		mAudioBufferUncached;
 
 	private:
-		CAudioBuffer *		mAudioBuffer;
 		bool				mAudioPlaying;
 		bool				mExitAudioThread;
 		u32					mFrequency;
