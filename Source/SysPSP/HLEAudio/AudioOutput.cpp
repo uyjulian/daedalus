@@ -85,7 +85,6 @@ void AudioInit()
 {
 	sound_status = 0; // threads running
 
-
 	SceUID audioThid = sceKernelCreateThread("audioOutput", audioOutput, 0x15, 0x1800, PSP_THREAD_ATTR_USER, NULL);
 	sceKernelStartThread(audioThid, 0, NULL);
 	audio_open = true;
@@ -98,7 +97,6 @@ void AudioExit()
 	{
 		sound_status = 0xDEADBEEF;
 		sceKernelDelayThread(100*1000);
-
 	}
 
 	audio_open = false;
@@ -110,7 +108,6 @@ AudioOutput::AudioOutput()
 {
 	void *mem = malloc( sizeof(CAudioBuffer) );
 	mAudioBuffer = new( mem ) CAudioBuffer( BUFFER_SIZE );
-
 }
 
 AudioOutput::~AudioOutput( )
@@ -127,50 +124,50 @@ void AudioOutput::SetFrequency( u32 frequency )
 	mFrequency = frequency;
 }
 
-// struct SAddSamplesJob : public SJob
-// {
-// 	CAudioBuffer *		mBuffer;
-// 	const Sample *		mSamples;
-// 	u32					mNumSamples;
-// 	u32					mFrequency;
-// 	u32					mOutputFreq;
-//
-// 	SAddSamplesJob( CAudioBuffer * buffer, const Sample * samples, u32 num_samples, u32 frequency, u32 output_freq )
-// 		:	mBuffer( buffer )
-// 		,	mSamples( samples )
-// 		,	mNumSamples( num_samples )
-// 		,	mFrequency( frequency )
-// 		,	mOutputFreq( output_freq )
-// 	{
-// 		InitJob = NULL;
-// 		DoJob = &DoAddSamplesStatic;
-// 		FiniJob = &DoJobComplete;
-// 	}
-//
-// 	static int DoAddSamplesStatic( SJob * arg )
-// 	{
-// 		SAddSamplesJob *	job( static_cast< SAddSamplesJob * >( arg ) );
-// 		return job->DoAddSamples();
-// 	}
-//
-// 	static int DoJobComplete( SJob * arg )
-// 	{
-// 		SAddSamplesJob *	job( static_cast< SAddSamplesJob * >( arg ) );
-// 		return job->DoJobComplete();
-// 	}
-//
-// 	int DoAddSamples()
-// 	{
-// 		mBuffer->AddSamples( mSamples, mNumSamples, mFrequency, mOutputFreq );
-// 		return 0;
-// 	}
-//
-// 	int DoJobComplete()
-// 	{
-// 	return 0;
-// 	}
-//
-// };
+struct SAddSamplesJob : public SJob
+{
+	CAudioBuffer *		mBuffer;
+	const Sample *		mSamples;
+	u32					mNumSamples;
+	u32					mFrequency;
+	u32					mOutputFreq;
+
+	SAddSamplesJob( CAudioBuffer * buffer, const Sample * samples, u32 num_samples, u32 frequency, u32 output_freq )
+		:	mBuffer( buffer )
+		,	mSamples( samples )
+		,	mNumSamples( num_samples )
+		,	mFrequency( frequency )
+		,	mOutputFreq( output_freq )
+	{
+		InitJob = NULL;
+		DoJob = &DoAddSamplesStatic;
+		FiniJob = &DoJobComplete;
+	}
+
+	static int DoAddSamplesStatic( SJob * arg )
+	{
+		SAddSamplesJob *	job( static_cast< SAddSamplesJob * >( arg ) );
+		return job->DoAddSamples();
+	}
+
+	static int DoJobComplete( SJob * arg )
+	{
+		SAddSamplesJob *	job( static_cast< SAddSamplesJob * >( arg ) );
+		return job->DoJobComplete();
+	}
+
+	int DoAddSamples()
+	{
+		mBuffer->AddSamples( mSamples, mNumSamples, mFrequency, mOutputFreq );
+		return 0;
+	}
+
+	int DoJobComplete()
+	{
+	return 0;
+	}
+
+};
 
 void AudioOutput::AddBuffer( u8 *start, u32 length )
 {
@@ -189,9 +186,9 @@ void AudioOutput::AddBuffer( u8 *start, u32 length )
 
 	case APM_ENABLED_ASYNC:
 		{
-			// SAddSamplesJob	job( mAudioBufferUncached, reinterpret_cast< const Sample * >( start ), num_samples, mFrequency, 44100 );
-			//
-			// gJobManager.AddJob( &job, sizeof( job ) );
+		SAddSamplesJob	job( mAudioBuffer, reinterpret_cast< const Sample * >( start ), num_samples, mFrequency, 44100 );
+
+	 gJobManager.AddJob( &job, sizeof( job ) );
 		}
 		break;
 

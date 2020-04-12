@@ -1005,7 +1005,7 @@ static bool Patch_GetCache()
 {
 	IO::Filename name;
 
-	Dump_GetSaveDirectory(name, g_ROM.mFileName, ".hle");
+	Dump_GetCacheDirectory(name, g_ROM.mFileName, ".hle");
 	FILE *fp = fopen(name, "rb");
 
 	if (fp != nullptr)
