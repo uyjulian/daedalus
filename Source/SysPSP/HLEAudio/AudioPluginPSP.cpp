@@ -38,8 +38,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/Memory.h"
 #include "Core/ROM.h"
 #include "Core/RSP_HLE.h"
-#include "SysPSP/Utility/JobManager.h"
-
+//#include "SysPSP/Utility/JobManager.h"
+#include "SysPSP/Include/melib.h"
 #define RSP_AUDIO_INTR_CYCLES     5 // This can be adjusted accordingly. Not sure on best value yet
 
 /* This sets default frequency what is used if rom doesn't want to change it.
@@ -119,26 +119,6 @@ u32		CAudioPluginPSP::ReadLength()
 	return 0;
 }
 
-struct SHLEStartJob : public SJob
-{
-	SHLEStartJob()
-	{
-		 InitJob = nullptr;
-		 DoJob = &DoHLEStartStatic;
-		 FiniJob = &DoHLEFinishedStatic;
-	}
-
-static int DoHLEStartStatic( SJob * arg )
-	{
-		 SHLEStartJob *  job( static_cast< SHLEStartJob * >( arg ) );
-		 return job->DoHLEStart();
-	}
-
-	static int DoHLEFinishedStatic( SJob * arg )
-	{
-		 SHLEStartJob *  job( static_cast< SHLEStartJob * >( arg ) );
-		 return job->DoHLEFinish();
-	}
 
 	int DoHLEStart()
 	{
@@ -150,12 +130,13 @@ static int DoHLEStartStatic( SJob * arg )
 	{
 		 CPU_AddEvent(RSP_AUDIO_INTR_CYCLES, CPU_EVENT_AUDIO);
 		 return 0;
-	}
-};
-
+	};
 
 EProcessResult	CAudioPluginPSP::ProcessAList()
 {
+		struct Job* j = (struct Job*)malloc(sizeof(struct Job));
+		j->jobInfo.execMode = MELIB_EXEC_CPU;
+		j->data = (int)&Audio_Ucode;
 	Memory_SP_SetRegisterBits(SP_STATUS_REG, SP_STATUS_HALT);
 
 	EProcessResult	result( PR_NOT_STARTED );
@@ -167,10 +148,13 @@ EProcessResult	CAudioPluginPSP::ProcessAList()
 			break;
 		case APM_ENABLED_ASYNC:
 			{
-				SHLEStartJob	job;
-				gJobManager.AddJob( &job, sizeof( job ) );
+
+
+				J_AddJob(j);
+		//		J_DispatchJobs(1);
+			//	gJobManager.AddJob( &job, sizeof( job ) );
 			}
-			result = PR_STARTED;
+			result = PR_COMPLETED;
 			break;
 		case APM_ENABLED_SYNC:
 			Audio_Ucode();
