@@ -35,7 +35,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Preferences.h"
 #include "Utility/ROMFile.h"
 #include "Utility/ROMFileCache.h"
-#include "Utility/ROMFileMemory.h"
 #include "Utility/Stream.h"
 #include "System/IO.h"
 
@@ -158,28 +157,19 @@ namespace
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 bool RomBuffer::Create()
 {
-	// Create memory heap used for either ROM Cache or ROM buffer
-	// We do this to avoid memory fragmentation
-	CROMFileMemory::Create();
 	return true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void RomBuffer::Destroy()
 {
 
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 bool RomBuffer::Open()
 {
 	CNullOutputStream messages;
@@ -207,8 +197,8 @@ bool RomBuffer::Open()
 	if( ShouldLoadAsFixed( sRomSize ) )
 	{
 		// Now, allocate memory for rom - round up to a 4 byte boundry
-		u32		size_aligned( AlignPow2( sRomSize, 4 ) );
-		u8 *	p_bytes( (u8*)CROMFileMemory::Get()->Alloc( size_aligned ) );
+		u32	size_aligned( AlignPow2( sRomSize, 4 ) );
+		u8* p_bytes = (u8*)malloc( size_aligned ) ;
 
 #ifndef DAEDALUS_PSP
 		if( !p_rom_file->LoadData( sRomSize, p_bytes, messages ) )
@@ -216,7 +206,7 @@ bool RomBuffer::Open()
 			#ifdef DAEDALUS_DEBUG_CONSOLE
 			DBGConsole_Msg(0, "Failed to load [C%s]\n", filename);
 			#endif
-			CROMFileMemory::Get()->Free( p_bytes );
+			free (p_bytes );
 			delete p_rom_file;
 			return false;
 		}
@@ -316,14 +306,12 @@ bool RomBuffer::Open()
 	return true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void	RomBuffer::Close()
 {
 	if (spRomData)
 	{
-		CROMFileMemory::Get()->Free( spRomData );
+		free ( spRomData );
 		spRomData = nullptr;
 	}
 
@@ -382,9 +370,7 @@ namespace
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void	RomBuffer::GetRomBytesRaw( void * p_dst, u32 rom_start, u32 length )
 {
 	if( sRomFixed )
@@ -400,9 +386,7 @@ void	RomBuffer::GetRomBytesRaw( void * p_dst, u32 rom_start, u32 length )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void	RomBuffer::PutRomBytesRaw( u32 rom_start, const void * p_src, u32 length )
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
@@ -413,9 +397,7 @@ void	RomBuffer::PutRomBytesRaw( u32 rom_start, const void * p_src, u32 length )
 
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void * RomBuffer::GetAddressRaw( u32 rom_start )
 {
 	if( rom_start < sRomSize )
@@ -439,9 +421,7 @@ void * RomBuffer::GetAddressRaw( u32 rom_start )
 	return nullptr;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void RomBuffer::CopyToRam( u8 * p_dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length )
 {
 	if( sRomFixed )
@@ -486,17 +466,13 @@ void RomBuffer::CopyToRam( u8 * p_dst, u32 dst_offset, u32 dst_size, u32 src_off
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 bool RomBuffer::IsRomAddressFixed()
 {
 	return sRomFixed;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 const void * RomBuffer::GetFixedRomBaseAddress()
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
