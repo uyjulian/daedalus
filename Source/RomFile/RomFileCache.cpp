@@ -18,9 +18,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "Utility/ROMFileCache.h"
+#include "RomFile/RomFileCache.h"
 
-#include "Utility/ROMFile.h"
+#include "RomFile/RomFile.h"
 
 #include "Base/MathUtil.h"
 

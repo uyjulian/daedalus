@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "OSHLE/patch.h"
 #include "OSHLE/ultra_R4300.h"
 #include "System/System.h"
-#include "Utility/ROMFile.h"
+#include "RomFile/RomFile.h"
 #include "System/CompressedStream.h"
 //
 //	SaveState code written initially by Lkb. Seems to be based about Project 64's
