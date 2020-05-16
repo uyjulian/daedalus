@@ -19,7 +19,7 @@
 #include "Base/Macros.h"
 #include "Utility/Preferences.h"
 #include "Utility/Stream.h"
-#include "Utility/Synchroniser.h"
+#include "Debug/Synchroniser.h"
 
 namespace
 {

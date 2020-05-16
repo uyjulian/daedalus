@@ -39,6 +39,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/IO.h"
 
 #ifdef DAEDALUS_PSP
+
 extern bool PSP_IS_SLIM;
 #endif
 

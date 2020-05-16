@@ -70,4 +70,4 @@ class RomBuffer
 		static const void* GetFixedRomBaseAddress();
 };
 
-#endif // CORE_ROMBUFFER_H_
+#endif  // CORE_ROMBUFFER_H_
