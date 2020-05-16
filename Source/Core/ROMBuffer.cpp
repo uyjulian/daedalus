@@ -44,21 +44,21 @@ extern bool PSP_IS_SLIM;
 
 namespace
 {
-	bool			sRomLoaded( false );
-	u8 *			spRomData( nullptr );
-	u32				sRomSize( 0 );
-	bool			sRomFixed( false );
-	ROMFileCache *	spRomFileCache( nullptr );
+bool sRomLoaded(false);
+u8* spRomData(nullptr);
+u32 sRomSize(0);
+bool sRomFixed(false);
+ROMFileCache*	spRomFileCache(nullptr);
 
 #ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
-	static bool		DECOMPRESS_ROMS( true );
+static bool	DECOMPRESS_ROMS( true );
 #endif
 	// Maximum read length is 8 bytes (i.e. double, u64)
-	const u32		SCRATCH_BUFFER_LENGTH = 16;
-	u8				sScratchBuffer[ SCRATCH_BUFFER_LENGTH ];
+const u32	SCRATCH_BUFFER_LENGTH = 16;
+u8 sScratchBuffer[SCRATCH_BUFFER_LENGTH];
 
-	bool		ShouldLoadAsFixed( u32 rom_size )
-	{
+bool	ShouldLoadAsFixed( u32 rom_size )
+{
 #ifdef DAEDALUS_PSP
 		if (PSP_IS_SLIM && !gGlobalPreferences.LargeROMBuffer)
 			return rom_size <= 32 * 1024 * 1024;
@@ -70,46 +70,46 @@ namespace
 	}
 
 #ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
-	ROMFile *	DecompressRom( ROMFile * p_rom_file, const char * temp_filename, COutputStream & messages )
+	ROMFile*	DecompressRom( ROMFile* p_rom_file, const char * temp_filename, COutputStream & messages )
 	{
-		ROMFile *	p_new_file( nullptr );
-		FILE *		fh( fopen( temp_filename, "wb" ) );
+		ROMFile* p_new_file = nullptr;
+		FILE*	fh = fopen(temp_filename, "wb");
 
-		if( fh == nullptr )
-		{
-			messages << "Unable to create temporary rom '" << temp_filename << "' for decompression\n";
-		}
-		else
-		{
-			bool			failed = false;
-			const u32		TEMP_BUFFER_SIZE = 32 * 1024;
-			u8 *			p_temp_buffer( new u8[ TEMP_BUFFER_SIZE ] );
+	if(fh == nullptr)
+	{
+		messages << "Unable to create temporary rom '" << temp_filename << "' for decompression\n";
+	}
+	 else
+	 {
+		bool failed = false;
+		const u32	TEMP_BUFFER_SIZE = 32 * 1024;
+		u8*	p_temp_buffer( new u8[TEMP_BUFFER_SIZE] );
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 			CDebugConsole::Get()->MsgOverwriteStart();
 #endif
 
-			u32				offset( 0 );
-			u32				total_length( p_rom_file->GetRomSize() );
-			u32				length_remaining( total_length );
+		u32	offset = 0;
+		u32	total_length = p_rom_file->GetRomSize();
+		u32 length_remaining = total_length ;
 
-			while( length_remaining > 0 )
+			while(length_remaining > 0)
 			{
 #ifdef DAEDALUS_DEBUG_CONSOLE
 				if ((offset % 0x8000) == 0)
 				{
-					CDebugConsole::Get()->MsgOverwrite(0, "Converted [M%d / %d] KB", offset /1024, total_length / 1024 );
+					CDebugConsole::Get()->MsgOverwrite(0, "Converted [M%d / %d] KB", offset / 1024, total_length / 1024);
 				}
 #endif
-				u32			length_to_process( Min( length_remaining, TEMP_BUFFER_SIZE ) );
+				u32	length_to_process(Min( length_remaining, TEMP_BUFFER_SIZE));
 
-				if( !p_rom_file->ReadChunk( offset, p_temp_buffer, length_to_process ) )
+				if (!p_rom_file->ReadChunk( offset, p_temp_buffer, length_to_process))
 				{
 					failed = true;
 					break;
 				}
 
-				if( fwrite( p_temp_buffer, 1, length_to_process, fh ) != length_to_process )
+				if (fwrite( p_temp_buffer, 1, length_to_process, fh ) != length_to_process)
 				{
 					failed = true;
 					break;
@@ -123,10 +123,10 @@ namespace
 			CDebugConsole::Get()->MsgOverwriteEnd();
 #endif
 
-			fclose( fh );
-			delete [] p_temp_buffer;
+			fclose(fh);
+			delete[] p_temp_buffer;
 
-			if( failed )
+			if(failed)
 			{
 				messages << "Failed to decompress rom to '" << temp_filename << "' - out of disk space?\n";
 			}
@@ -136,13 +136,13 @@ namespace
 				//	Open the newly created file
 				//
 				p_new_file = ROMFile::Create( temp_filename );
-				if( p_new_file == nullptr )
+				if (p_new_file == nullptr)
 				{
 					messages << "Failed to open temporary rom '" << temp_filename << "' we just created\n";
 				}
 				else
 				{
-					if( !p_new_file->Open( messages ) )
+					if (!p_new_file->Open( messages ) )
 					{
 						messages << "Failed to open temporary rom '" << temp_filename << "' we just created\n";
 						delete p_new_file;
@@ -158,23 +158,16 @@ namespace
 }
 
 
-bool RomBuffer::Create()
-{
-	return true;
-}
+bool RomBuffer::Create() { return true; }
 
-
-void RomBuffer::Destroy()
-{
-
-}
+void RomBuffer::Destroy() {}
 
 
 bool RomBuffer::Open()
 {
 	CNullOutputStream messages;
-	const char * filename   = g_ROM.mFileName;
-	ROMFile *    p_rom_file = ROMFile::Create( filename );
+	const char* filename = g_ROM.mFileName;
+	ROMFile* p_rom_file = ROMFile::Create( filename );
 	if(p_rom_file == nullptr)
 	{
 		#ifdef DAEDALUS_DEBUG_CONSOLE
@@ -183,7 +176,7 @@ bool RomBuffer::Open()
 		return false;
 	}
 
-	if( !p_rom_file->Open( messages ) )
+	if (!p_rom_file->Open(messages))
 	{
 		#ifdef DAEDALUS_DEBUG_CONSOLE
 		DBGConsole_Msg(0, "Failed to open [C%s]\n", filename);
@@ -194,35 +187,35 @@ bool RomBuffer::Open()
 
 	sRomSize = p_rom_file->GetRomSize();
 
-	if( ShouldLoadAsFixed( sRomSize ) )
+	if (ShouldLoadAsFixed(sRomSize))
 	{
 		// Now, allocate memory for rom - round up to a 4 byte boundry
-		u32	size_aligned( AlignPow2( sRomSize, 4 ) );
-		u8* p_bytes = (u8*)malloc( size_aligned ) ;
+		u32	size_aligned( AlignPow2(sRomSize, 4));
+		u8* p_bytes = (u8*)malloc(size_aligned) ;
 
 #ifndef DAEDALUS_PSP
-		if( !p_rom_file->LoadData( sRomSize, p_bytes, messages ) )
+		if (!p_rom_file->LoadData( sRomSize, p_bytes, messages ) )
 		{
 			#ifdef DAEDALUS_DEBUG_CONSOLE
 			DBGConsole_Msg(0, "Failed to load [C%s]\n", filename);
 			#endif
-			free (p_bytes );
+			free (p_bytes);
 			delete p_rom_file;
 			return false;
 		}
 #else
-		u32 offset( 0 );
-		u32 length_remaining( sRomSize );
+		u32 offset = 0;
+		u32 length_remaining = sRomSize;
 		const u32 TEMP_BUFFER_SIZE = 128 * 1024;
 
-		intraFont* ltn8  = intraFontLoad( "flash0:/font/ltn8.pgf", INTRAFONT_CACHE_ASCII);
+		intraFont* ltn8 = intraFontLoad( "flash0:/font/ltn8.pgf", INTRAFONT_CACHE_ASCII);
 		intraFontSetStyle( ltn8, 1.5f, 0xFFFFFFFF, 0, 0.f, INTRAFONT_ALIGN_CENTER );
 
 		while( offset < sRomSize )
 		{
-			u32 length_to_process( Min( length_remaining, TEMP_BUFFER_SIZE ) );
+			u32 length_to_process = Min(length_remaining, TEMP_BUFFER_SIZE);
 
-			if( !p_rom_file->ReadChunk( offset, p_bytes + offset, length_to_process ) )
+			if (!p_rom_file->ReadChunk( offset, p_bytes + offset, length_to_process ) )
 			{
 				break;
 			}
@@ -249,39 +242,39 @@ bool RomBuffer::Open()
 #ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
 		if(DECOMPRESS_ROMS)
 		{
-			bool	compressed( p_rom_file->IsCompressed() );
-			bool	byteswapped( p_rom_file->RequiresSwapping() );
+			bool compressed = p_rom_file->IsCompressed();
+			bool byteswapped = p_rom_file->RequiresSwapping();
 			if(compressed)// || byteswapped)
 			{
-				const char * temp_filename( "daedrom.tmp" );
+				const char* temp_filename( "daedrom.tmp" );
 
 				#ifdef DAEDALUS_DEBUG_CONSOLE
 				if(compressed && byteswapped)
 				{
-					DBGConsole_Msg( 0, "Rom is [Mcompressed] and [Mbyteswapped]" );
+					DBGConsole_Msg(0, "Rom is [Mcompressed] and [Mbyteswapped]");
 				}
 				else if(compressed)
 				{
-					DBGConsole_Msg( 0, "Rom is [Mcompressed]" );
+					DBGConsole_Msg(0, "Rom is [Mcompressed]");
 				}
 				else
 				{
-					DBGConsole_Msg( 0, "Rom is [Mbyteswapped]" );
+					DBGConsole_Msg(0, "Rom is [Mbyteswapped]");
 				}
-				DBGConsole_Msg( 0, "Decompressing rom to [C%s] (this may take some time)", temp_filename );
+				DBGConsole_Msg(0, "Decompressing rom to [C%s] (this may take some time)", temp_filename);
 				#endif
-				CNullOutputStream		local_messages;
+				CNullOutputStream	local_messages;
 
-				ROMFile * p_new_file = DecompressRom( p_rom_file, temp_filename, local_messages );
+				ROMFile* p_new_file = DecompressRom(p_rom_file, temp_filename, local_messages);
 				#ifdef DAEDALUS_DEBUG_CONSOLE
 				DBGConsole_Msg( 0, "messages:\n%s", local_messages.c_str() );
 				#endif
 				messages << local_messages;
 
-				if(p_new_file != nullptr)
+				if (p_new_file != nullptr)
 				{
 					#ifdef DAEDALUS_DEBUG_CONSOLE
-					DBGConsole_Msg( 0, "Decompression [gsuccessful]. Booting using decompressed rom" );
+					DBGConsole_Msg(0, "Decompression [gsuccessful]. Booting using decompressed rom");
 					#endif
 					delete p_rom_file;
 					p_rom_file = p_new_file;
@@ -289,14 +282,14 @@ bool RomBuffer::Open()
 				#ifdef DAEDALUS_DEBUG_CONSOLE
 				else
 				{
-					DBGConsole_Msg( 0, "Decompression [rfailed]. Booting using original rom" );
+					DBGConsole_Msg(0, "Decompression [rfailed]. Booting using original rom");
 				}
 				#endif
 			}
 		}
 #endif
 		spRomFileCache = new ROMFileCache();
-		spRomFileCache->Open( p_rom_file );
+		spRomFileCache->Open(p_rom_file);
 		sRomFixed = false;
 	}
 	#ifdef DAEDALUS_DEBUG_CONSOLE
@@ -311,7 +304,7 @@ void	RomBuffer::Close()
 {
 	if (spRomData)
 	{
-		free ( spRomData );
+		free (spRomData);
 		spRomData = nullptr;
 	}
 
@@ -322,45 +315,45 @@ void	RomBuffer::Close()
 		spRomFileCache = nullptr;
 	}
 
-	sRomSize   = 0;
+	sRomSize = 0;
 	sRomLoaded = false;
 	sRomFixed  = false;
 }
 
-bool	RomBuffer::IsRomLoaded() { return sRomLoaded; }
-u32		RomBuffer::GetRomSize() { return sRomSize; }
+bool RomBuffer::IsRomLoaded() { return sRomLoaded; }
+u32	RomBuffer::GetRomSize() { return sRomSize; }
 
 namespace
 {
-	void	CopyBytesRaw( ROMFileCache * p_cache, u8 * p_dst, u32 rom_offset, u32 length )
+	void CopyBytesRaw( ROMFileCache* p_cache, u8* p_dst, u32 rom_offset, u32 length )
 	{
 		// Read the cached bytes into our scratch buffer, and return that
-		u32		dst_offset( 0 );
-		u32		src_offset( rom_offset );
+		u32		dst_offset = 0;
+		u32		src_offset = rom_offset;
 
 		// Similar algorithm to below - we don't care about byte swapping though
-		while(length > 0)
+		while (length > 0)
 		{
-			u8 *	p_chunk_base = 0;
-			u32		chunk_offset = 0;
-			u32		chunk_size = 0;
+			u8*	p_chunk_base = 0;
+			u32	chunk_offset = 0;
+			u32	chunk_size = 0;
 
-			if( !p_cache->GetChunk( src_offset, &p_chunk_base, &chunk_offset, &chunk_size ) )
+			if ( !p_cache->GetChunk( src_offset, &p_chunk_base, &chunk_offset, &chunk_size))
 			{
 				// Out of range
 				break;
 			}
 
 			// Calculate how many bytes we can transfer this pass
-			u32		offset_into_chunk( src_offset - chunk_offset );
-			u32		bytes_remaining_in_chunk( chunk_size - offset_into_chunk );
-			u32		bytes_this_pass( Min( length, bytes_remaining_in_chunk ) );
+			u32	offset_into_chunk = src_offset - chunk_offset;
+			u32	bytes_remaining_in_chunk = chunk_size - offset_into_chunk;
+			u32	bytes_this_pass = Min( length, bytes_remaining_in_chunk);
 
 			#ifdef DAEDALUS_ENABLE_ASSERTS
-			DAEDALUS_ASSERT( s32( bytes_this_pass ) > 0, "How come we're trying to copy <= 0 bytes across?" );
+			DAEDALUS_ASSERT(s32( bytes_this_pass ) > 0, "How come we're trying to copy <= 0 bytes across?");
 			#endif
 			// Copy this chunk across
-			memcpy( p_dst + dst_offset, p_chunk_base + offset_into_chunk, bytes_this_pass );
+			memcpy(p_dst + dst_offset, p_chunk_base + offset_into_chunk, bytes_this_pass);
 
 			// Update the src/dst pointers and reduce length by the number of copied bytes
 			dst_offset += bytes_this_pass;
@@ -371,7 +364,7 @@ namespace
 }
 
 
-void	RomBuffer::GetRomBytesRaw( void * p_dst, u32 rom_start, u32 length )
+void RomBuffer::GetRomBytesRaw( void* p_dst, u32 rom_start, u32 length )
 {
 	if( sRomFixed )
 	{
@@ -387,22 +380,22 @@ void	RomBuffer::GetRomBytesRaw( void * p_dst, u32 rom_start, u32 length )
 }
 
 
-void	RomBuffer::PutRomBytesRaw( u32 rom_start, const void * p_src, u32 length )
+void RomBuffer::PutRomBytesRaw( u32 rom_start, const void* p_src, u32 length )
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT( IsRomAddressFixed(), "Cannot put rom bytes when the data isn't fixed" );
 	#endif
 
-	memcpy( (u8*)spRomData + rom_start, p_src, length );
+	memcpy((u8*)spRomData + rom_start, p_src, length);
 
 }
 
 
-void * RomBuffer::GetAddressRaw( u32 rom_start )
+void* RomBuffer::GetAddressRaw( u32 rom_start )
 {
-	if( rom_start < sRomSize )
+	if (rom_start < sRomSize)
 	{
-		if( sRomFixed )
+		if (sRomFixed)
 		{
 			return (u8 *)spRomData + rom_start;
 		}
@@ -422,38 +415,38 @@ void * RomBuffer::GetAddressRaw( u32 rom_start )
 }
 
 
-void RomBuffer::CopyToRam( u8 * p_dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length )
+void RomBuffer::CopyToRam( u8* p_dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length )
 {
-	if( sRomFixed )
+	if(sRomFixed)
 	{
-		const u8 *	p_src( (const u8 *)spRomData );
-		u32			src_size( sRomSize );
+		const u8*	p_src = (const u8 *)spRomData;
+		u32	src_size = sRomSize;
 
-		DMA_HandleTransfer( p_dst, dst_offset, dst_size, p_src, src_offset, src_size, length );
+		DMA_HandleTransfer(p_dst, dst_offset, dst_size, p_src, src_offset, src_size, length);
 	}
 	else
 	{
-		while(length > 0)
+		while (length > 0)
 		{
-			u8 *	p_chunk_base = 0;
-			u32		chunk_offset = 0;
-			u32		chunk_size = 0;
+			u8*	p_chunk_base = 0;
+			u32	chunk_offset = 0;
+			u32	chunk_size = 0;
 
-			if( !spRomFileCache->GetChunk( src_offset, &p_chunk_base, &chunk_offset, &chunk_size ) )
+			if (!spRomFileCache->GetChunk( src_offset, &p_chunk_base, &chunk_offset, &chunk_size))
 			{
 				// Out of range
 				break;
 			}
 
 			// Calculate how many bytes we can transfer this pass
-			u32		offset_into_chunk( src_offset - chunk_offset );
-			u32		bytes_remaining_in_chunk( chunk_size - offset_into_chunk );
-			u32		bytes_this_pass( Min( length, bytes_remaining_in_chunk ) );
+			u32	offset_into_chunk = src_offset - chunk_offset;
+			u32	bytes_remaining_in_chunk = chunk_size - offset_into_chunk;
+			u32	bytes_this_pass = Min( length, bytes_remaining_in_chunk );
 			#ifdef DAEDALUS_ENABLE_ASSERTS
 			DAEDALUS_ASSERT( s32( bytes_this_pass ) > 0, "How come we're trying to copy <= 0 bytes across?" );
 			#endif
 			// Copy this chunk across
-			if( !DMA_HandleTransfer( p_dst, dst_offset, dst_size, p_chunk_base, offset_into_chunk, chunk_size, bytes_this_pass  ) )
+			if (!DMA_HandleTransfer( p_dst, dst_offset, dst_size, p_chunk_base, offset_into_chunk, chunk_size, bytes_this_pass))
 			{
 				break;
 			}
@@ -467,18 +460,14 @@ void RomBuffer::CopyToRam( u8 * p_dst, u32 dst_offset, u32 dst_size, u32 src_off
 }
 
 
-bool RomBuffer::IsRomAddressFixed()
-{
-	return sRomFixed;
-}
+bool RomBuffer::IsRomAddressFixed() { return sRomFixed; }
 
 
-const void * RomBuffer::GetFixedRomBaseAddress()
+const void* RomBuffer::GetFixedRomBaseAddress()
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
-	DAEDALUS_ASSERT( IsRomLoaded(), "The rom isn't loaded" );
-	DAEDALUS_ASSERT( IsRomAddressFixed(), "Trying to access the rom base address when it's not fixed" );
+	DAEDALUS_ASSERT(IsRomLoaded(), "The rom isn't loaded");
+	DAEDALUS_ASSERT(IsRomAddressFixed(), "Trying to access the rom base address when it's not fixed");
 #endif
 	return spRomData;
-
 }
