@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 class COutputStream;
 
-bool IsRomfilename( const char * rom_filename );
+bool IsRomFilename( const char * rom_filename );
 
 class ROMFile
 {

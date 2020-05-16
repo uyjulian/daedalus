@@ -186,7 +186,7 @@ void Generate500(WebDebugConnection * connection, const char * message)
 {
 	connection->BeginResponse(500, -1, kTextHTML );
 
-	WriteStandardHeader(connection, "404 - Page Not Found");
+	WriteStandardHeader(connection, "500 - Internal Server Error");
 
 	connection->WriteString(
 		"<div class=\"container\">\n"

@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef DEBUG_DBGCONSOLE_H_
-#define DEBUG_DBGCONSOLE_H_
+#ifndef DEBUG_CONSOLE_H_
+#define DEBUG_CONSOLE_H_
 
 #include "Base/Types.h"
 #include "Base/Singleton.h"

@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <algorithm>
 #include <string.h>
 
-bool IsRomfilename( const char * rom_filename )
+bool IsRomFilename( const char * rom_filename )
 {
 	const char * last_period( strrchr( rom_filename, '.' ) );
 	if(last_period == NULL)

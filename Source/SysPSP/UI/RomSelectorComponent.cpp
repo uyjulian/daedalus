@@ -330,7 +330,7 @@ void	IRomSelectorComponent::AddRomDirectory(const char * p_roms_dir, RomInfoList
 		do
 		{
 			const char * rom_filename( find_data.Name );
-			if(IsRomfilename( rom_filename ))
+			if(IsRomFilename( rom_filename ))
 			{
 				full_path = p_roms_dir;
 				full_path += rom_filename;
