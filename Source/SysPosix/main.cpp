@@ -62,6 +62,7 @@ int main(int argc, char **argv)
 
 	if (!System_Init())
 	{
+		fprintf(stderr, "System_Init Failed\n");
 		return 1;
 	}
 
@@ -112,7 +113,10 @@ int main(int argc, char **argv)
 		}
 		else if (filename)
 		{
-			System_Open( filename );
+		if (!System_Open( filename ))
+		{
+			fprintf(stderr, "System_Open failed\n");
+		}
 			CPU_Run();
 			System_Close();
 		}
@@ -120,6 +124,7 @@ int main(int argc, char **argv)
 	else
 	{
 		printf("Usage: daedalus 'Path to Rom'\n");
+		return 1;
 	}
 	System_Finalize();
 	return result;

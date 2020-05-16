@@ -27,15 +27,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef DAEDALUS_LOG
 
-//*****************************************************************************
-//
-//*****************************************************************************
-static bool			g_bLog = false;
-static FILE *		g_hOutputLog	= NULL;
 
-//*****************************************************************************
-//
-//*****************************************************************************
+static bool	g_bLog = false;
+static FILE* g_hOutputLog	= NULL;
+
 bool Debug_InitLogging()
 {
 	IO::Filename log_filename;
@@ -45,19 +40,17 @@ bool Debug_InitLogging()
 	IO::Path::Append(log_filename, "daedalus.txt");
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
-	if ( CDebugConsole::IsAvailable() )
+	if (CDebugConsole::IsAvailable())
 	{
-		CDebugConsole::Get()->Msg( 0, "Creating Dump file '%s'", log_filename );
+		CDebugConsole::Get()->Msg(0, "Creating Dump file '%s'", log_filename);
 	}
 #endif
-	g_hOutputLog = fopen( log_filename, "w" );
+	g_hOutputLog = fopen(log_filename, "w");
 
 	return g_hOutputLog != NULL;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void Debug_FinishLogging()
 {
 	if( g_hOutputLog )
@@ -67,15 +60,13 @@ void Debug_FinishLogging()
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void Debug_Print( const char * format, ... )
+
+void Debug_Print( const char* format, ... )
 {
-	if(g_bLog && format != NULL )
+	if(g_bLog && format != NULL)
 	{
-		char buffer[1024+1];
-		char * p = buffer;
+		char buffer[1024 + 1];
+		char* p = buffer;
 		va_list va;
 		// Parse the buffer:
 		// Format the output
@@ -84,22 +75,18 @@ void Debug_Print( const char * format, ... )
 		vsprintf(p, format, va);
 		va_end(va);
 
-		fprintf( g_hOutputLog, "%s\n", p );
+		fprintf(g_hOutputLog, "%s\n", p);
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-bool		Debug_GetLoggingEnabled()
+
+bool Debug_GetLoggingEnabled()
 {
 	return g_bLog && (g_hOutputLog != NULL);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void		Debug_SetLoggingEnabled( bool enabled )
+
+void Debug_SetLoggingEnabled( bool enabled )
 {
 	g_bLog = enabled;
 }
