@@ -3,6 +3,7 @@
 
 #include <pspgu.h>
 
+#include "Base/MathUtil.h"
 #include "Combiner/BlendConstant.h"
 #include "Combiner/CombinerTree.h"
 #include "Combiner/RenderSettings.h"
@@ -14,10 +15,12 @@
 #include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/RDPStateManager.h"
 #include "HLEGraphics/TextureCache.h"
-#include "Base/MathUtil.h"
+#include "Interface/Preferences.h"
+
 #include "OSHLE/ultra_gbi.h"
 #include "System/IO.h"
 #include "Utility/Profiler.h"
+
 
 
 //Draw normal filled triangles

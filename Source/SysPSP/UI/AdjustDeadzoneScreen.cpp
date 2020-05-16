@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/MathUtil.h"
 #include "Math/Vector2.h"
 #include "SysPSP/Graphics/DrawText.h"
-#include "Utility/Preferences.h"
+#include "Interface/Preferences.h"
 #include "Utility/Translate.h"
 #include "PSPMenu.h"
 

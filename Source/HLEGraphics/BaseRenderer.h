@@ -20,15 +20,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_BASERENDERER_H_
 #define HLEGRAPHICS_BASERENDERER_H_
 
+#include "Config/ConfigOptions.h"
+#include "Graphics/ColourValue.h"
+#include "HLEGraphics/DaedalusVtx.h"
+#include "HLEGraphics/TextureInfo.h"
+#include "Math/Matrix4x4.h"
 #include "Math/Vector2.h"
 #include "Math/Vector3.h"
 #include "Math/Vector4.h"
-#include "Math/Matrix4x4.h"
 #include "Utility/RefCounted.h"
-#include "HLEGraphics/DaedalusVtx.h"
-#include "HLEGraphics/TextureInfo.h"
-#include "Graphics/ColourValue.h"
-#include "Utility/Preferences.h"
+
 
 #ifdef DAEDALUS_PSP
 #include <pspgu.h>
@@ -235,7 +236,7 @@ public:
 	inline void			SetFogMultOffs(f32 Mult, f32 Offs)		{ mTnL.FogMult=Mult/255.0f; mTnL.FogOffs=Offs/255.0f;}
 	inline void			SetFogMinMax(f32 fog_near, f32 fog_far)	{ sceGuFog(fog_near, fog_far, mFogColour.GetColour()); }
 	inline void			SetFogColour( c32 colour )				{ mFogColour = colour; }
-	
+
 	// PrimDepth will replace the z value if depth_source=1 (z range 32767-0 while PSP depthbuffer range 0-65535)//Corn
 #ifdef DAEDALUS_PSP
 	inline void			SetPrimitiveDepth( u32 z )				{ mPrimDepth = (f32)( ( ( 32767 - z ) << 1) + 1 ); }

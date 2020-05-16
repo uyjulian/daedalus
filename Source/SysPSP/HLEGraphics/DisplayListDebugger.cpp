@@ -40,7 +40,7 @@
 #include "Debug/Dump.h"
 
 #include "System/IO.h"
-#include "Utility/Preferences.h"
+#include "Interface/Preferences.h"
 #include "Utility/Timer.h"
 #include "Utility/Timing.h"
 

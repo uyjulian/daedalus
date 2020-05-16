@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Debug/DBGConsole.h"
 
-#include "Utility/Preferences.h"
+#include "Interface/Preferences.h"
 #include "Utility/ROMFile.h"
 #include "Utility/ROMFileCache.h"
 #include "Utility/Stream.h"

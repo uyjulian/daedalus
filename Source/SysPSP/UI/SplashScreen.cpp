@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Math/Math.h"	// VFPU Math
 
-#include "Utility/Preferences.h"
+#include "Interface/Preferences.h"
 #include "SysPSP/Utility/PathsPSP.h"
 #include "PSPMenu.h"
 #include <pspctrl.h>

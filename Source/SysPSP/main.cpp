@@ -59,7 +59,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Test/BatchTest.h"
 #include "System/IO.h"
 #include "Utility/ModulePSP.h"
-#include "Utility/Preferences.h"
+#include "Interface/Preferences.h"
 #include "Utility/Profiler.h"
 #include "Utility/Thread.h"
 #include "Utility/Translate.h"
