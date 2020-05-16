@@ -136,7 +136,7 @@ add_definitions("-DNDEBUG -O3 -DDAEDALUS_POSIX")
 	add_definitions(-DDAEDALUS_POSIX)
 		include_directories(${PROJECT_SOURCE_DIR}/Base/Release)
 include_directories(${PROJECT_SOURCE_DIR/HLEGraphics})
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/Config/Release ${PROJECT_SOURCE_DIR}/SysPosix/Include)
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/SysPosix/Include)
 
 endif (MAC_RELEASE OR LINUX_RELEASE)
 
@@ -146,7 +146,7 @@ add_definitions("-D_DEBUG -g -DDAEDALUS_POSIX")
 	add_definitions(-DDAEDALUS_POSIX)
 		include_directories(${PROJECT_SOURCE_DIR}/Base/Dev)
 include_directories(${PROJECT_SOURCE_DIR/HLEGraphics})
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/Config/Dev ${PROJECT_SOURCE_DIR}/SysPosix/Include)
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/SysPosix/Include)
 
 endif (MAC_DEBUG OR LINUX_DEBUG)
 
