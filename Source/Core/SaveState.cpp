@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "OSHLE/ultra_R4300.h"
 #include "System/System.h"
 #include "Utility/ROMFile.h"
-#include "Utility/ZlibWrapper.h"
+#include "System/CompressedStream.h"
 //
 //	SaveState code written initially by Lkb. Seems to be based about Project 64's
 //	savestate format, which is partially documented here: http://www.hcs64.com/usf/usf.txt
