@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/MathUtil.h"
 #include "OSHLE/patch.h"
 #include "OSHLE/ultra_R4300.h"
-#include "System/System.h"
+#include "System/SystemInit.h"
 #include "RomFile/RomFile.h"
 #include "System/CompressedStream.h"
 //
