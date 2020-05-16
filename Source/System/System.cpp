@@ -51,7 +51,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef DAEDALUS_PSP
 #include "Utility/Translate.h"
 #endif
-#include "Input/InputManager.h"		// CInputManager::Create/Destroy
+#include "Input/InputManager.h"	// CInputManager::Create/Destroy
 
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
@@ -59,18 +59,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Plugins/GraphicsPlugin.h"
 #include "Plugins/AudioPlugin.h"
 
-CGraphicsPlugin * gGraphicsPlugin   = NULL;
-CAudioPlugin	* gAudioPlugin		= NULL;
+CGraphicsPlugin* gGraphicsPlugin = NULL;
+CAudioPlugin* gAudioPlugin = NULL;
 
 static bool InitAudioPlugin()
 {
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 	DAEDALUS_ASSERT( gAudioPlugin == NULL, "Why is there already an audio plugin?" );
 	#endif
-	CAudioPlugin * audio_plugin = CreateAudioPlugin();
-	if( audio_plugin != NULL )
+	CAudioPlugin* audio_plugin = CreateAudioPlugin();
+	if(audio_plugin != NULL)
 	{
-		if( !audio_plugin->StartEmulation() )
+		if(!audio_plugin->StartEmulation())
 		{
 			delete audio_plugin;
 			audio_plugin = NULL;
@@ -86,9 +86,9 @@ static bool InitGraphicsPlugin()
 	DAEDALUS_ASSERT( gGraphicsPlugin == NULL, "The graphics plugin should not be initialised at this point" );
 	#endif
 	CGraphicsPlugin * graphics_plugin = CreateGraphicsPlugin();
-	if( graphics_plugin != NULL )
+	if(graphics_plugin != NULL)
 	{
-		if( !graphics_plugin->StartEmulation() )
+		if(!graphics_plugin->StartEmulation())
 		{
 			delete graphics_plugin;
 			graphics_plugin = NULL;
@@ -100,7 +100,7 @@ static bool InitGraphicsPlugin()
 
 static void DisposeGraphicsPlugin()
 {
-	if ( gGraphicsPlugin != NULL )
+	if (gGraphicsPlugin != NULL)
 	{
 		gGraphicsPlugin->RomClosed();
 		delete gGraphicsPlugin;
@@ -113,7 +113,7 @@ static void DisposeAudioPlugin()
 	// Make a copy of the plugin, and set the global pointer to NULL;
 	// This stops other threads from trying to access the plugin
 	// while we're in the process of shutting it down.
-	CAudioPlugin * audio_plugin = gAudioPlugin;
+	CAudioPlugin* audio_plugin = gAudioPlugin;
 	gAudioPlugin = NULL;
 	if (audio_plugin != NULL)
 	{
@@ -124,13 +124,13 @@ static void DisposeAudioPlugin()
 
 struct SysEntityEntry
 {
-	const char *name;
+	const char* name;
 	bool (*init)();
 	void (*final)();
 };
 
 #ifdef DAEDALUS_ENABLE_PROFILING
-static void ProfilerVblCallback(void * arg)
+static void ProfilerVblCallback(void* arg)
 {
 	CProfiler::Get()->Update();
 	CProfiler::Get()->Display();
@@ -138,8 +138,7 @@ static void ProfilerVblCallback(void * arg)
 
 static bool Profiler_Init()
 {
-	if (!CProfiler::Create())
-		return false;
+	if (!CProfiler::Create())	return false;
 
 	CPU_RegisterVblCallback(&ProfilerVblCallback, NULL);
 
@@ -153,80 +152,78 @@ static void Profiler_Fini()
 }
 #endif
 
-static const SysEntityEntry gSysInitTable[] =
-{
+static const SysEntityEntry gSysInitTable[] = {
 #ifdef DAEDALUS_DEBUG_CONSOLE
-	{"DebugConsole",		CDebugConsole::Create,		CDebugConsole::Destroy},
+	{"DebugConsole", CDebugConsole::Create, CDebugConsole::Destroy},
 #endif
 #ifdef DAEDALUS_LOG
-	{"Logger",				Debug_InitLogging,			Debug_FinishLogging},
+	{"Logger", Debug_InitLogging,	Debug_FinishLogging},
 #endif
 #ifdef DAEDALUS_ENABLE_PROFILING
-	{"Profiler",			Profiler_Init,				Profiler_Fini},
+	{"Profiler", Profiler_Init, Profiler_Fini},
 #endif
-	{"ROM Database",		CRomDB::Create,				CRomDB::Destroy},
-	{"ROM Settings",		CRomSettingsDB::Create,		CRomSettingsDB::Destroy},
-	{"InputManager",		CInputManager::Create,		CInputManager::Destroy},
+	{"ROM Database", CRomDB::Create, CRomDB::Destroy},
+	{"ROM Settings", CRomSettingsDB::Create, CRomSettingsDB::Destroy},
+	{"InputManager", CInputManager::Create, CInputManager::Destroy},
 #ifdef DAEDALUS_PSP
-	{"VideoMemory",			CVideoMemoryManager::Create, NULL},
+	{"VideoMemory", CVideoMemoryManager::Create, NULL},
 #endif
-	{"GraphicsContext",		CGraphicsContext::Create,	CGraphicsContext::Destroy},
+	{"GraphicsContext", CGraphicsContext::Create,	CGraphicsContext::Destroy},
 #ifdef DAEDALUS_PSP
-	{"Language",			Translate_Init,				NULL},
+	{"Language", Translate_Init, NULL},
 #endif
-	{"Preference",			CPreferences::Create,		CPreferences::Destroy},
-	{"Memory",				Memory_Init,				Memory_Fini},
+	{"Preference", CPreferences::Create, CPreferences::Destroy},
+	{"Memory", Memory_Init, Memory_Fini},
 
-	{"Controller",			CController::Create,		CController::Destroy},
-	{"RomBuffer",			RomBuffer::Create,			RomBuffer::Destroy},
+	{"Controller", CController::Create, CController::Destroy},
+	{"RomBuffer", RomBuffer::Create, RomBuffer::Destroy},
 
 #if defined(DAEDALUS_POSIX) || defined(DAEDALUS_W32)
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	{"WebDebug",			WebDebug_Init, 				WebDebug_Fini},
+	{"WebDebug", WebDebug_Init, WebDebug_Fini},
 	{"TextureCacheWebDebug",TextureCache_RegisterWebDebug, 	NULL},
 	{"DLDebuggerWebDebug",	DLDebugger_RegisterWebDebug, 	NULL},
 #endif
 #endif
 
 #ifdef DAEDALUS_GL
-	{"UI",					UI_Init,				 	UI_Finalise},
+	{"UI", UI_Init, UI_Finalise},
 #endif
 };
 
 struct RomEntityEntry
 {
-	const char *name;
+	const char* name;
 	bool (*open)();
 	void (*close)();
 };
 
 static const RomEntityEntry gRomInitTable[] =
 {
-	{"RomBuffer",			RomBuffer::Open, 		RomBuffer::Close},
-	{"Settings",			ROM_LoadFile,			ROM_UnloadFile},
-	{"InputManager",		CInputManager::Init,	CInputManager::Fini},
-	{"Memory",				Memory_Reset,			Memory_Cleanup},
-	{"Audio",				InitAudioPlugin,		DisposeAudioPlugin},
-	{"Graphics",			InitGraphicsPlugin,		DisposeGraphicsPlugin},
-	{"FramerateLimiter",	FramerateLimiter_Reset,	NULL},
+	{"RomBuffer", RomBuffer::Open, RomBuffer::Close},
+	{"Settings", ROM_LoadFile,	ROM_UnloadFile},
+	{"InputManager", CInputManager::Init, CInputManager::Fini},
+	{"Memory", Memory_Reset, Memory_Cleanup},
+	{"Audio", InitAudioPlugin, DisposeAudioPlugin},
+	{"Graphics", InitGraphicsPlugin, DisposeGraphicsPlugin},
+	{"FramerateLimiter", FramerateLimiter_Reset, NULL},
 	//{"RSP", RSP_Reset, NULL},
-	{"CPU",					CPU_RomOpen},
-	{"ROM",					ROM_ReBoot,				ROM_Unload},
-	{"Controller",			CController::Reset,		CController::RomClose},
-	{"Save",				Save_Reset,				Save_Fini},
+	{"CPU", CPU_RomOpen},
+	{"ROM",	ROM_ReBoot, ROM_Unload},
+	{"Controller", CController::Reset, CController::RomClose},
+	{"Save", Save_Reset,	Save_Fini},
 #ifdef DAEDALUS_ENABLE_SYNCHRONISATION
-	{"CSynchroniser",		CSynchroniser::InitialiseSynchroniser, CSynchroniser::Destroy},
+	{"CSynchroniser",	CSynchroniser::InitialiseSynchroniser, CSynchroniser::Destroy},
 #endif
 };
 
 bool System_Init()
 {
-	for(u32 i = 0; i < ARRAYSIZE(gSysInitTable); i++)
+	for (u32 i = 0; i < ARRAYSIZE(gSysInitTable); i++)
 	{
-		const SysEntityEntry & entry = gSysInitTable[i];
+		const SysEntityEntry& entry = gSysInitTable[i];
 
-		if (entry.init == NULL)
-			continue;
+		if (entry.init == NULL) continue;
 
 		if (entry.init())
 		{
@@ -246,15 +243,14 @@ bool System_Init()
 	return true;
 }
 
-bool System_Open(const char * filename)
+bool System_Open(const char* filename)
 {
 	strcpy(g_ROM.mFileName, filename);
-	for(u32 i = 0; i < ARRAYSIZE(gRomInitTable); i++)
+	for (u32 i = 0; i < ARRAYSIZE(gRomInitTable); i++)
 	{
 		const RomEntityEntry & entry = gRomInitTable[i];
 
-		if (entry.open == NULL)
-			continue;
+		if (entry.open == NULL)	continue;
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 		DBGConsole_Msg(0, "==>Open %s", entry.name);
 		#endif
@@ -272,12 +268,11 @@ bool System_Open(const char * filename)
 
 void System_Close()
 {
-	for(s32 i = ARRAYSIZE(gRomInitTable) - 1 ; i >= 0; i--)
+	for (s32 i = ARRAYSIZE(gRomInitTable) - 1 ; i >= 0; i--)
 	{
 		const RomEntityEntry & entry = gRomInitTable[i];
 
-		if (entry.close == NULL)
-			continue;
+		if (entry.close == NULL) continue;
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 		DBGConsole_Msg(0, "==>Close %s", entry.name);
 		#endif
@@ -287,12 +282,11 @@ void System_Close()
 
 void System_Finalize()
 {
-	for(s32 i = ARRAYSIZE(gSysInitTable) - 1; i >= 0; i--)
+	for (s32 i = ARRAYSIZE(gSysInitTable) - 1; i >= 0; i--)
 	{
 		const SysEntityEntry & entry = gSysInitTable[i];
 
-		if (entry.final == NULL)
-			continue;
+		if (entry.final == NULL) continue;
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 		DBGConsole_Msg(0, "==>Finalize %s", entry.name);
 		#endif
