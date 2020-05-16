@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <psputilsforkernel.h>
 #include <psputils.h>
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 extern "C" { void _DaedalusICacheInvalidate( const void * address, u32 length ); }
 
@@ -46,7 +46,7 @@ bool	PatchJumpLong( CJumpLocation jump, CCodeLabel target )
 
 	if( op_code.op == OP_J || op_code.op == OP_JAL )
 	{
-		op_code.target = target.GetTargetU32() >> 2;
+	op_code.target = reinterpret_cast<u32>(target.GetTargetU8P()) >> 2;
 	}
 	else
 	{
@@ -114,7 +114,7 @@ void		ReplaceBranchWithJump( CJumpLocation branch, CCodeLabel target )
 
 	// Sanity check this is actually a branch?
 	op_code.op = OP_J;
-	op_code.target = target.GetTargetU32() >> 2;
+op_code.target = reinterpret_cast<u32>(target.GetTargetU8P()) >> 2;
 
 //	sceKernelDcacheWritebackRange( branch.GetTargetU8P(), 4 );
 //	sceKernelIcacheInvalidateRange( branch.GetTargetU8P(), 4 );

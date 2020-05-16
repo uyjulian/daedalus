@@ -25,13 +25,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <vector>
 #include <string>
 
-#include "IO.h"
+#include "System/IO.h"
 #include "StringUtil.h"
 #include "VolatileMem.h"
 
 #include "System/Paths.h"
 #include "SysPSP/Utility/PathsPSP.h"
-#include "Utility/Macros.h"
+#include "Base/Macros.h"
 
 #define TRANSLATE_DUMP_VALUE 0xDAEDDAED
 //*****************************************************************************

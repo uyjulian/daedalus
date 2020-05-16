@@ -20,12 +20,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // This file should not be compiled using precompiled headers.
 
 #include "stdafx.h"
-#include "ZlibWrapper.h"
+#include "Utility/ZlibWrapper.h"
 
 #include <string.h>
 #include <zlib.h>
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 
 #define toGzipFile(fh) ((gzFile)fh)

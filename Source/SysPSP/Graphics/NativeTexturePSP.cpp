@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "VideoMemoryManager.h"
 #include "Utility/FastMemcpy.h"
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 #include <png.h>
 

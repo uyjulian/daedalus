@@ -34,8 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "OSHLE/patch.h"		// For GetCorrectOp
 #include "OSHLE/ultra_R4300.h"
 #include "System/Paths.h"
-#include "Utility/IO.h"
-#include "Utility/PrintOpCode.h"
+#include "System/IO.h"
+#include "Core/PrintOpCode.h"
 
 static IO::Filename gDumpDir = "";
 

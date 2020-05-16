@@ -30,7 +30,7 @@ Copyright (C) 2001 StrmnNrmn
 
 #include "Graphics/NativePixelFormat.h"
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 #include "OSHLE/ultra_gbi.h"
 
@@ -181,12 +181,12 @@ static void ConvertGenericYUVBlocks( const TextureDestInfo & dsti, const Texture
 	u32 *		dst  = reinterpret_cast< u32 * >( dsti.Data );
 	const u8 *	src  = g_pu8RamBase;
 	u32			src_offset = ti.GetLoadAddress();
-	
+
 	u32 width = ti.GetWidth();
 	u32 height = ti.GetHeight();
-	
+
 	u32 *mb = (u32*)(src + src_offset);
-	
+
 	//yuv macro block contains 16x16 texture.
 	for (u16 h = 0; h < ti.GetHeight(); h++)
 	{
@@ -201,7 +201,7 @@ static void ConvertGenericYUVBlocks( const TextureDestInfo & dsti, const Texture
 			*(dst++) = (u32)ConvertYUV16ToRGBA8888(y1, u, v);
 		}
 	}
-	
+
 }
 
 };
@@ -330,7 +330,7 @@ struct SConvert
 												 ConvertRow< OutT, Fiddle, Swizzle >,
 												 ConvertRow< OutT, Fiddle, 0 > );
 	}
-	
+
 	template < typename OutT >
 	static inline void ConvertYUVTextureT( const TextureDestInfo & dsti, const TextureInfo & ti )
 	{
@@ -344,7 +344,7 @@ struct SConvert
 			ConvertYUVTextureT< NativePf8888 >( dsti, ti ); // NOTE: Hardcoded to RGB8888
 			return;
 		}
-		
+
 		switch( dsti.Format )
 		{
 		case TexFmt_5650:	ConvertTextureT< NativePf5650 >( dsti, ti ); return;
@@ -626,14 +626,11 @@ static void ConvertI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 
 static void ConvertCI8(const TextureDestInfo & dsti, const TextureInfo & ti)
 {
-	#ifdef DAEDALUS_ENABLE_ASSERTS
-	DAEDALUS_ASSERT(ti.GetTlutAddress(), "No TLUT address");
-	#endif
 
 	NativePf8888 temp_palette[256];
 
 	NativePf8888 *	dst_palette = dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette;
-	const void * 	src_palette = reinterpret_cast< const void * >( ti.GetTlutAddress() );
+	const void * 	src_palette =  g_pu8RamBase + ti.GetTlutAddress();
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 256);
 
@@ -666,13 +663,11 @@ static void ConvertYUV16(const TextureDestInfo & dsti, const TextureInfo & ti)
 
 static void ConvertCI4(const TextureDestInfo & dsti, const TextureInfo & ti)
 {
-#ifdef DAEDALUS_ENABLE_ASSERTS
-	DAEDALUS_ASSERT(ti.GetTlutAddress(), "No TLUT address");
-#endif
+
 	NativePf8888 temp_palette[16];
 
 	NativePf8888 *	dst_palette = dsti.Palette ? reinterpret_cast< NativePf8888 * >( dsti.Palette ) : temp_palette;
-	const void * 	src_palette = reinterpret_cast< const void * >( ti.GetTlutAddress() );
+	const void * 	src_palette = g_pu8RamBase + ti.GetTlutAddress();
 
 	ConvertPalette(ti.GetTLutFormat(), dst_palette, src_palette, 16);
 
@@ -720,9 +715,11 @@ bool ConvertTexture(const TextureInfo & ti,
 					ETextureFormat texture_format,
 					u32 pitch)
 {
-	//Do nothing if palette address is nullptr or close to nullptr in a palette texture //Corn
-	//Loading a SaveState (OOT -> SSV) dont bring back our TMEM data which causes issues for the first rendered frame.
-	//Checking if the palette pointer is less than 0x1000 (rather than just nullptr) fixes it.
+  // TODO(strmnnrmn): Check this - it's probably because we were storing addresses in
+	// system memory here rather than offsets into n64 ram.
+	// Do nothing if palette address is NULL or close to NULL in a palette texture //Corn
+	// Loading a SaveState (OOT -> SSV) dont bring back our TMEM data which causes issues for the first rendered frame.
+	// Checking if the palette pointer is less than 0x1000 (rather than just NULL) fixes it.
 	// Seems to happen on the first frame of Goldeneye too?
 	if( (ti.GetFormat() == G_IM_FMT_CI) && (ti.GetTlutAddress() < 0x1000) ) return false;
 

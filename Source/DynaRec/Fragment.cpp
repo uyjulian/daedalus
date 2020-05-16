@@ -39,8 +39,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "DynaRec/CodeBufferManager.h"
 #include "DynaRec/CodeGenerator.h"
 
-#include "Utility/Macros.h"
-#include "Utility/PrintOpCode.h"
+#include "Base/Macros.h"
+#include "Core/PrintOpCode.h"
 #include "Utility/Profiler.h"
 #include "Utility/Synchroniser.h"
 

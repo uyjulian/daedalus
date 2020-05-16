@@ -43,9 +43,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysGL/Interface/UI.h"
 #endif
 
-#include "Utility/FramerateLimiter.h"
+#include "Core/FramerateLimiter.h"
 #include "Utility/Synchroniser.h"
-#include "Utility/Macros.h"
+#include "Base/Macros.h"
 #include "Utility/Profiler.h"
 #include "Utility/Preferences.h"
 #ifdef DAEDALUS_PSP

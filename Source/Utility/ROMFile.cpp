@@ -18,14 +18,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "ROMFile.h"
-#include "ROMFileCompressed.h"
-#include "ROMFileUncompressed.h"
+#include "Utility/ROMFile.h"
+#include "Utility/ROMFileCompressed.h"
+#include "Utility/ROMFileUncompressed.h"
 
 #include "Debug/DBGConsole.h"
 
 #include "Utility/Stream.h"
-#include "Utility/IO.h"
+#include "System/IO.h"
 
 #include <algorithm>
 #include <string.h>

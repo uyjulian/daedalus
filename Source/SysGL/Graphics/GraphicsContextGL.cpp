@@ -12,13 +12,22 @@
 
 static u32 SCR_WIDTH = 640;
 static u32 SCR_HEIGHT = 480;
-
+#define MAX_INDEXES 0xFFFF
+uint16_t *gIndexes;
+float *gVertexBuffer;
+uint32_t *gColorBuffer;
+float *gTexCoordBuffer;
+float *gVertexBufferPtr;
+uint32_t *gColorBufferPtr;
+float *gTexCoordBufferPtr;
 SDL_Window * gWindow = NULL;
+bool new_frame = true;
 
 
 class GraphicsContextGL : public CGraphicsContext
 {
 public:
+	GraphicsContextGL();
 	virtual ~GraphicsContextGL();
 
 
@@ -50,6 +59,20 @@ template<> bool CSingleton< CGraphicsContext >::Create()
 	return mpInstance->Initialise();
 }
 
+GraphicsContextGL::GraphicsContextGL()
+{
+	uint16_t i;
+	gIndexes = (uint16_t*)malloc(sizeof(uint16_t)*MAX_INDEXES);
+	for (i = 0; i < MAX_INDEXES; i++){
+		gIndexes[i] = i;
+	}
+	gVertexBufferPtr = (float*)malloc(0x800000);
+	gColorBufferPtr = (uint32_t*)malloc(0x600000);
+	gTexCoordBufferPtr = (float*)malloc(0x600000);
+	gVertexBuffer = gVertexBufferPtr;
+	gColorBuffer = gColorBufferPtr;
+	gTexCoordBuffer = gTexCoordBufferPtr;
+}
 
 GraphicsContextGL::~GraphicsContextGL()
 {
@@ -165,21 +188,32 @@ void GraphicsContextGL::BeginFrame()
 	// Get window size (may be different than the requested size)
 	u32 width, height;
 	GetScreenSize(&width, &height);
+		glEnableClientState(GL_VERTEX_ARRAY);
+	gVertexBuffer = gVertexBufferPtr;
+gColorBuffer = gColorBufferPtr;
+gTexCoordBuffer = gTexCoordBufferPtr;
 
 	// Special case: avoid division by zero below
 	height = height > 0 ? height : 1;
 
-	glViewport( 0, 0, width, height );
-	glScissor( 0, 0, width, height );
+if (new_frame)
+{
+	CGraphicsContext::Get()->ClearToBlack();
+new_frame = false;
+}
+
 }
 
 void GraphicsContextGL::EndFrame()
 {
+	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	glScissor( 0, 0, SCR_WIDTH, SCR_HEIGHT);
 }
 
 void GraphicsContextGL::UpdateFrame( bool wait_for_vbl )
 {
 	SDL_GL_SwapWindow(gWindow);
+	new_frame = true;
 
 //	if( gCleanSceneEnabled ) //TODO: This should be optional
 //	{

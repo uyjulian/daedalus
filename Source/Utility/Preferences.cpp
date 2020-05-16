@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "Preferences.h"
+#include "Utility/Preferences.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,15 +28,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <set>
 #include <map>
 
-#include "IniFile.h"
-#include "FramerateLimiter.h"
+
+#include "Core/FramerateLimiter.h"
 
 #include "Config/ConfigOptions.h"
 #include "Core/ROM.h"
 #include "Input/InputManager.h"
 #include "Interface/RomDB.h"
 #include "System/Paths.h"
-#include "Utility/IO.h"
+#include "System/IO.h"
+#include "Utility/IniFile.h"
 
 #ifdef DAEDALUS_PSP
 #include "Utility/Translate.h"

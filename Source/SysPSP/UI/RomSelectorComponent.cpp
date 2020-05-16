@@ -40,13 +40,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../../Input/InputManager.h"
 #include "../../Utility/Preferences.h"
 
-#include "Utility/IO.h"
+#include "System/IO.h"
 #include "Utility/ROMFile.h"
 
 #include "SysPSP/Utility/Buttons.h"
 #include "SysPSP/Utility/PathsPSP.h"
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 #include <string>
 #include <vector>

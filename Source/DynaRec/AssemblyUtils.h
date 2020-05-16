@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdlib.h>
 
-#include "Utility/DaedalusTypes.h"
+#include "Base/Types.h"
 
 class CCodeLabel
 {
@@ -38,7 +38,6 @@ public:
 	bool			IsSet() const				{ return mpLocation != nullptr; }
 	const void *	GetTarget() const			{ return mpLocation; }
 	const u8 *		GetTargetU8P() const		{ return reinterpret_cast< const u8 * >( mpLocation ); }
-	u32				GetTargetU32() const		{ return reinterpret_cast< uintptr_t >( mpLocation ); }
 
 
 

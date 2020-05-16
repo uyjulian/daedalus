@@ -6,7 +6,7 @@
 #include "AudioHLEProcessor.h"
 
 #include "Core/Memory.h"
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 #include "Debug/DBGConsole.h"
 extern bool isMKABI;

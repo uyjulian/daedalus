@@ -20,12 +20,12 @@
 
 #pragma once
 
-#ifndef UTILITY_SINGLETON_H_
-#define UTILITY_SINGLETON_H_
+#ifndef BASE_SINGLETON_H_
+#define BASE_SINGLETON_H_
 
 #include <stdlib.h>
 
-#include "Debug/DaedalusAssert.h"
+#include "Base/Assert.h"
 
 //
 // CSingleton is an abstract base class for classes where only one

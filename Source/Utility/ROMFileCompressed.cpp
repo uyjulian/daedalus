@@ -18,16 +18,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-#include "ROMFileCompressed.h"
+#include "Utility/ROMFileCompressed.h"
 
 #ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
 
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 #include "Debug/DBGConsole.h"
 
-#include "Utility/IO.h"
-#include "Utility/Macros.h"
+#include "System/IO.h"
+#include "Base/Macros.h"
 #include "Utility/Stream.h"
 
 //*****************************************************************************
