@@ -26,12 +26,6 @@
 #error DAEDALUS_ENDIAN_MODE was not specified in Platform.h
 #endif
 
-// Calling convention for the R4300 instruction handlers.
-// This is only defined for W32, so provide a default if it's not set up
-#ifndef R4300_CALL_TYPE
-#define R4300_CALL_TYPE
-#endif
-
 // Calling convention for threads
 #ifndef DAEDALUS_THREAD_CALL_TYPE
 #define DAEDALUS_THREAD_CALL_TYPE
@@ -62,22 +56,19 @@
 #define MAKE_UNCACHED_PTR(x)	(x)
 #endif
 
-// Pure is a function attribute which says that a function does not modify any global memory.
-// Const is a function attribute which says that a function does not read/modify any global memory.
 
-// Given that information, the compiler can do some additional optimisations.
-
-#ifndef DAEDALUS_ATTRIBUTE_PURE
-#define DAEDALUS_ATTRIBUTE_PURE
-#endif
-
-#ifndef DAEDALUS_ATTRIBUTE_CONST
-#define DAEDALUS_ATTRIBUTE_CONST
-#endif
-
-//
 //	Configuration options. These are not really platform-specific, but control various features
 //
-#include "BuildConfig.h"
+
+#if defined(DAEDALUS_CONFIG_RELEASE)
+#include "Base/Release/BuildConfig.h"
+#elif defined(DAEDALUS_CONFIG_PROFILE)
+#include "Base/Profile/BuildConfig.h"
+#elif defined(DAEDALUS_CONFIG_DEV)
+#include "Base/Dev/BuildConfig.h"
+#else
+#error Unknown compilation mode
+#endif
+
 
 #endif // BUILDOPTIONS_H_
