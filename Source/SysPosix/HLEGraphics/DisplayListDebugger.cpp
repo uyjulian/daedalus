@@ -28,7 +28,7 @@ static bool gDebugging = false;
 
 
 // These coordinate requests between the web threads and the main thread (only the main thread can call OpenGL functions)
-static Cond * gMainThreadCond   = NULL;
+static Condition * gMainThreadCond   = NULL;
 static Mutex * gMainThreadMutex = NULL;
 
 enum DebugTask
@@ -303,7 +303,7 @@ void DLDebugger_ProcessDebugTask()
 
 	}
 	gMainThreadMutex->Unlock();
-	CondSignal(gMainThreadCond);
+	ConditionSignal(gMainThreadCond);
 }
 
 bool DLDebugger_Process()
@@ -331,7 +331,7 @@ static void DoTask(WebDebugConnection * connection, DebugTask task)
 
 	gActiveConnection = connection;
 	gDebugTask        = task;
-	CondWait(gMainThreadCond, gMainThreadMutex, kTimeoutInfinity);
+	ConditionWait(gMainThreadCond, gMainThreadMutex, kTimeoutInfinity);
 }
 
 static void DLDebugHandler(void * arg, WebDebugConnection * connection)
@@ -394,7 +394,7 @@ bool DLDebugger_RegisterWebDebug()
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	WebDebug_Register( "/dldebugger", &DLDebugHandler, NULL );
 #endif
-	gMainThreadCond = CondCreate();
+	gMainThreadCond = ConditionCreate();
 	gMainThreadMutex = new Mutex();
 	return true;
 }

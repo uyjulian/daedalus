@@ -48,7 +48,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "OSHLE/ultra_sptask.h"
 #include "Plugins/AudioPlugin.h"
 #include "Utility/CRC.h"
-#include "Utility/Endian.h"
+#include "System/Endian.h"
 #include "Utility/FastMemcpy.h"
 #include "Utility/Profiler.h"
 

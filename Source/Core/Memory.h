@@ -23,8 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define CORE_MEMORY_H_
 
 #include "OSHLE/ultra_rcp.h"
-#include "Utility/AtomicPrimitives.h"
-#include "Utility/Endian.h"
+#include "System/AtomicPrimitives.h"
+#include "System/Endian.h"
 
 enum MEMBANKTYPE
 {

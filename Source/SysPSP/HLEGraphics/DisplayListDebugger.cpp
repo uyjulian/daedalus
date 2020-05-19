@@ -42,7 +42,7 @@
 #include "System/IO.h"
 #include "Interface/Preferences.h"
 #include "Utility/Timer.h"
-#include "Utility/Timing.h"
+#include "System/Timing.h"
 
 #include <set>
 #include <vector>

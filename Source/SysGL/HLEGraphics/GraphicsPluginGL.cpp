@@ -12,7 +12,7 @@
 #include "Interface/Preferences.h"
 #include "Plugins/GraphicsPlugin.h"
 #include "SysGL/GL.h"
-#include "Utility/Timing.h"
+#include "System/Timing.h"
 
 
 extern SDL_Window * gWindow;
