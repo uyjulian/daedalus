@@ -21,25 +21,36 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Config/ConfigOptions.h"
 #include "Core/CPU.h"
-#include "Core/ROM.h"				// ROM_Unload
+#include "Core/ROM.h"
 #include "Core/RomSettings.h"
-#include "Debug/DBGConsole.h"		// DBGConsole_Enable
+#include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
+#include "Interface/Preferences.h"
 #include "Interface/RomDB.h"
+#include "System/IO.h"
 #include "System/Paths.h"
 #include "System/SystemInit.h"
 #include "Test/BatchTest.h"
-#include "System/IO.h"
-#include "Interface/Preferences.h"
-#include "Utility/Profiler.h"		// CProfiler::Create/Destroy
+#include "Utility/Profiler.h"
+
+#pragma comment(lib, "dsound.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "gdi32.lib")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "shell32.lib")
+#pragma comment(lib, "shlwapi.lib")
+#pragma comment(lib, "user32.lib")
+#pragma comment(lib, "ws2_32.lib")
 
 int __cdecl main(int argc, char **argv)
 {
 	HMODULE hModule = GetModuleHandle(NULL);
 	if (hModule != NULL)
 	{
-		GetModuleFileName(hModule, gDaedalusExePath, ARRAYSIZE(gDaedalusExePath));
-		IO::Path::RemoveFileSpec(gDaedalusExePath);
+		IO::Filename exe_path;
+		GetModuleFileName(hModule, exe_path, ARRAYSIZE(exe_path));
+		gDaedalusExePath = exe_path;
+		IO::Path::RemoveFileSpec(&gDaedalusExePath);
 	}
 	else
 	{
@@ -47,13 +58,15 @@ int __cdecl main(int argc, char **argv)
 		return 1;
 	}
 
-	//ReadConfiguration();
+	// ReadConfiguration();
 
 	int result = 0;
-	IO::Filename rom_path;
 
 	if (!System_Init())
+	{
+		fprintf(stderr, "System_Init failed\n");
 		return 1;
+	}
 
 	if (argc > 1)
 	{
@@ -88,10 +101,10 @@ int __cdecl main(int argc, char **argv)
 		}
 		else if (filename)
 		{
-			//Need absolute path when loading from Visual Studio
-			//This is ok when loading from console too, since arg0 will be empty, it'll just load file name (arg1)
-			IO::Path::Combine(rom_path, gDaedalusExePath, argv[1]);
-			fprintf(stderr, "Loading %s\n",rom_path);
+			// Need absolute path when loading from Visual Studio
+			// This is ok when loading from console too, since arg0 will be empty, it'll just load file name (arg1)
+			std::string rom_path = filename;// IO::Path::Join(gDaedalusExePath, argv[1]);
+			fprintf(stderr, "Loading %s\n", rom_path.c_str());
 			System_Open(rom_path);
 			CPU_Run();
 			System_Close();
@@ -99,16 +112,22 @@ int __cdecl main(int argc, char **argv)
 	}
 	else
 	{
-//		result = RunMain();
+		// result = RunMain();
 	}
 
-	//
 	// Write current config out to the registry
-	//
-	//WriteConfiguration();
-
+	// WriteConfiguration();
 	System_Finalize();
-
-
 	return result;
+}
+
+// TODO(strmnnrmn): Move DisplayListDebugger to common location?
+void DLDebugger_RequestDebug() {}
+bool DLDebugger_Process()
+{
+	return false;
+}
+bool DLDebugger_RegisterWebDebug()
+{
+	return true;
 }

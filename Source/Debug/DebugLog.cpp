@@ -28,43 +28,38 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef DAEDALUS_LOG
 
-
-static bool	g_bLog = false;
-static FILE* g_hOutputLog	= NULL;
+static bool g_bLog = false;
+static FILE* g_hOutputLog = NULL;
 
 bool Debug_InitLogging()
 {
-	IO::Filename log_filename;
-
-	Dump_GetDumpDirectory(log_filename, "");
-
-	IO::Path::Append(log_filename, "daedalus.txt");
+	std::string log_filename = IO::Path::Join(Dump_GetDumpDirectory(""), "daedalus.txt");
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	if (CDebugConsole::IsAvailable())
 	{
-		CDebugConsole::Get()->Msg(0, "Creating Dump file '%s'", log_filename);
+		CDebugConsole::Get()->Msg(0, "Creating Dump file '%s'", log_filename.c_str());
 	}
 #endif
-	g_hOutputLog = fopen(log_filename, "w");
-
+	g_hOutputLog = fopen(log_filename.c_str(), "w");
+	if (!g_hOutputLog) {
+		DBGConsole_Msg(0, "Can't open %s", log_filename.c_str());
+	}
 	return g_hOutputLog != NULL;
 }
 
-
 void Debug_FinishLogging()
 {
-	if( g_hOutputLog )
+	if (g_hOutputLog)
 	{
-		fclose( g_hOutputLog );
+		fclose(g_hOutputLog);
 		g_hOutputLog = NULL;
 	}
 }
 
-
-void Debug_Print( const char* format, ... )
+void Debug_Print(const char* format, ...)
 {
-	if(g_bLog && format != NULL)
+	if (g_bLog && format != NULL)
 	{
 		char buffer[1024 + 1];
 		char* p = buffer;
@@ -80,17 +75,8 @@ void Debug_Print( const char* format, ... )
 	}
 }
 
+bool Debug_GetLoggingEnabled() { return g_bLog && (g_hOutputLog != NULL); }
 
-bool Debug_GetLoggingEnabled()
-{
-	return g_bLog && (g_hOutputLog != NULL);
-}
+void Debug_SetLoggingEnabled(bool enabled) { g_bLog = enabled; }
 
-
-void Debug_SetLoggingEnabled( bool enabled )
-{
-	g_bLog = enabled;
-}
-
-
-#endif // DAEDALUS_LOG
+#endif  // DAEDALUS_LOG
