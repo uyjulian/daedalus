@@ -47,10 +47,6 @@ enum PspModel
 // We have a VFPU :)
 #define DAEDALUS_PSP_USE_VFPU
 
-#define DAEDALUS_EXPECT_LIKELY(c) __builtin_expect((c),1)
-#define DAEDALUS_EXPECT_UNLIKELY(c) __builtin_expect((c),0)
-
-#define DAEDALUS_ATTRIBUTE_NOINLINE __attribute__((noinline))
 
 #define DAEDALUS_HALT			__asm__ __volatile__ ( "break" )
 
