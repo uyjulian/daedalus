@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef SYSPOSIX_INCLUDE_PLATFORM_H_
-#define SYSPOSIX_INCLUDE_PLATFORM_H_
+#ifndef PLATFORM_POSIX_PLATFORM_H_
+#define PLATFORM_POSIX_PLATFORM_H_
 
 //
 //	Make sure this platform is defined correctly
@@ -45,4 +45,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //#define DAEDALUS_HALT			__builtin_debugger()
 
 
-#endif // SYSPOSIX_INCLUDE_PLATFORM_H_
+#endif // PLATFORM_POSIX_PLATFORM_H_

@@ -19,12 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef SYSW32_DYNAREC_X86_CODEGENERATORX86_H_
-#define SYSW32_DYNAREC_X86_CODEGENERATORX86_H_
+#ifndef DYNAREC_WINDOWS_X86_CODEGENERATORX86_H_
+#define DYNAREC_WINDOWS_X86_CODEGENERATORX86_H_
 
 #include "DynaRec/CodeGenerator.h"
 #include "AssemblyWriterX86.h"
-#include "DynarecTargetX86.h"
+#include "DynaRec/Windows/x86/DynarecTargetX86.h"
 #include "DynaRec/TraceRecorder.h"
 
 // XXXX For GenerateCompare_S/D
@@ -102,4 +102,4 @@ class CCodeGeneratorX86 : public CCodeGenerator, public CAssemblyWriterX86
 				void	GenerateSRA( EN64Reg rd, EN64Reg rt, u32 sa );
 };
 
-#endif // SYSW32_DYNAREC_X86_CODEGENERATORX86_H_
+#endif // DYNAREC_WINDOWS_X86_CODEGENERATORX86_H_
