@@ -17,10 +17,10 @@
 #include "HLEGraphics/RDPStateManager.h"
 #include "HLEGraphics/TextureCache.h"
 
-#include "Utility/Cond.h"
+#include "System/Condition.h"
 #include "Utility/StringUtil.h"
 #include "System/Thread.h"
-#include "Utility/Mutex.h"
+#include "System/Mutex.h"
 
 #include "SysGL/GL.h"
 

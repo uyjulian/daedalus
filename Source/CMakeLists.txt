@@ -79,7 +79,7 @@ project (DaedalusX64)
 				#Windows -- Not sure if it works yet
 				set (WIN_AUDIO SysW32/HLEAudio/AudioPluginW32.cpp)
 				set (WIN_DEBUG SysW32/Debug/DaedalusAssertW32.cpp SysW32/Debug/DebugConsoleW32.cpp)
-				set (WIN_SYSTEM Utility/Windows/Thread.cpp)
+				set (WIN_SYSTEM System/Windows/Condition.cpp System/Windows/Thread.cpp)
 				set (WIN_UTILITY SysW32/Utility/IOW32.cpp  SysW32/Utility/TimingW32.cpp)
 				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG} ${WIN_SYSTEM} ${WIN_UTILITY})
 
@@ -88,8 +88,8 @@ project (DaedalusX64)
 				set (POSIX_DYNAREC SysPosix/DynaRec/CodeBufferManagerPosix.cpp)
 				set (POSIX_HLEGRAPHICS SysPosix/HLEGraphics/DisplayListDebugger.cpp)
 				set (POSIX_MAIN_FILES SysPosix/main.cpp)
-				set (POSIX_SYSTEM System/Posix/Thread.cpp )
-				set (POSIX_UTILITY SysPosix/Utility/CondPosix.cpp SysPosix/Utility/IO.cpp SysPosix/Utility/TimingPosix.cpp)
+				set (POSIX_SYSTEM System/Posix/Condition.cpp System/Posix/Thread.cpp )
+				set (POSIX_UTILITY SysPosix/Utility/IO.cpp SysPosix/Utility/TimingPosix.cpp)
 				set (POSIX_BUILD ${POSIX_DEBUG} ${POSIX_DYNAREC} ${POSIX_HLEGRAPHICS} ${POSIX_SYSTEM} ${POSIX_UTILITY})
 
 				# These will remain separate for now..

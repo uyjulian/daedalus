@@ -1,5 +1,5 @@
-#ifndef SYSPOSIX_DEBUG_WEBDEBUG_H_
-#define SYSPOSIX_DEBUG_WEBDEBUG_H_
+#ifndef DEBUG_WEBDEBUG_H_
+#define DEBUG_WEBDEBUG_H_
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 #include "System/DataSink.h"
@@ -71,4 +71,4 @@ void WebDebug_Register(const char * request, WebDebugHandler handler, void * arg
 bool WebDebug_Init();
 void WebDebug_Fini();
 #endif // DAEDALUS_DEBUG_DISPLAYLIST
-#endif // SYSPOSIX_DEBUG_WEBDEBUG_H_
+#endif // DEBUG_WEBDEBUG_H_

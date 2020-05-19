@@ -5,7 +5,7 @@
 #include "Debug/WebDebug.h"
 #include "Debug/WebDebugTemplate.h"
 
-#include "Utility/Mutex.h"
+#include "System/Mutex.h"
 #include "System/DataSink.h"
 #include "Graphics/PngUtil.h"
 

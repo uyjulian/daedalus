@@ -30,14 +30,6 @@ namespace
 {
 DAEDALUS_STATIC_ASSERT( sizeof( pthread_t ) == sizeof( ThreadHandle ) );
 
-const int	gThreadPriorities[ TP_NUM_PRIORITIES ] =
-{
-	0x19,		// TP_LOW
-	0x18,		// TP_NORMAL
-	0x17,		// TP_HIGH
-	0x16,		// TP_TIME_CRITICAL
-};
-
 pthread_t HandleToPthread( ThreadHandle handle )
 {
 	return handle == kInvalidThreadHandle ? 0 : (pthread_t)handle;
