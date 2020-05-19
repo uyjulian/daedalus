@@ -79,6 +79,7 @@ project (DaedalusX64)
 				#Windows -- Not sure if it works yet
 				set (WIN_AUDIO SysW32/HLEAudio/AudioPluginW32.cpp)
 				set (WIN_DEBUG SysW32/Debug/DaedalusAssertW32.cpp SysW32/Debug/DebugConsoleW32.cpp)
+				set (WIN_DYNAREC DynaRec/Windows/x86/AssemblyUtilsX86.cpp DynaRec/Windows/x86/AssemblyWriterX86.cpp DynaRec/Windows/x86/CodeBufferManagerX86.cpp DynaRec/Windows/x86/CodeGeneratorX86.cpp)
 				set (WIN_MAIN Source/Platform/Windows/main.cpp)
 				set (WIN_SYSTEM System/Windows/Condition.cpp System/Windows/Timing.cpp System/Windows/Thread.cpp)
 				set (WIN_UTILITY SysW32/Utility/IOW32.cpp)
