@@ -19,7 +19,7 @@
 
 #include "Utility/Cond.h"
 #include "Utility/StringUtil.h"
-#include "Utility/Thread.h"
+#include "System/Thread.h"
 #include "Utility/Mutex.h"
 
 #include "SysGL/GL.h"
