@@ -2,8 +2,8 @@
 
 #include "TextureCache.h"
 
-#include "SysPosix/Debug/WebDebug.h"
-#include "SysPosix/Debug/WebDebugTemplate.h"
+#include "Debug/WebDebug.h"
+#include "Debug/WebDebugTemplate.h"
 
 #include "Utility/Mutex.h"
 #include "System/DataSink.h"
