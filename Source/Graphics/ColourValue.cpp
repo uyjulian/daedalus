@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 const v4 __attribute__((aligned(16))) SCALE( 255.0f, 255.0f, 255.0f, 255.0f );
 
 // Around 354,000 ticks/million - faster than the CPU version
-inline u32 Vector2ColourClampedVFPU(const v4 * col_in)
+inline u32 Vector2ColourClamped(const v4 &colour)
 {
 	u32		out_ints[4];
 
@@ -47,33 +47,21 @@ inline u32 Vector2ColourClampedVFPU(const v4 * col_in)
 		"vf2in.q	R000, R000, 0\n"		// R000 = (s32)(R000) << 0		- or is scale applied before? could use << 8 to scale to 0..255? Would need to be careful of 1.0 overflowing to 256
 		"usv.q		R000, %0\n"				// Save out value
 
-		: "=m" (out_ints) : "m" (*col_in), "m" (SCALE) : "memory" );
+		: "=m" (out_ints) : "m" (&colour), "m" (SCALE) : "memory" );
 
 	return c32::Make( out_ints[0], out_ints[1], out_ints[2], out_ints[3] );
 }
-
-#endif // DAEDALUS_PSP
-
-// Around 463,000 ticks/million
-inline u32 Vector2ColourClampedCPU( const v4 * col_in )
+#else
+inline u32 Vector2ColourClamped( const v4 & colour )
 {
-	u8 r = u8( Clamp<s32>( s32(col_in->x * 255.0f), 0, 255 ) );
-	u8 g = u8( Clamp<s32>( s32(col_in->y * 255.0f), 0, 255 ) );
-	u8 b = u8( Clamp<s32>( s32(col_in->z * 255.0f), 0, 255 ) );
-	u8 a = u8( Clamp<s32>( s32(col_in->w * 255.0f), 0, 255 ) );
+	u8 r = u8( Clamp<s32>( s32(colour.x * 255.0f), 0, 255 ) );
+	u8 g = u8( Clamp<s32>( s32(colour.y * 255.0f), 0, 255 ) );
+	u8 b = u8( Clamp<s32>( s32(colour.z * 255.0f), 0, 255 ) );
+	u8 a = u8( Clamp<s32>( s32(colour.w * 255.0f), 0, 255 ) );
 
 	return c32::Make( r, g, b, a );
 }
-
-inline u32 Vector2ColourClamped( const v4 & colour )
-{
-	//This is faster than the CPU Version
-#ifdef DAEDALUS_PSP
-	return Vector2ColourClampedVFPU( &colour );
-#else
-	return Vector2ColourClampedCPU( &colour );
 #endif
-}
 
 inline u8 AddComponent( u8 a, u8 b )
 {
