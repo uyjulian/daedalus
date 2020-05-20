@@ -7,6 +7,8 @@
 #ifndef MAKE_UNCACHED_PTR
 #define MAKE_UNCACHED_PTR(x)	(reinterpret_cast< void * >( reinterpret_cast<u32>( (x) ) | 0x40000000 ))
 #endif
+#else
+#define MAKE_UNCACHED_PTR(x) (x)
 #endif
 
 // Branch prediction
