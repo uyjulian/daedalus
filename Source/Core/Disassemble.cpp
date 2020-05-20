@@ -124,11 +124,13 @@ void Dump_Disassemble(u32 start, u32 end, const char* p_file_name)
 	}
 
 	u8* p_base;
+	#ifdef DAEDALUS_DEBUG_CONSOLE
 	if (!Memory_GetInternalReadAddress(start, (void**)&p_base))
 	{
 		DBGConsole_Msg(0, "[Ydis: Invalid base 0x%08x]", start);
 		return;
 	}
+	#endif
 
 	FILE* fp(fopen(file_path, "w"));
 	if (fp == NULL) return;
@@ -149,11 +151,13 @@ void Dump_RSPDisassemble(const char* p_file_name)
 	u32 start = 0xa4000000;
 	u32 end = 0xa4002000;
 
+#ifdef DAEDALUS_DEBUG_CONSOLE
 	if (!Memory_GetInternalReadAddress(start, (void**)&base))
 	{
 		DBGConsole_Msg(0, "[Yrdis: Invalid base 0x%08x]", start);
 		return;
 	}
+	#endif
 
 	IO::Filename file_path;
 

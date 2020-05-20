@@ -53,7 +53,7 @@ project (DaedalusX64)
 
 
 				set (PSP_BUILD ${PSP_DEBUG_FILES} ${PSP_DVEMGR_FILES} ${PSP_DYNAREC_FILES} ${PSP_GRAPHICS_FILES} ${PSP_HLEAUDIO_FILES} ${PSP_HLEGRAPHICS_FILES} ${PSP_INPUTMANAGER_FILES} ${PSP_KERNELBUTTON_FILES} ${PSP_MEDIAENGINEFILES} ${PSP_SYSTEM_FILES} ${PSP_UI_FILES} ${PSP_UTILITY_FILES})
-				set (PSP_DEFINES -DDAEDALUS_PSP -DDAEDALUS_ENABLE_DYNAREC -DDAEDALUS_PSP_USE_ME -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_PSP_USE_VFPU)
+				set (PSP_DEFINES -DDAEDALUS_PSP -DDAEDALUS_ENABLE_DYNAREC -DDAEDALUS_PSP_USE_ME -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_PSP_USE_VFPU -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE)
 				Set(PSPSDK_LIBS -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpsplibc -lpsputility -lpspuser -lpspkernel -lpspaudiolib)
 
 
@@ -85,7 +85,7 @@ project (DaedalusX64)
 				set (WIN_SYSTEM System/Windows/Condition.cpp System/Windows/Timing.cpp System/Windows/Thread.cpp)
 				set (WIN_UTILITY SysW32/Utility/IOW32.cpp)
 				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG} ${WIN_SYSTEM} ${WIN_UTILITY})
-				set (WIN_DEFINES -DDAEDALUS_W32 -DDAEDALUS_ACCURATE_TMEM -DDAEDALUS_ENABLE_OS_HOOKS) #dynarec is broken -DDAEDALUS_ENABLE_DYNAREC
+				set (WIN_DEFINES -DDAEDALUS_W32 -DDAEDALUS_ACCURATE_TMEM -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE ) #dynarec is broken -DDAEDALUS_ENABLE_DYNAREC
         #Posix
 				set (POSIX_DEBUG SysPosix/Debug/DaedalusAssertPosix.cpp SysPosix/Debug/DebugConsolePosix.cpp SysPosix/Debug/WebDebug.cpp SysPosix/Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
 				set (POSIX_DYNAREC Source/Dynarec/OSX/CodeBufferManager.cpp)
@@ -94,7 +94,7 @@ project (DaedalusX64)
 				set (POSIX_SYSTEM System/Posix/Condition.cpp System/Posix/Timing.cpp System/Posix/Thread.cpp )
 				set (POSIX_UTILITY SysPosix/Utility/IO.cpp )
 				set (POSIX_BUILD ${POSIX_DEBUG} ${POSIX_DYNAREC} ${POSIX_HLEGRAPHICS} ${POSIX_SYSTEM} ${POSIX_UTILITY})
-				set (POSIX_DEFINES -DDAEDALUS_POSIX  -DDAEDALUS_ACCURATE_TMEM -DDAEDALUS_COMPRESSED_ROM_SUPPORT -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_GL)
+				set (POSIX_DEFINES -DDAEDALUS_POSIX  -DDAEDALUS_ACCURATE_TMEM -DDAEDALUS_COMPRESSED_ROM_SUPPORT -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_GL -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE)
 
 				# These will remain separate for now..
 				set (LINUX_AUDIO HLEAudio/Linux/AudioPlugin.cpp)
@@ -105,7 +105,7 @@ if (PSP_RELEASE)
 	message("PSP Release Build..")
 	add_definitions("-DNDEBUG  -march=allegrex -O2 -msingle-float -mfix-r4000 -W ")
 	add_compile_options(-DPSP_LARGE_MEMORY=1 -DPSP_FW_VERSION=661)
-	add_definitions(-DDAEDALUS_CONFIG_RELEASE ${PSP_DEFINES})
+	add_definitions(-DDAEDALUS_CONFIG_RELEASE ${PSP_DEFINES} )
 	add_library(pspkubridge STATIC IMPORTED)
 set_property(TARGET pspkubridge PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SysPSP/Include/lib/libpspkubridge.a)
 	include_directories(BEFORE SysPSP/Include BEFORE Platform/PSP)
