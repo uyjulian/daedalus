@@ -23,26 +23,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SYSPSP_INCLUDE_PLATFORM_H_
 
 
-enum PspModel
-{
-    PSP_MODEL_STANDARD = 0,
-    PSP_MODEL_SLIM_AND_LITE = 1,
-    PSP_MODEL_BRITE = 8,
-    PSP_MODEL_GO = 4,
-    PSP_MODEL_STREET = 10
-};
-
 #define DAEDALUS_ENDIAN_MODE DAEDALUS_ENDIAN_LITTLE
 
 
-
-#define DAEDALUS_DYNAREC_HALT	SW(PspReg_R0, PspReg_R0, 0)
-
 #define MAKE_UNCACHED_PTR(x)	(reinterpret_cast< void * >( reinterpret_cast<u32>( (x) ) | 0x40000000 ))
 
-#define DAEDALUS_ATTRIBUTE_PURE   __attribute__((pure))
-#define DAEDALUS_ATTRIBUTE_CONST   __attribute__((const))
 
-#define DAEDALUS_COMPILER_HAS_FEATURE(x) 0
 
 #endif // SYSPSP_INCLUDE_PLATFORM_H_
