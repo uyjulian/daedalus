@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Endian.h"
 #include "Utility/FastMemcpy.h"
 
+#include <math.h>
 
 extern SImageDescriptor g_TI;		//Texture data from Timg ucode
 
