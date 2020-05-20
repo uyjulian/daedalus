@@ -3,6 +3,12 @@
 #ifndef BASE_MACROS_H_
 #define BASE_MACROS_H_
 
+
+// This is required for PSP and under investigation
+#ifdef DAEDALUS_PSP
+#define MAKE_UNCACHED_PTR(x)	(reinterpret_cast< void * >( reinterpret_cast<u32>( (x) ) | 0x40000000 ))
+#endif
+
 // Branch prediction
 #ifdef _MSC_VER
 
