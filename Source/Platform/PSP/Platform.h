@@ -35,7 +35,6 @@ enum PspModel
 #define DAEDALUS_ENDIAN_MODE DAEDALUS_ENDIAN_LITTLE
 
 
-#define DAEDALUS_HALT			__asm__ __volatile__ ( "break" )
 
 #define DAEDALUS_DYNAREC_HALT	SW(PspReg_R0, PspReg_R0, 0)
 

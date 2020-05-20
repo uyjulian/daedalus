@@ -39,6 +39,15 @@
 
 #endif
 
+// Breakpoints.
+#ifdef _MSC_VER
+#define DAEDALUS_HALT __debugbreak()
+#elif DAEDALUS_PSP
+#define DAEDALUS_HALT __asm__ __volatile__ ( "break" )
+#else
+#define DAEDALUS_HALT __builtin_trap()
+#endif
+
 
 #ifdef DAEDALUS_ENABLE_ASSERTS
 
