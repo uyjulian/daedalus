@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
+#include "Core/FlashMem.h"
 #include "Debug/DBGConsole.h"
 #include "Memory.h"
 #include "DMA.h"
