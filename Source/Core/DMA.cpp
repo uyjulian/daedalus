@@ -21,15 +21,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Daedalus.h"
 
-#include "DMA.h"
-#include "Memory.h"
-#include "RSP_HLE.h"
-#include "CPU.h"
-#include "ROM.h"
-#include "ROMBuffer.h"
-#include "PIF.h"
-#include "Interrupt.h"
-#include "Save.h"
+#include "Core/DMA.h"
+#include "Core/Memory.h"
+#include "Core/RSP_HLE.h"
+#include "Core/CPU.h"
+#include "Core/ROM.h"
+#include "Core/ROMBuffer.h"
+#include "Core/PIF.h"
+#include "Core/Interrupt.h"
+#include "Core/Save.h"
 
 #include "Utility/FastMemcpy.h"
 
@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DBGConsole.h"
 
 #include "OSHLE/OSTask.h"
-#include "OSHLE/patch.h"
+#include "OSHLE/OSHLE.h"
 
 bool gDMAUsed {false};
 //*****************************************************************************

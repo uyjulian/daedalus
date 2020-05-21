@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Synchroniser.h"
 
 #include "Ultra/ultra_R4300.h"
-#include "OSHLE/patch.h"
+#include "OSHLE/OSHLE.h"
 
 
 //#define IMMEDIATE_COUNTER_UPDATE

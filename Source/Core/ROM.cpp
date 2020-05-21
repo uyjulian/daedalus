@@ -22,13 +22,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <stdio.h>
 
-#include "Cheats.h"
-#include "CPU.h"
-#include "PIF.h"		// CController
-#include "R4300.h"
-#include "ROMBuffer.h"
-#include "ROMImage.h"
-#include "RomSettings.h"
+#include "Core/Cheats.h"
+#include "Core/CPU.h"
+#include "Core/PIF.h"		// CController
+#include "Core/R4300.h"
+#include "Core/ROMBuffer.h"
+#include "Core/ROMImage.h"
+#include "Core/RomSettings.h"
 
 #include "Config/ConfigOptions.h"
 #include "Debug/DBGConsole.h"
@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Synchroniser.h"
 #include "Interface/RomDB.h"
 #include "Base/MathUtil.h"
-#include "OSHLE/patch.h"			// Patch_ApplyPatches
+#include "OSHLE/OSHLE.h"			// Patch_ApplyPatches
 #include "Ultra/ultra_os.h"		// System type
 #include "Ultra/ultra_R4300.h"
 #include "Plugins/AudioPlugin.h"
