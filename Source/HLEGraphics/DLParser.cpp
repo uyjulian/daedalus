@@ -48,9 +48,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/IO.h"
 #include "Utility/Profiler.h"
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 #define DL_UNIMPLEMENTED_ERROR( msg )			\
 {												\
@@ -66,16 +64,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define DL_UNIMPLEMENTED_ERROR( msg )
 #endif
 
-//*****************************************************************************
-//
-//*****************************************************************************
-#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_PROFILING)
-#define SetCommand( cmd, func, name )	gCustomInstruction[ cmd ] = func;	gCustomInstructionName[ cmd ] = name;
-#else
-#define SetCommand( cmd, func, name )	gCustomInstruction[ cmd ] = func;
-#endif
 
-#define MAX_DL_STACK_SIZE	32
+static const u32 kMaxDisplayListDepth = 32;
 
 #define N64COL_GETR( col )		(u8((col) >> 24))
 #define N64COL_GETG( col )		(u8((col) >> 16))
@@ -90,11 +80,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Mask down to 0x003FFFFF?
 #define RDPSegAddr(seg) ( (gSegments[((seg)>>24)&0x0F]&0x00ffffff) + ((seg)&0x00FFFFFF) )
 
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
-//                     GFX State                        //
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
 
 struct N64Viewport
 {
@@ -155,13 +140,11 @@ struct RDP_Scissor
 // items, but this way we can nest as deeply as necessary.
 struct DList
 {
-	u32 address[MAX_DL_STACK_SIZE];
+	u32 address[kMaxDisplayListDepth];
 	s32 limit;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void RDP_MoveMemViewport(u32 address);
 void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 void DLParser_InitMicrocode( u32 code_base, u32 code_size, u32 data_base, u32 data_size );
@@ -192,9 +175,23 @@ static const char * gCustomInstructionName[256];
 
 bool					gFrameskipActive = false;
 
-//*****************************************************************************
-//
-//*****************************************************************************
+#ifdef DAEDALUS_ENABLE_PROFILING
+SProfileItemHandle * gpProfileItemHandles[ 256 ];
+
+#define PROFILE_DL_CMD( cmd )								\
+	if(gpProfileItemHandles[ (cmd) ] == NULL)				\
+	{														\
+		gpProfileItemHandles[ (cmd) ] = new SProfileItemHandle( CProfiler::Get()->AddItem( gUcodeName[ cmd ] ));		\
+	}														\
+	CAutoProfile		_auto_profile( *gpProfileItemHandles[ (cmd) ] )
+
+#else
+
+#define PROFILE_DL_CMD( cmd )		do { } while(0)
+
+#endif
+
+
 inline void FinishRDPJob()
 {
 	Memory_MI_SetRegisterBits(MI_INTR_REG, MI_INTR_DP);
@@ -214,9 +211,7 @@ inline void	DLParser_FetchNextCommand( MicroCodeCommand * p_command )
 	pc+= 8;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 inline void DLParser_PopDL()
 {
 	DL_PF("    Returning from DisplayList: level=%d", gDlistStackPointer+1);
@@ -239,9 +234,7 @@ u32			gNumRectsClipped;
 u32			gNumInstructionsExecuted = 0;
 #endif
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 u32 gRDPFrame		= 0;
 u32 gAuxAddr		= 0;
 
@@ -264,11 +257,6 @@ extern u32 uViHeight;
 #include "uCodes/Ucode_Sprite2D.h"
 #include "uCodes/Ucode_S2DEX.h"
 
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
-//                      Strings                         //
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
 
 static const char * const gFormatNames[8] = {"RGBA", "YUV", "CI", "IA", "I", "?1", "?2", "?3"};
 
@@ -276,9 +264,7 @@ static const char * const gSizeNames[4]   = {"4bpp", "8bpp", "16bpp", "32bpp"};
 static const char * const gOnOffNames[2]  = {"Off", "On"};
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_DumpVtxInfo(u32 address, u32 v0_idx, u32 num_verts)
 {
 	if (DLDebug_IsActive())
@@ -318,9 +304,7 @@ void DLParser_DumpVtxInfo(u32 address, u32 v0_idx, u32 num_verts)
 }
 #endif
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 bool DLParser_Initialise()
 {
 	gFirstCall = true;
@@ -340,20 +324,24 @@ bool DLParser_Initialise()
 	return true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_Finalise()
 {
 }
 
-//*************************************************************************************
+#if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_PROFILING)
+#define SetCommand( cmd, func, name )	gCustomInstruction[ cmd ] = func;	gCustomInstructionName[ cmd ] = name;
+#else
+#define SetCommand( cmd, func, name )	gCustomInstruction[ cmd ] = func;
+#endif
+
+
 // This is called from Microcode.cpp after a custom ucode has been detected and cached
 // This function is only called once per custom ucode set
 // Main resaon for this function is to save memory since custom ucodes share a common table
 //	ucode:			custom ucode (ucode>= MAX_UCODE)
 //	offset:			offset to normal ucode this custom ucode is based of ex GBI0
-//*************************************************************************************
+
 static void DLParser_SetCustom( u32 ucode, u32 offset )
 {
 	for (u32 i = 0; i < 256; i++)
@@ -422,9 +410,7 @@ static void DLParser_SetCustom( u32 ucode, u32 offset )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_InitMicrocode( u32 code_base, u32 code_size, u32 data_base, u32 data_size )
 {
 	u32 ucode = GBIMicrocode_DetectVersion( code_base, code_size, data_base, data_size, &DLParser_SetCustom );
@@ -438,9 +424,7 @@ void DLParser_InitMicrocode( u32 code_base, u32 code_size, u32 data_base, u32 da
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 #ifdef DAEDALUS_ENABLE_PROFILING
 SProfileItemHandle * gpProfileItemHandles[ 256 ];
 
@@ -458,9 +442,8 @@ SProfileItemHandle * gpProfileItemHandles[ 256 ];
 #endif
 
 
-//*****************************************************************************
+
 //	Process the entire display list in one go
-//*****************************************************************************
 static u32 DLParser_ProcessDList(u32 instruction_limit)
 {
 	MicroCodeCommand command;
@@ -506,9 +489,7 @@ static u32 DLParser_ProcessDList(u32 instruction_limit)
 
 	return current_instruction_count;
 }
-//*****************************************************************************
-//
-//*****************************************************************************
+
 u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 {
 	DAEDALUS_PROFILE( "DLParser_Process" );
@@ -605,9 +586,7 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	return count;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address )
 {
 	DAEDALUS_ASSERT( address+64 < MAX_RAM_ADDRESS, "Mtx: Address invalid (0x%08x)", address);
@@ -643,9 +622,7 @@ void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void RDP_MoveMemLight(u32 light_idx, const N64Light *light)
 {
 	DAEDALUS_ASSERT( light_idx < 12, "Warning: invalid light # = %d", light_idx );
@@ -672,9 +649,7 @@ void RDP_MoveMemLight(u32 light_idx, const N64Light *light)
 	gRenderer->SetLightDirection( light_idx, dir_x, dir_y, dir_z );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 //0x000b46b0: dc080008 800b46a0 G_GBI2_MOVEMEM
 //    Type: 08 Len: 08 Off: 0000
 //        Scale: 640 480 511 0 = 160,120
@@ -702,9 +677,7 @@ void RDP_MoveMemViewport(u32 address)
 	DL_PF("    Trans: %d %d", vp->trans_x, vp->trans_y);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 //Nintro64 uses Sprite2d
 void DLParser_Nothing( MicroCodeCommand command )
 {
@@ -716,33 +689,25 @@ void DLParser_Nothing( MicroCodeCommand command )
 
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetKeyGB( MicroCodeCommand command )
 {
 	DL_PF( "    SetKeyGB (Ignored)" );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetKeyR( MicroCodeCommand command )
 {
 	DL_PF( "    SetKeyR (Ignored)" );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetConvert( MicroCodeCommand command )
 {
 	DL_PF( "    SetConvert (Ignored)" );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetPrimDepth( MicroCodeCommand command )
 {
 	DL_PF("    SetPrimDepth z[0x%04x] dz[0x%04x]",
@@ -751,9 +716,7 @@ void DLParser_SetPrimDepth( MicroCodeCommand command )
 	gRenderer->SetPrimitiveDepth( command.primdepth.z );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_RDPSetOtherMode( MicroCodeCommand command )
 {
 	DL_PF( "    RDPSetOtherMode: 0x%08x 0x%08x", command.inst.cmd0, command.inst.cmd1 );
@@ -766,16 +729,12 @@ void DLParser_RDPSetOtherMode( MicroCodeCommand command )
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_RDPLoadSync( MicroCodeCommand command )	{ /*DL_PF("    LoadSync: (Ignored)");*/ }
 void DLParser_RDPPipeSync( MicroCodeCommand command )	{ /*DL_PF("    PipeSync: (Ignored)");*/ }
 void DLParser_RDPTileSync( MicroCodeCommand command )	{ /*DL_PF("    TileSync: (Ignored)");*/ }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_RDPFullSync( MicroCodeCommand command )
 {
 	// We now do this regardless
@@ -785,9 +744,7 @@ void DLParser_RDPFullSync( MicroCodeCommand command )
 	/*DL_PF("    FullSync: (Generating Interrupt)");*/
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetScissor( MicroCodeCommand command )
 {
 	// The coords are all in 10:2 fixed point
@@ -816,9 +773,7 @@ void DLParser_SetScissor( MicroCodeCommand command )
 		gRenderer->SetScissor( scissors.left, scissors.top, scissors.right, scissors.bottom );
 	}
 }
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetTile( MicroCodeCommand command )
 {
 	RDP_Tile tile;
@@ -832,9 +787,7 @@ void DLParser_SetTile( MicroCodeCommand command )
 	DL_PF( "      T: Clamp[%s] Mirror[%s] Mask[0x%x] Shift[0x%x]", gOnOffNames[tile.clamp_t],gOnOffNames[tile.mirror_t], tile.mask_t, tile.shift_t );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetTileSize( MicroCodeCommand command )
 {
 	RDP_TileSize tile;
@@ -851,9 +804,7 @@ void DLParser_SetTileSize( MicroCodeCommand command )
 }
 
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetTImg( MicroCodeCommand command )
 {
 	g_TI.Format		= command.img.fmt;
@@ -866,33 +817,25 @@ void DLParser_SetTImg( MicroCodeCommand command )
 		g_TI.Address, gFormatNames[g_TI.Format], gSizeNames[g_TI.Size], g_TI.Width, g_TI.GetPitch(), g_TI.Width << g_TI.Size >> 1 );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_LoadBlock( MicroCodeCommand command )
 {
 	gRDPStateManager.LoadBlock( command.loadtile );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_LoadTile( MicroCodeCommand command )
 {
 	gRDPStateManager.LoadTile( command.loadtile );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_LoadTLut( MicroCodeCommand command )
 {
 	gRDPStateManager.LoadTlut( command.loadtile );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_TexRect( MicroCodeCommand command )
 {
 	MicroCodeCommand command2;
@@ -978,9 +921,7 @@ void DLParser_TexRect( MicroCodeCommand command )
 	gRenderer->TexRect( tex_rect.tile_idx, xy0, xy1, st0, st1 );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_TexRectFlip( MicroCodeCommand command )
 {
 	MicroCodeCommand command2;
@@ -1065,9 +1006,7 @@ void Clear_N64DepthBuffer( MicroCodeCommand command )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_FillRect( MicroCodeCommand command )
 {
 	//
@@ -1148,9 +1087,7 @@ void DLParser_FillRect( MicroCodeCommand command )
 	gRenderer->FillRect( xy0, xy1, colour.GetColour() );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetZImg( MicroCodeCommand command )
 {
 	DL_PF("    ZImg Adr[0x%08x]", RDPSegAddr(command.inst.cmd1));
@@ -1159,9 +1096,7 @@ void DLParser_SetZImg( MicroCodeCommand command )
 	g_DI.Address = RDPSegAddr(command.inst.cmd1);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetCImg( MicroCodeCommand command )
 {
 	g_CI.Format = command.img.fmt;
@@ -1173,9 +1108,7 @@ void DLParser_SetCImg( MicroCodeCommand command )
 	DL_PF("    CImg Adr[0x%08x] Format[%s] Size[%s] Width[%d]", RDPSegAddr(command.inst.cmd1), gFormatNames[ g_CI.Format ], gSizeNames[ g_CI.Size ], g_CI.Width);
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetCombine( MicroCodeCommand command )
 {
 	//Swap the endian
@@ -1193,9 +1126,7 @@ void DLParser_SetCombine( MicroCodeCommand command )
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetFillColor( MicroCodeCommand command )
 {
 	u32 fill_colour = command.inst.cmd1;
@@ -1208,9 +1139,7 @@ void DLParser_SetFillColor( MicroCodeCommand command )
 	gRenderer->SetFillColour( fill_colour );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetFogColor( MicroCodeCommand command )
 {
 	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
@@ -1221,9 +1150,7 @@ void DLParser_SetFogColor( MicroCodeCommand command )
 	gRenderer->SetFogColour( fog_colour );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetBlendColor( MicroCodeCommand command )
 {
 	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
@@ -1233,9 +1160,7 @@ void DLParser_SetBlendColor( MicroCodeCommand command )
 	gRenderer->SetBlendColour( blend_colour );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetPrimColor( MicroCodeCommand command )
 {
 	DL_PF("    M:%d L:%d RGBA: %d %d %d %d", command.color.prim_min_level, command.color.prim_level, command.color.r, command.color.g, command.color.b, command.color.a);
@@ -1246,9 +1171,7 @@ void DLParser_SetPrimColor( MicroCodeCommand command )
 	gRenderer->SetPrimitiveColour( prim_colour );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void DLParser_SetEnvColor( MicroCodeCommand command )
 {
 	DL_PF("    RGBA: %d %d %d %d", command.color.r, command.color.g, command.color.b, command.color.a);
