@@ -19,10 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Daedalus.h"
 
-#include "RSP_HLE.h"
+#include "Core/RSP_HLE.h"
 
-#include "Interrupt.h"
-#include "Memory.h"
+#include <vector>
+
+#include "Core/Interrupt.h"
+#include "Core/Memory.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Dump.h"			// For Dump_GetDumpDirectory()
@@ -32,7 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_sptask.h"
 #include "HLEAudio/AudioPlugin.h"
 #include "HLEGraphics/GraphicsPlugin.h"
-#include "Test/BatchTest.h"
 #include "System/IO.h"
 #include "Core/PrintOpCode.h"
 #include "Utility/Profiler.h"
@@ -121,7 +122,34 @@ static void	RSP_HLE_DumpTaskInfo( const OSTask * pTask )
 #endif
 
 #endif
-//
+
+
+typedef void (*DisplayListCallback)(void* arg);
+struct DLCallback
+{
+	DisplayListCallback Fn;
+	void* Arg;
+};
+
+static std::vector<DLCallback> gDLCallbacks;
+
+void RSP_HLE_RegisterDisplayListCallback(DisplayListCallback fn, void* arg)
+{
+	DLCallback callback = {fn, arg};
+	gDLCallbacks.push_back(callback);
+}
+
+void RSP_HLE_UnregisterDisplayListCallback(DisplayListCallback fn, void* arg)
+{
+	for (std::vector<DLCallback>::iterator it = gDLCallbacks.begin(); it != gDLCallbacks.end(); ++it)
+	{
+		if (it->Fn == fn && it->Arg == arg)
+		{
+			gDLCallbacks.erase(it);
+			break;
+		}
+	}
+}
 
 void RSP_HLE_Finished(u32 setbits)
 {
@@ -163,9 +191,10 @@ static EProcessResult RSP_HLE_Graphics()
 
 
 #ifdef DAEDALUS_BATCH_TEST_ENABLED
-	if (CBatchTestEventHandler * handler = BatchTest_GetHandler())
+
+	for (auto callback : gDLCallbacks)
 	{
-		handler->OnDisplayListComplete();
+		callback.Fn(callback.Arg);
 	}
 #endif
 

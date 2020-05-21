@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "Base/Macros.h"
 #include "Core/ROM.h"
 #include "Debug/DBGConsole.h"
 #include "Graphics/ColourValue.h"
@@ -14,10 +13,11 @@
 #include "Interface/Preferences.h"
 #include "Ultra/ultra_gbi.h"
 #include "SysGL/GL.h"
-#include "System/IO.h"
+#include <GL/glew.h>
 #include "System/Paths.h"
+#include "System/IO.h"
+#include "Base/Macros.h"
 #include "Utility/Profiler.h"
-
 
 BaseRenderer * gRenderer   = NULL;
 RendererGL *   gRendererGL = NULL;
@@ -92,15 +92,16 @@ bool initgl()
 {
 	DAEDALUS_ASSERT(gN64FramentLibrary == NULL, "Already initialised");
 
-  // FIXME(strmnnrmn): need a nicer 'load file' utility function.
+	// FIXME(strmnnrmn): need a nicer 'load file' utility function.
 	{
-		std::string shader_path = GetRunfilePath("SysGL/HLEGraphics/n64.psh");
+		IO::Filename shader_path;
+		IO::Path::Combine(shader_path, gDaedalusExePath, "n64.psh");
 
-		FILE * fh = fopen(shader_path.c_str(), "r");
+		FILE * fh = fopen(shader_path, "r");
 		if (!fh)
 		{
-			DAEDALUS_ERROR("Couldn't load shader source %s", shader_path.c_str());
-			fprintf(stderr, "ERROR: couldn't load shader source %s\n", shader_path.c_str());
+			DAEDALUS_ERROR("Couldn't load shader source %s", shader_path);
+			fprintf(stderr, "ERROR: couldn't load shader source %s\n", shader_path);
 			return false;
 		}
 
