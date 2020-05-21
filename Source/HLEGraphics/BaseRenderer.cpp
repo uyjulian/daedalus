@@ -115,10 +115,8 @@ f32 TEST_VARX = 0.0f;
 f32 TEST_VARY = 0.0f;
 #endif
 
+extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 
-//*****************************************************************************
-//
-//*****************************************************************************
 BaseRenderer::BaseRenderer()
 :	mN64ToScreenScale( 2.0f, 2.0f )
 ,	mN64ToScreenTranslate( 0.0f, 0.0f )
@@ -173,16 +171,12 @@ BaseRenderer::BaseRenderer()
 	memset( mTnL.Lights, 0, sizeof(mTnL.Lights) );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 BaseRenderer::~BaseRenderer()
 {
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::SetVIScales()
 {
 	u32 width = Memory_VI_GetRegister( VI_WIDTH_REG );
@@ -227,9 +221,9 @@ void BaseRenderer::SetVIScales()
 	uViHeight = (u32)fViHeight - 1;
 }
 
-//*****************************************************************************
+
 // Reset for a new frame
-//*****************************************************************************
+
 void BaseRenderer::Reset()
 {
 	mNumIndices = 0;
@@ -243,9 +237,7 @@ void BaseRenderer::Reset()
 
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::BeginScene()
 {
 	CGraphicsContext::Get()->BeginFrame();
@@ -259,9 +251,7 @@ void BaseRenderer::BeginScene()
 	InitViewport();
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::EndScene()
 {
 	CGraphicsContext::Get()->EndFrame();
@@ -275,9 +265,7 @@ void BaseRenderer::EndScene()
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::InitViewport()
 {
 	// Init the N64 viewport.
@@ -332,9 +320,7 @@ void BaseRenderer::InitViewport()
 	UpdateViewport();
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::SetN64Viewport( const v2 & scale, const v2 & trans )
 {
 	// Only Update viewport when it actually changed, this happens rarely
@@ -352,9 +338,7 @@ void BaseRenderer::SetN64Viewport( const v2 & scale, const v2 & trans )
 	UpdateViewport();
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::UpdateViewport()
 {
 	v2		n64_min( mVpTrans.x - mVpScale.x, mVpTrans.y - mVpScale.y );
@@ -388,9 +372,9 @@ void BaseRenderer::UpdateViewport()
 #endif
 }
 
-//*****************************************************************************
+
 // Returns true if triangle visible and rendered, false otherwise
-//*****************************************************************************
+
 bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 {
 	//DAEDALUS_PROFILE( "BaseRenderer::AddTri" );
@@ -473,9 +457,7 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 	return true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::FlushTris()
 {
 	#ifdef DAEDALUS_ENABLE_PROFILING
@@ -546,7 +528,7 @@ void BaseRenderer::FlushTris()
 	mVtxClipFlagsUnion = 0;
 }
 
-//*****************************************************************************
+
 //
 //	The following clipping code was taken from The Irrlicht Engine.
 //	See http://irrlicht.sourceforge.net/ for more information.
@@ -554,7 +536,7 @@ void BaseRenderer::FlushTris()
 //
 //Croping triangles just outside the NDC box and let PSP HW do the final crop
 //improves quality but fails in some games (Rocket Robot/Lego racers)//Corn
-//*****************************************************************************
+
 ALIGNED_TYPE(const v4, NDCPlane[6], 16) =
 {
 	v4(  0.f,  0.f, -1.f, -1.f ),	// near
@@ -565,9 +547,9 @@ ALIGNED_TYPE(const v4, NDCPlane[6], 16) =
 	v4(  0.f, -1.f,  0.f, -1.f )	// top
 };
 
-//*****************************************************************************
+
 //VFPU tris clip(fast)
-//*****************************************************************************
+
 #ifdef DAEDALUS_PSP_USE_VFPU
 u32 clip_tri_to_frustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 {
@@ -585,9 +567,9 @@ u32 clip_tri_to_frustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 
 #else	// FPU/CPU(slower)
 
-//*****************************************************************************
+
 //CPU interpolate line parameters
-//*****************************************************************************
+
 void DaedalusVtx4::Interpolate( const DaedalusVtx4 & lhs, const DaedalusVtx4 & rhs, float factor )
 {
 	ProjectedPos = lhs.ProjectedPos + (rhs.ProjectedPos - lhs.ProjectedPos) * factor;
@@ -597,9 +579,9 @@ void DaedalusVtx4::Interpolate( const DaedalusVtx4 & lhs, const DaedalusVtx4 & r
 	ClipFlags = 0;
 }
 
-//*****************************************************************************
+
 //CPU line clip to plane
-//*****************************************************************************
+
 static u32 clipToHyperPlane( DaedalusVtx4 * dest, const DaedalusVtx4 * source, u32 inCount, const v4 &plane )
 {
 	u32 outCount(0);
@@ -656,9 +638,9 @@ static u32 clipToHyperPlane( DaedalusVtx4 * dest, const DaedalusVtx4 * source, u
 	return outCount;
 }
 
-//*****************************************************************************
+
 //CPU tris clip to frustum
-//*****************************************************************************
+
 u32 clip_tri_to_frustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 {
 	u32 vOut = 3;
@@ -674,9 +656,7 @@ u32 clip_tri_to_frustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 }
 #endif // CPU clip
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 namespace
 {
 	DaedalusVtx4		temp_a[ 8 ];
@@ -686,9 +666,7 @@ namespace
 	DaedalusVtx			clip_vtx[MAX_CLIPPED_VERTS];
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 {
 	#ifdef DAEDALUS_ENABLE_PROFILING
@@ -817,9 +795,7 @@ void BaseRenderer::PrepareTrisClipped( TempVerts * temp_verts ) const
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::PrepareTrisUnclipped( TempVerts * temp_verts ) const
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
@@ -857,9 +833,9 @@ void BaseRenderer::PrepareTrisUnclipped( TempVerts * temp_verts ) const
  #endif
 }
 
-//*****************************************************************************
+
 // Standard rendering pipeline using VFPU(fast)
-//*****************************************************************************
+
 #ifdef DAEDALUS_PSP_USE_VFPU
 void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 {
@@ -884,9 +860,7 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 /*void BaseRenderer::TestVFPUVerts( u32 v0, u32 num, const FiddledVtx * verts, const Matrix4x4 & mat_world )
 {
 	bool	env_map( (mTnL.Flags._u32 & (TNL_LIGHT|TNL_TEXGEN)) == (TNL_LIGHT|TNL_TEXGEN) );
@@ -962,9 +936,7 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 }*/
 
 #else	//Transform using VFPU(fast) or FPU/CPU(slow)
-//*****************************************************************************
-//
-//*****************************************************************************
+
 v3 BaseRenderer::LightVert( const v3 & norm ) const
 {
 	const v3 & col = mTnL.Lights[mTnL.NumLights].Colour;
@@ -989,9 +961,7 @@ v3 BaseRenderer::LightVert( const v3 & norm ) const
 	return result;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 v3 BaseRenderer::LightPointVert( const v4 & w ) const
 {
 	const v3 & col = mTnL.Lights[mTnL.NumLights].Colour;
@@ -1025,9 +995,9 @@ v3 BaseRenderer::LightPointVert( const v4 & w ) const
 	return result;
 }
 
-//*****************************************************************************
+
 // Standard rendering pipeline using FPU/CPU
-//*****************************************************************************
+
 void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 {
 	const FiddledVtx * pVtxBase = (const FiddledVtx*)(g_pu8RamBase + address);
@@ -1164,9 +1134,9 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 
 #endif // Transform VFPU/FPU
 
-//*****************************************************************************
+
 // Conker Bad Fur Day rendering pipeline
-//*****************************************************************************
+
 #ifdef DAEDALUS_PSP_USE_VFPU
 void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 {
@@ -1328,10 +1298,10 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 }
 #endif
 
-//*****************************************************************************
+
 // Assumes address has already been checked!
 // DKR/Jet Force Gemini rendering pipeline
-//*****************************************************************************
+
 void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboard)
 {
 	uintptr_t pVtxBase = reinterpret_cast<uintptr_t>(g_pu8RamBase + address);
@@ -1441,9 +1411,9 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 	}
 }
 
-//*****************************************************************************
+
 // Perfect Dark rendering pipeline
-//*****************************************************************************
+
 #ifdef DAEDALUS_PSP_USE_VFPU
 void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 {
@@ -1553,9 +1523,7 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 }
 #endif
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::ModifyVertexInfo(u32 whered, u32 vert, u32 val)
 {
 	switch ( whered )
@@ -1635,9 +1603,7 @@ void BaseRenderer::ModifyVertexInfo(u32 whered, u32 vert, u32 val)
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 inline void BaseRenderer::SetVtxColor( u32 vert, u32 color )
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
@@ -1651,9 +1617,7 @@ inline void BaseRenderer::SetVtxColor( u32 vert, u32 color )
 	mVtxProjected[vert].Colour = v4( r * (1.0f / 255.0f), g * (1.0f / 255.0f), b * (1.0f / 255.0f), a * (1.0f / 255.0f) );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 /*
 inline void BaseRenderer::SetVtxZ( u32 vert, float z )
 {
@@ -1662,9 +1626,7 @@ inline void BaseRenderer::SetVtxZ( u32 vert, float z )
 	mVtxProjected[vert].TransformedPos.z = z;
 }
 */
-//*****************************************************************************
-//
-//*****************************************************************************
+
 inline void BaseRenderer::SetVtxXY( u32 vert, float x, float y )
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
@@ -1674,9 +1636,9 @@ inline void BaseRenderer::SetVtxXY( u32 vert, float x, float y )
 	mVtxProjected[vert].TransformedPos.y = y;
 }
 
-//*****************************************************************************
+
 // Init matrix stack to identity matrices (called once per frame)
-//*****************************************************************************
+
 void BaseRenderer::ResetMatrices(u32 size)
 {
 	//Tigger's Honey Hunt
@@ -1689,9 +1651,7 @@ void BaseRenderer::ResetMatrices(u32 size)
 	mWorldProjectValid = false;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::UpdateTileSnapshots( u32 tile_idx )
 {
 	UpdateTileSnapshot( 0, tile_idx );
@@ -1775,12 +1735,12 @@ static void T1Hack(const TextureInfo & ti0, CNativeTexture * texture0,
 }
 #endif // DAEDALUS_PSP
 
-//*****************************************************************************
+
 // This captures the state of the RDP tiles in:
 //   mTexWrap
 //   mTileTopLeft
 //   mBoundTexture
-//*****************************************************************************
+
 void BaseRenderer::UpdateTileSnapshot( u32 index, u32 tile_idx )
 {
 	#ifdef DAEDALUS_ENABLE_PROFILING
@@ -1955,9 +1915,7 @@ void BaseRenderer::PrepareTexRectUVs(TexCoord * puv0, TexCoord * puv1)
 	mTileTopLeft[0].t = 0;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 CRefPtr<CNativeTexture> BaseRenderer::LoadTextureDirectly( const TextureInfo & ti )
 {
 	CRefPtr<CNativeTexture> texture = CTextureCache::Get()->GetOrCreateTexture( ti );
@@ -1972,9 +1930,7 @@ CRefPtr<CNativeTexture> BaseRenderer::LoadTextureDirectly( const TextureInfo & t
 	return texture;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 {
 	//Clamp scissor to max N64 screen resolution //Corn
@@ -2013,9 +1969,7 @@ void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 }
 
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::SetProjection(const u32 address, bool bReplace)
 {
 	// Projection
@@ -2055,9 +2009,7 @@ void BaseRenderer::SetProjection(const u32 address, bool bReplace)
 		#endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::SetDKRMat(const u32 address, bool mul, u32 idx)
 {
 	mDKRMatIdx = idx;
@@ -2087,9 +2039,7 @@ void BaseRenderer::SetDKRMat(const u32 address, bool mul, u32 idx)
 			mtx.m[3][0], mtx.m[3][1], mtx.m[3][2], mtx.m[3][3]);
 #endif
 }
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void BaseRenderer::SetWorldView(const u32 address, bool bPush, bool bReplace)
 {
 	// ModelView
@@ -2141,9 +2091,7 @@ void BaseRenderer::SetWorldView(const u32 address, bool bPush, bool bReplace)
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 inline void BaseRenderer::UpdateWorldProject()
 {
 	if( !mWorldProjectValid )
@@ -2179,9 +2127,7 @@ inline void BaseRenderer::PokeWorldProject()
 }
 
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 void BaseRenderer::PrintActive()
 {
@@ -2200,9 +2146,9 @@ void BaseRenderer::PrintActive()
 }
 #endif
 
-//*****************************************************************************
+
 //Modify the WorldProject matrix, used by Kirby & SSB //Corn
-//*****************************************************************************
+
 void BaseRenderer::InsertMatrix(u32 w0, u32 w1)
 {
 	mWPmodified = true;	//Signal that Worldproject matrix is changed
@@ -2243,9 +2189,9 @@ void BaseRenderer::InsertMatrix(u32 w0, u32 w1)
 		#endif
 }
 
-//*****************************************************************************
+
 //Replaces the WorldProject matrix //Corn
-//*****************************************************************************
+
 void BaseRenderer::ForceMatrix(const u32 address)
 {
 	mWorldProjectValid = true;

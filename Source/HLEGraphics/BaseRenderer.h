@@ -282,7 +282,6 @@ public:
 	void				SetDKRMat(const u32 address, bool mul, u32 idx);
 	void				SetProjection(const u32 address, bool bReplace);
 	void				SetWorldView(const u32 address, bool bPush, bool bReplace);
-	//inline void			PopProjection() {if (mProjectionTop > 0) --mProjectionTop;	mWorldProjectValid = false;}
 	inline void			PopWorldView(u32 num = 1)	{if (mModelViewTop > (num-1))	 mModelViewTop-=num;	mWorldProjectValid = false;}
 	void				InsertMatrix(u32 w0, u32 w1);
 	void				ForceMatrix(const u32 address);
@@ -305,7 +304,6 @@ public:
 
 	// Render our current triangle list to screen
 	void				FlushTris();
-	//void				Line3D( u32 v0, u32 v1, u32 width );
 
 	// Returns true if bounding volume is visible within NDC box, false if culled
 	inline bool			TestVerts( u32 v0, u32 vn ) const		{ u32 f=mVtxProjected[v0].ClipFlags; for( u32 i=v0+1; i<=vn; i++ ) f&=mVtxProjected[i].ClipFlags; return f==0; }
@@ -351,10 +349,9 @@ protected:
 
 	virtual void		RestoreRenderStates() = 0;
 
-	//*****************************************************************************
 	// We round these value here, so that when we scale up the coords to our screen
 	// coords we don't get any gaps.
-	//*****************************************************************************
+
 	inline void ConvertN64ToScreen( const v2 & n64_coords, v2 & answ ) const
 	{
 		answ.x = roundf( N64ToScreenX( roundf( n64_coords.x ) ) );
