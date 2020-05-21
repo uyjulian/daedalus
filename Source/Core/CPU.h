@@ -52,20 +52,33 @@ struct DBG_BreakPoint
 #endif
 //
 // CPU Jobs
-//
+
 #define CPU_CHECK_EXCEPTIONS				0x00000001
 #define CPU_CHECK_INTERRUPTS				0x00000002
 #define CPU_STOP_RUNNING					0x00000008
 #define CPU_CHANGE_CORE						0x00000010
 
-//*****************************************************************************
 // External declarations
-//*****************************************************************************
 #ifdef DAEDALUS_BREAKPOINTS_ENABLED
 #include <vector>
 extern std::vector< DBG_BreakPoint > g_BreakPoints;
 #endif
 
+inline OpCode GetCorrectOp( OpCode op_code )
+{
+#ifdef DAEDALUS_BREAKPOINTS_ENABLED
+	if (op_code.op == OP_DBG_BKPT)
+	{
+		u32 bp_index = op_code.bp_index;
+
+		if (bp_index < g_BreakPoints.size())
+		{
+			op_code = g_BreakPoints[bp_index].mOriginalOp;
+		}
+	}
+#endif
+	return op_code;
+}
 // Arbitrary unique numbers for different timing related events:
 enum	ECPUEventType
 {

@@ -19,7 +19,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // Code to format opcodes and display them nicely
 #include "Base/Daedalus.h"
-#include "PrintOpCode.h"
+#include "Core/PrintOpCode.h"
+
+
+
 
 //
 //	Exclude this from public release builds to save a little on the elf size
@@ -27,10 +30,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef DAEDALUS_SILENT
 
 #include <stdio.h>
-
+#include "Core/Registers.h"
 #include "Core/R4300OpCode.h"
-
-#include "OSHLE/patch.h"		// For Definition of GetCorrectOp
+#include "OSHLE/patch.h"
 
 
 static const char *Cop1BC1OpCodeNames[4] = {
@@ -1153,4 +1155,3 @@ void SprintRSPOpCodeInfo(char *str, u32 address, OpCode op)
 }
 
 #endif // DAEDALUS_SILENT
-
