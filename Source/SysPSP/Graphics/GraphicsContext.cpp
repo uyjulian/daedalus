@@ -18,7 +18,7 @@
 
 */
 
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 #include "Graphics/GraphicsContext.h"
 
 #include <pspgu.h>

@@ -19,8 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef STDAFX_H_
-#define STDAFX_H_
+#ifndef BASE_DAEDALUS_H_
+#define BASE_DAEDALUS_H_
 
 #if defined(DAEDALUS_CONFIG_RELEASE)
 #include "Base/Release/BuildConfig.h"
@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Dev/BuildConfig.h"
 #else
 #error Unknown compilation mode
-#endif 
+#endif
 // Platform specifc #includes, externs, #defines etc
 #ifdef DAEDALUS_W32
 #include "Platform/Windows/DaedalusW32.h"
@@ -38,4 +38,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Types.h"
 
-#endif // STDAFX_H_
+#endif // BASE_DAEDALUS_H_
