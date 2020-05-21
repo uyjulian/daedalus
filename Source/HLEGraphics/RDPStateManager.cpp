@@ -42,14 +42,14 @@ static const char * const kTLUTTypeName[] = {"None", "?", "RGBA16", "IA16"};
 
 RDP_OtherMode		gRDPOtherMode;
 
-#define MAX_TMEM_ADDRESS 4096
+static const u32 kMaxTmemAddress = 4096;
 
 // Granularity down to 24bytes is good enuff also only need to address the upper half of TMEM for palettes//Corn
-u32 gTlutLoadAddresses[ MAX_TMEM_ADDRESS >> 6 ];
+u32 gTlutLoadAddresses[ kMaxTmemAddress >> 6 ];
 
 
 #ifdef DAEDALUS_ACCURATE_TMEM
-ALIGNED_GLOBAL(u8, gTMEM[ MAX_TMEM_ADDRESS ], 16);	// 4Kb
+ALIGNED_GLOBAL(u8, gTMEM[ kMaxTmemAddress ], 16);	// 4Kb
 #endif
 
 
