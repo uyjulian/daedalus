@@ -43,7 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "DynaRec/FragmentCache.h"
 #include "Math/Math.h"
 #include "OSHLE/PatchTables.h"
-#include "Plugins/AudioPlugin.h"
+#include "HLEAudio/AudioPlugin.h"
 #include "System/Endian.h"
 #include "Ultra/ultra_os.h"
 #include "Ultra/ultra_R4300.h"

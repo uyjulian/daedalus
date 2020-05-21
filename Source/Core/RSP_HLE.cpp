@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_mbi.h"
 #include "Ultra/ultra_rcp.h"
 #include "Ultra/ultra_sptask.h"
-#include "Plugins/AudioPlugin.h"
+#include "HLEAudio/AudioPlugin.h"
 #include "HLEGraphics/GraphicsPlugin.h"
 #include "Test/BatchTest.h"
 #include "System/IO.h"
