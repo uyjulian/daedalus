@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "DynaRec/AssemblyUtils.h"
 #include "DynaRec/Trace.h"
 #include "Base/MathUtil.h"
-#include "OSHLE/ultra_R4300.h"
+#include "Ultra/ultra_R4300.h"
 #include "Base/Macros.h"
 #include "Core/PrintOpCode.h"
 #include "Utility/Profiler.h"

@@ -37,8 +37,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Interface/RomDB.h"
 #include "Base/MathUtil.h"
 #include "OSHLE/patch.h"			// Patch_ApplyPatches
-#include "OSHLE/ultra_os.h"		// System type
-#include "OSHLE/ultra_R4300.h"
+#include "Ultra/ultra_os.h"		// System type
+#include "Ultra/ultra_R4300.h"
 #include "Plugins/AudioPlugin.h"
 #include "Plugins/GraphicsPlugin.h"
 #include "Utility/CRC.h"
