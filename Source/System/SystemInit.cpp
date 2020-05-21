@@ -57,7 +57,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 
-#include "Plugins/GraphicsPlugin.h"
+#include "HLEGraphics/GraphicsPlugin.h"
 #include "Plugins/AudioPlugin.h"
 
 CGraphicsPlugin* gGraphicsPlugin = NULL;
@@ -86,16 +86,8 @@ static bool InitGraphicsPlugin()
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT( gGraphicsPlugin == NULL, "The graphics plugin should not be initialised at this point" );
 	#endif
-	CGraphicsPlugin * graphics_plugin = CreateGraphicsPlugin();
-	if(graphics_plugin != NULL)
-	{
-		if(!graphics_plugin->StartEmulation())
-		{
-			delete graphics_plugin;
-			graphics_plugin = NULL;
-		}
-		gGraphicsPlugin = graphics_plugin;
-	}
+
+		gGraphicsPlugin = CreateGraphicsPlugin();
 	return true;
 }
 

@@ -10,7 +10,7 @@
 #include "HLEGraphics/DLParser.h"
 #include "HLEGraphics/TextureCache.h"
 #include "Interface/Preferences.h"
-#include "Plugins/GraphicsPlugin.h"
+#include "HLEGraphics/GraphicsPlugin.h"
 #include "SysGL/GL.h"
 #include "System/Timing.h"
 
