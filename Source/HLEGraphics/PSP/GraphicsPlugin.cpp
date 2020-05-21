@@ -117,27 +117,7 @@ static void	UpdateFramerate()
 }
 }
 
-class CGraphicsPluginImpl : public CGraphicsPlugin
-{
-	public:
-	virtual	~CGraphicsPluginImpl();
-
-		virtual 	bool		Initialise();
-		virtual bool		StartEmulation()		{ return true; }
-		virtual void		ViStatusChanged()		{}
-		virtual void		ViWidthChanged()		{}
-		virtual void		ProcessDList();
-
-		virtual void		UpdateScreen();
-
-		virtual void		RomClosed();
-};
-
-CGraphicsPluginImpl::~CGraphicsPluginImpl()
-{
-}
-
-bool CGraphicsPluginImpl::Initialise()
+bool CGraphicsPlugin::Initialise()
 {
 	if(!CreateRenderer())
 	{
@@ -157,7 +137,7 @@ bool CGraphicsPluginImpl::Initialise()
 	return true;
 }
 
-void CGraphicsPluginImpl::ProcessDList()
+void CGraphicsPlugin::ProcessDList()
 {
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	if (!DLDebugger_Process())
@@ -175,16 +155,15 @@ extern u32 gNumDListsCulled;
 extern u32 gNumRectsClipped;
 #endif
 
-void CGraphicsPluginImpl::UpdateScreen()
+void CGraphicsPlugin::UpdateScreen()
 {
 	//gVblCount++;
 
-	static u32		last_origin = 0;
 	u32 current_origin = Memory_VI_GetRegister(VI_ORIGIN_REG);
 	static bool Old_FrameskipActive = false;
 	static bool Older_FrameskipActive =false;
 
-	if( current_origin != last_origin )
+	if( current_origin != LastOrigin )
 	{
 		//printf( "Flip (%08x, %08x)\n", current_origin, last_origin );
 		if( gGlobalPreferences.DisplayFramerate )
@@ -263,11 +242,11 @@ void CGraphicsPluginImpl::UpdateScreen()
 			break;
 		}
 
-		last_origin = current_origin;
+		LastOrigin = current_origin;
 	}
 }
 
-void CGraphicsPluginImpl::RomClosed()
+void CGraphicsPlugin::Finalise()
 {
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 	DBGConsole_Msg(0, "Finalising PSPGraphics");
@@ -283,7 +262,7 @@ CGraphicsPlugin * CreateGraphicsPlugin()
 	DBGConsole_Msg( 0, "Initialising Graphics Plugin [CPSP]" );
 #endif
 
-	CGraphicsPluginImpl * plugin = new CGraphicsPluginImpl;
+	CGraphicsPlugin * plugin = new CGraphicsPlugin;
 	if( !plugin->Initialise() )
 	{
 		delete plugin;

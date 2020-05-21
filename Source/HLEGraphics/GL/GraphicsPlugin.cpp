@@ -86,38 +86,8 @@ static void	UpdateFramerate()
 }
 }
 
-class CGraphicsPluginImpl : public CGraphicsPlugin
-{
-	public:
-		CGraphicsPluginImpl();
-		~CGraphicsPluginImpl();
 
-				bool		Initialise();
-
-		virtual bool		StartEmulation()		{ return true; }
-
-		virtual void		ViStatusChanged()		{}
-		virtual void		ViWidthChanged()		{}
-		virtual void		ProcessDList();
-
-		virtual void		UpdateScreen();
-
-		virtual void		RomClosed();
-
-	private:
-		u32					LastOrigin;
-};
-
-CGraphicsPluginImpl::CGraphicsPluginImpl()
-:	LastOrigin( 0 )
-{
-}
-
-CGraphicsPluginImpl::~CGraphicsPluginImpl()
-{
-}
-
-bool CGraphicsPluginImpl::Initialise()
+bool CGraphicsPlugin::Initialise()
 {
 	if (!CreateRenderer())
 	{
@@ -137,7 +107,7 @@ bool CGraphicsPluginImpl::Initialise()
 	return true;
 }
 
-void CGraphicsPluginImpl::ProcessDList()
+void CGraphicsPlugin::ProcessDList()
 {
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	if (!DLDebugger_Process())
@@ -149,7 +119,7 @@ void CGraphicsPluginImpl::ProcessDList()
 #endif
 }
 
-void CGraphicsPluginImpl::UpdateScreen()
+void CGraphicsPlugin::UpdateScreen()
 {
 	u32 current_origin = Memory_VI_GetRegister(VI_ORIGIN_REG);
 
@@ -175,7 +145,7 @@ void CGraphicsPluginImpl::UpdateScreen()
 	}
 }
 
-void CGraphicsPluginImpl::RomClosed()
+void CGraphicsPlugin::Finalise()
 {
 	DBGConsole_Msg(0, "Finalising GLGraphics");
 	DLParser_Finalise();
@@ -187,7 +157,7 @@ class CGraphicsPlugin *	CreateGraphicsPlugin()
 {
 	DBGConsole_Msg( 0, "Initialising Graphics Plugin [CGL]" );
 
-	CGraphicsPluginImpl * plugin = new CGraphicsPluginImpl;
+	CGraphicsPlugin * plugin = new CGraphicsPlugin;
 	if (!plugin->Initialise())
 	{
 		delete plugin;

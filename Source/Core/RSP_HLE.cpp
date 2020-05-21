@@ -37,8 +37,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/PrintOpCode.h"
 #include "Utility/Profiler.h"
 
-static const bool	gGraphicsEnabled = true;
-static const bool	gAudioEnabled	 = true;
 
 extern void jpeg_decode_PS(OSTask *task);
 extern void jpeg_decode_PS0(OSTask *task);
@@ -152,7 +150,7 @@ static EProcessResult RSP_HLE_Graphics()
 {
 	DAEDALUS_PROFILE( "HLE: Graphics" );
 
-	if (gGraphicsEnabled && gGraphicsPlugin != nullptr)
+		if (gGraphicsPlugin != NULL)
 	{
 		gGraphicsPlugin->ProcessDList();
 	}
@@ -181,7 +179,7 @@ static EProcessResult RSP_HLE_Audio()
 {
 	DAEDALUS_PROFILE( "HLE: Audio" );
 
-	if (gAudioEnabled && gAudioPlugin != nullptr)
+		if (gAudioPlugin != NULL)
 	{
 		return gAudioPlugin->ProcessAList();
 	}

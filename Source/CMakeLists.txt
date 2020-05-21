@@ -31,7 +31,7 @@ project (DaedalusX64)
 				set (UTILITY_FILES Utility/CRC.cpp  Utility/FastMemcpy.cpp Utility/Hash.cpp Utility/IniFile.cpp Utility/MemoryHeap.cpp  Utility/Profiler.cpp Utility/Stream.cpp Utility/StringUtil.cpp  Utility/Timer.cpp  Utility/Translate.cpp)
 				set (UNKNOWN_FILES Utility/FastMemcpy_test.cpp Utility/MemoryPool.cpp)
 				set (DEBUG_ONLY Core/Registers.cpp)
-				set (BUILD ${TEMP} ${CONFIG_FILES} ${CORE_FILES} ${DEBUG_FILES} ${DYNAREC_FILES} ${GRAPHICS_FILES} ${HLEAUDIO_FILES} ${HLEGRAPHICS_FILES} ${INTERFACE_FILES} ${MATH_FILES} ${OSHLE_FILES} ${ROMFILE_FILES} ${SYSTEM_FILES} ${TEST_FILES} ${UTILITY_FILES})
+				set (BUILD  ${CONFIG_FILES} ${CORE_FILES} ${DEBUG_FILES} ${DYNAREC_FILES} ${GRAPHICS_FILES} ${HLEAUDIO_FILES} ${HLEGRAPHICS_FILES} ${INTERFACE_FILES} ${MATH_FILES} ${OSHLE_FILES} ${ROMFILE_FILES} ${SYSTEM_FILES} ${TEST_FILES} ${UTILITY_FILES})
 
 
 				#PSP Build
@@ -71,7 +71,7 @@ project (DaedalusX64)
 
 				#SysGL
 				set (SYSGL_GRAPHICS SysGL/Graphics/GraphicsContextGL.cpp SysGL/Graphics/NativeTextureGL.cpp)
-				set (SYSGL_HLEGRAPHICS SysGL/HLEGraphics/GraphicsPluginGL.cpp SysGL/HLEGraphics/RendererGL.cpp)
+				set (SYSGL_HLEGRAPHICS HLEGraphics/GL/GraphicsPlugin.cpp SysGL/HLEGraphics/RendererGL.cpp)
 				set (SYSGL_INPUT SysGL/Input/InputManagerGL.cpp)
 				set (SYSGL_INTERFACE SysGL/Interface/UI.cpp)
 				set (SYSGL_BUILD ${SYSGL_GRAPHICS} ${SYSGL_HLEGRAPHICS} ${SYSGL_INPUT} ${SYSGL_INTERFACE} ${PLUGIN_FILES})
@@ -80,15 +80,15 @@ project (DaedalusX64)
 				set (WIN_AUDIO HLEAudio/Windows/AudioPlugin.cpp)
 				set (WIN_DEBUG SysW32/Debug/DaedalusAssertW32.cpp SysW32/Debug/DebugConsoleW32.cpp)
 				set (WIN_DYNAREC DynaRec/Windows/x86/AssemblyUtilsX86.cpp DynaRec/Windows/x86/AssemblyWriterX86.cpp DynaRec/Windows/x86/CodeBufferManagerX86.cpp DynaRec/Windows/x86/CodeGeneratorX86.cpp)
-				set (WIN_MAIN Source/Platform/Windows/main.cpp)
+				set (WIN_MAIN System/Platform/Windows/main.cpp)
 				set (WIN_SYSTEM System/Windows/Condition.cpp System/Windows/Timing.cpp System/Windows/Thread.cpp)
 				set (WIN_UTILITY SysW32/Utility/IOW32.cpp)
 				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG} ${WIN_SYSTEM} ${WIN_UTILITY})
 				set (WIN_DEFINES -DDAEDALUS_W32 -DDAEDALUS_ACCURATE_TMEM -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE ) #dynarec is broken -DDAEDALUS_ENABLE_DYNAREC
         #Posix
-				set (POSIX_DEBUG SysPosix/Debug/DaedalusAssertPosix.cpp SysPosix/Debug/DebugConsolePosix.cpp SysPosix/Debug/WebDebug.cpp SysPosix/Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
-				set (POSIX_DYNAREC Source/Dynarec/OSX/CodeBufferManager.cpp)
-				set (POSIX_HLEGRAPHICS HLEGraphics/DisplayListDebugger.cpp)
+				set (POSIX_DEBUG SysPosix/Debug/DaedalusAssertPosix.cpp SysPosix/Debug/DebugConsolePosix.cpp Debug/WebDebug.cpp Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
+				set (POSIX_DYNAREC DynaRec/Posix/CodeBufferManager.cpp)
+				set (POSIX_HLEGRAPHICS HLEGraphics/DisplayListDebuggerPosix.cpp)
 				set (POSIX_MAIN_FILES Platform/Posix/main.cpp)
 				set (POSIX_SYSTEM System/Posix/Condition.cpp System/Posix/Timing.cpp System/Posix/Thread.cpp )
 				set (POSIX_UTILITY SysPosix/Utility/IO.cpp )
