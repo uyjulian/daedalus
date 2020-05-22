@@ -86,6 +86,23 @@ static void	UpdateFramerate()
 }
 }
 
+class CGraphicsPlugin *	CreateGraphicsPlugin()
+{
+	DBGConsole_Msg( 0, "Initialising Graphics Plugin [CGL]" );
+
+	CGraphicsPlugin * plugin = new CGraphicsPlugin;
+	if (!plugin->Initialise())
+	{
+		delete plugin;
+		plugin = NULL;
+	}
+
+	return plugin;
+}
+
+CGraphicsPlugin::~CGraphicsPlugin()
+{
+}
 
 bool CGraphicsPlugin::Initialise()
 {
@@ -103,11 +120,21 @@ bool CGraphicsPlugin::Initialise()
 	{
 		return false;
 	}
-
+RSP_HLE_RegisterDisplayListEventHandler(this);
 	return true;
 }
 
-void CGraphicsPlugin::ProcessDList()
+void CGraphicsPlugin::Finalise()
+{
+	DBGConsole_Msg(0, "Finalising GLGraphics");
+	RSP_HLE_UnregisterDisplayListProcessor(this);
+	DLParser_Finalise();
+	CTextureCache::Destroy();
+	DestroyRenderer();
+}
+
+
+void CGraphicsPlugin::ProcessDisplayList()
 {
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	if (!DLDebugger_Process())
@@ -143,26 +170,4 @@ void CGraphicsPlugin::UpdateScreen()
 
 		LastOrigin = current_origin;
 	}
-}
-
-void CGraphicsPlugin::Finalise()
-{
-	DBGConsole_Msg(0, "Finalising GLGraphics");
-	DLParser_Finalise();
-	CTextureCache::Destroy();
-	DestroyRenderer();
-}
-
-class CGraphicsPlugin *	CreateGraphicsPlugin()
-{
-	DBGConsole_Msg( 0, "Initialising Graphics Plugin [CGL]" );
-
-	CGraphicsPlugin * plugin = new CGraphicsPlugin;
-	if (!plugin->Initialise())
-	{
-		delete plugin;
-		plugin = NULL;
-	}
-
-	return plugin;
 }

@@ -97,6 +97,16 @@ static void BatchVblHandler( void * arg )
 	gBatchTestEventHandler->OnVerticalBlank();
 }
 
+class BatchDisplayListEventHandler : public DisplayListEventHandler
+{
+	void OnDisplayListComplete() override
+	{
+		gBatchTestEventHandler->OnDisplayListComplete();
+	}
+};
+ 
+
+
 static void MakeNewLogFilename( IO::Filename & filepath, const char * rundir )
 {
 	u32 count = 0;

@@ -329,11 +329,10 @@ void	CPU_DumpFragmentCache()
 		fputs( "<div align=\"center\"><table>\n", fh );
 		fputs( "<tr><th>Address</th><th>Hit Count</th><th>Abort Reason</th></tr>\n", fh );
 
-		for( u32 i = 0; i < hit_counts.size(); ++i )
-		{
-			const SAddressHitCount & info( hit_counts[ i ] );
+		for (const auto& info : hit_counts)
 
-			u32		abort_reason( info.GetAbortReason() );
+
+			u32	abort_reason = info.GetAbortReason();
 
 			fprintf( fh, "<tr><td>%08x</td><td>%d</td>\n", info.Address, info.HitCount );
 

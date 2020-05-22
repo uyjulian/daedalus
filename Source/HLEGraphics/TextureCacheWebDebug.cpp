@@ -33,10 +33,9 @@ static void TextureHandler(void * arg, WebDebugConnection * connection)
 		CRefPtr<CNativeTexture> texture;
 		{
 			std::vector<CTextureCache::STextureInfoSnapshot> textures;
-			CTextureCache::Get()->Snapshot(lock, textures);
-			for (size_t i = 0; i < textures.size(); ++i)
+			CTextureCache::Get()->Snapshot(lock, textures);\
+			for (const auto& snap : textures)
 			{
-				CTextureCache::STextureInfoSnapshot & snap = textures[i];
 				if ((CNativeTexture*)snap.Texture == ptr)
 				{
 					texture = snap.Texture;

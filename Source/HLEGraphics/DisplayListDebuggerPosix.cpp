@@ -340,12 +340,11 @@ static void DLDebugHandler(void * arg, WebDebugConnection * connection)
 	if (!params.empty())
 	{
 		bool ok = false;
-
-		for (size_t i = 0; i < params.size(); ++i)
+		for (const auto& param : params)
 		{
-			if (params[i].Key == "action")
+			if (params.Key == "action")
 			{
-				if (params[i].Value == "break")
+				if (params.Value == "break")
 				{
 					DoTask(connection, kBreakExecution);
 					return;
@@ -356,19 +355,19 @@ static void DLDebugHandler(void * arg, WebDebugConnection * connection)
 					return;
 				}
 			}
-			else if (params[i].Key == "scrub")
+			else if (params.Key == "scrub")
 			{
 				gInstructionCountLimit = ParseU32(params[i].Value, 10);
 				DoTask(connection, kTaskScrub);
 				return;
 			}
-			else if (params[i].Key == "screen")
+			else if (params.Key == "screen")
 			{
 				//int cmd = atoi(params[i].Value);
 				DoTask(connection, kTaskTakeScreenshot);
 				return;
 			}
-			else if (params[i].Key == "dump")
+			else if (params.Key == "dump")
 			{
 				//int cmd = atoi(params[i].Value);
 				DoTask(connection, kTaskDumpDList);

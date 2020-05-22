@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/RSP_HLE.h"
 
 #include <vector>
+#include <algorithm>
 
 #include "Core/Interrupt.h"
 #include "Core/Memory.h"
@@ -33,7 +34,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_rcp.h"
 #include "Ultra/ultra_sptask.h"
 #include "HLEAudio/AudioPlugin.h"
-#include "HLEGraphics/GraphicsPlugin.h"
 #include "System/IO.h"
 #include "Core/PrintOpCode.h"
 #include "Utility/Profiler.h"
@@ -124,30 +124,37 @@ static void	RSP_HLE_DumpTaskInfo( const OSTask * pTask )
 #endif
 
 
-typedef void (*DisplayListCallback)(void* arg);
-struct DLCallback
-{
-	DisplayListCallback Fn;
-	void* Arg;
-};
+DisplayListEventHandler::~DisplayListEventHandler() {}
+DisplayListProcessor::~DisplayListProcessor() {}
 
-static std::vector<DLCallback> gDLCallbacks;
+static std::vector<DisplayListEventHandler*> gDisplayListEventHandlers;
+static std::vector<DisplayListProcessor*> gDisplayListProcessors;
 
-void RSP_HLE_RegisterDisplayListCallback(DisplayListCallback fn, void* arg)
+void RSP_HLE_RegisterDisplayListEventHandler(DisplayListEventHandler* handler)
 {
-	DLCallback callback = {fn, arg};
-	gDLCallbacks.push_back(callback);
+	gDisplayListEventHandlers.push_back(handler);
 }
 
-void RSP_HLE_UnregisterDisplayListCallback(DisplayListCallback fn, void* arg)
+void RSP_HLE_UnregisterDisplayListEventHandler(DisplayListEventHandler* handler)
 {
-	for (std::vector<DLCallback>::iterator it = gDLCallbacks.begin(); it != gDLCallbacks.end(); ++it)
+	auto it = std::find(gDisplayListEventHandlers.begin(), gDisplayListEventHandlers.end(), handler);
+	if (it != gDisplayListEventHandlers.end())
 	{
-		if (it->Fn == fn && it->Arg == arg)
-		{
-			gDLCallbacks.erase(it);
-			break;
-		}
+		gDisplayListEventHandlers.erase(it);
+	}
+}
+
+void RSP_HLE_RegisterDisplayListProcessor(DisplayListProcessor* processor)
+{
+	gDisplayListProcessors.push_back(processor);
+}
+
+void RSP_HLE_UnregisterDisplayListProcessor(DisplayListProcessor* processor)
+{
+	auto it = std::find(gDisplayListProcessors.begin(), gDisplayListProcessors.end(), processor);
+	if (it != gDisplayListProcessors.end())
+	{
+		gDisplayListProcessors.erase(it);
 	}
 }
 
@@ -174,15 +181,17 @@ void RSP_HLE_Finished(u32 setbits)
 
 //
 
-static EProcessResult RSP_HLE_Graphics()
+static EProcessResult ProcessGfxTask()
 {
 	DAEDALUS_PROFILE( "HLE: Graphics" );
 
-		if (gGraphicsPlugin != NULL)
+	bool handled = false;
+	for (auto processor : gDisplayListProcessors)
 	{
-		gGraphicsPlugin->ProcessDList();
+		processor->ProcessDisplayList();
+		handled = true;
 	}
-	else
+	if (!handled)
 	{
 		// Skip the entire dlist if graphics are disabled
 		Memory_MI_SetRegisterBits(MI_INTR_REG, MI_INTR_DP);
@@ -192,19 +201,18 @@ static EProcessResult RSP_HLE_Graphics()
 
 #ifdef DAEDALUS_BATCH_TEST_ENABLED
 
-	for (auto callback : gDLCallbacks)
+	for (auto handler : gDisplayListEventHandlers)
 	{
-		callback.Fn(callback.Arg);
+		handler->OnDisplayListComplete();
 	}
 #endif
 
 	return PR_COMPLETED;
 }
 
-
 //
 
-static EProcessResult RSP_HLE_Audio()
+static EProcessResult ProcessAudTask()
 {
 	DAEDALUS_PROFILE( "HLE: Audio" );
 
@@ -215,7 +223,7 @@ static EProcessResult RSP_HLE_Audio()
 	return PR_COMPLETED;
 }
 
-// RSP_HLE_Jpeg and RSP_HLE_CICX105 were borrowed from Mupen64plus
+// ProcessJpegTask and RSP_HLE_CICX105 were borrowed from Mupen64plus
 static u32 sum_bytes(const u8 *bytes, u32 size)
 {
     u32 sum {};
@@ -227,8 +235,10 @@ static u32 sum_bytes(const u8 *bytes, u32 size)
     return sum;
 }
 
-EProcessResult RSP_HLE_Jpeg(OSTask * task)
+EProcessResult ProcessJpegTask(OSTask * task)
 {
+	void jpeg_decode_PS(OSTask *task);
+	void jpeg_decode_OB(OSTask *task);
 	// most ucode_boot procedure copy 0xf80 bytes of ucode whatever the ucode_size is.
 	// For practical purpose we use a ucode_size = min(0xf80, task->ucode_size)
 	u32 sum = sum_bytes(g_pu8RamBase + (u32)task->t.ucode , Min<u32>(task->t.ucode_size, 0xf80) >> 1);
@@ -306,11 +316,11 @@ void RSP_HLE_ProcessTask()
 			{
 				return;
 			}
-			result = RSP_HLE_Graphics();
+			result = ProcessGfxTask();
 			break;
 
 		case M_AUDTASK:
-			result = RSP_HLE_Audio();
+			result = ProcessAudTask();
 			break;
 
 		case M_VIDTASK:
@@ -318,7 +328,7 @@ void RSP_HLE_ProcessTask()
 			break;
 
 		case M_JPGTASK:
-			result = RSP_HLE_Jpeg(pTask);
+			result = ProcessJpegTask(pTask);
 			break;
 		#ifdef DAEDALUS_ENABLE_ASSERTS
 		default:
@@ -338,5 +348,7 @@ void RSP_HLE_ProcessTask()
 
 	// Started and completed. No need to change cores. [synchronously]
 	if( result == PR_COMPLETED )
+	{
 		RSP_HLE_Finished(SP_STATUS_TASKDONE|SP_STATUS_BROKE|SP_STATUS_HALT);
+	}
 }

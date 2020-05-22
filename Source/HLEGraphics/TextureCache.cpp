@@ -108,10 +108,9 @@ void CTextureCache::PurgeOldTextures()
 void CTextureCache::DropTextures()
 {
 	MutexLock lock(GetDebugMutex());
-
-	for( u32 i = 0; i < mTextures.size(); ++i)
+	for (CachedTexture * texture : mTextures)
 	{
-		delete mTextures[i];
+		delete texture;
 	}
 	mTextures.clear();
 	for( u32 i = 0; i < HASH_TABLE_SIZE; ++i )
@@ -229,8 +228,9 @@ CRefPtr<CNativeTexture> CTextureCache::GetOrCreateTexture(const TextureInfo & ti
 {
 	CachedTexture * base_texture = GetOrCreateCachedTexture(ti);
 	if (!base_texture)
+	{
 		return nullptr;
-
+	}
 	return base_texture->GetTexture();
 }
 
@@ -239,9 +239,9 @@ void CTextureCache::Snapshot(const MutexLock & lock, std::vector< STextureInfoSn
 {
 	DAEDALUS_ASSERT(lock.HasLock(mDebugMutex), "No debug lock");
 
-	snapshot.erase( snapshot.begin(), snapshot.end() );
 
-	for( TextureVec::const_iterator it = mTextures.begin(); it != mTextures.end(); ++it )
+	snapshot.clear();
+	for( const auto& it : mTextures )
 	{
 		STextureInfoSnapshot	info( (*it)->GetTextureInfo(), (*it)->GetTexture() );
 		snapshot.push_back( info );

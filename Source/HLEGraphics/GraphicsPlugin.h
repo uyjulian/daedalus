@@ -16,20 +16,25 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+
 #pragma once
 
 #ifndef HLEGRAPHICS_GRAPHICSPLUGIN_H_
 #define HLEGRAPHICS_GRAPHICSPLUGIN_H_
 
-class CGraphicsPlugin
+#include "Core/RSP_HLE.h"
+
+class CGraphicsPlugin : public DisplayListProcessor
 {
 	public:
 		CGraphicsPlugin() : LastOrigin(0) {}
+		~CGraphicsPlugin() override;
 
 		bool		Initialise();
-		void		ProcessDList();
 		void		UpdateScreen();
 		void		Finalise();
+
+		void		ProcessDisplayList() override;
 
 	private:
 		u32					LastOrigin;

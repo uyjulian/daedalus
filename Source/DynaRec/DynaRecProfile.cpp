@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-#include "DynaRecProfile.h"
+#include "DynaRec/DynaRecProfile.h"
 
 #include "Debug/DebugLog.h"
 
@@ -70,9 +70,9 @@ void	CheckForNewFrame()
 	if( gLastFrame != g_dwNumFrames )
 	{
 		std::vector< SFragmentCount >		LookupList;
-		for(std::map<u32, u32>::const_iterator it = gFrameLookups.begin(); it != gFrameLookups.end(); ++it)
+		for(const auto&  it : gFrameLookups)
 		{
-			LookupList.push_back( SFragmentCount( it->second, it->first ) );
+		LookupList.push_back(SFragmentCount(it.second, it.first)); 
 		}
 
 		std::sort( LookupList.begin(), LookupList.end(), SortDecreasingSize() );

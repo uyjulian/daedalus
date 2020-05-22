@@ -113,8 +113,7 @@ static std::vector<VblCallback>		gVblCallbacks;
 
 void CPU_RegisterVblCallback(VblCallbackFn fn, void * arg)
 {
-	VblCallback callback = { fn, arg };
-	gVblCallbacks.push_back(callback);
+	gVblCallbacks.push_back({fn, arg});
 }
 
 void CPU_UnregisterVblCallback(VblCallbackFn fn, void * arg)
@@ -694,10 +693,8 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			if ((gVerticalInterrupts & 0x3F) == 0) // once every 60 VBLs
 				Save_Flush();
 
-				//TESTING
-			for (size_t i = 0; i < gVblCallbacks.size(); ++i)
+			for (const auto& callback : gVblCallbacks)
 			{
-				VblCallback & callback = gVblCallbacks[i];
 				callback.Fn(callback.Arg);
 			}
 

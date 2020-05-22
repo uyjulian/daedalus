@@ -85,7 +85,7 @@ WebDebugConnection::WebDebugConnection(WebbyConnection * connection)
 		Split(params, '&', &args);
 
 		mQueryParams.reserve(args.size());
-		for (size_t i = 0; i < args.size(); ++i)
+		for (const auto& arg : args)
 		{
 			Param param;
 			SplitAt(args[i], '=', &param.Key, &param.Value);
@@ -248,9 +248,8 @@ static void ServeFile(WebDebugConnection * connection, const char * filename)
 
 bool ServeResource(WebDebugConnection * connection, const char * resource_path)
 {
-	for (size_t i = 0; i < gStaticResources.size(); ++i)
+	for (const auto& resource: gStaticResources)
 	{
-		const StaticResource & resource = gStaticResources[i];
 
 		if (strcmp(resource_path, resource.Resource.c_str()) == 0)
 		{
@@ -267,9 +266,8 @@ static int WebDebugDispatch(struct WebbyConnection *connection)
 	WebDebugConnection dbg_connection(connection);
 
 	// Check dynamic handlers.
-	for (size_t i = 0; i < gHandlers.size(); ++i)
+	for (const auto& entry : gHandlers)
 	{
-		const WebDebugHandlerEntry & entry = gHandlers[i];
 		if (strcmp(connection->request.uri, entry.Request) == 0)
 		{
 			entry.Handler(entry.Arg, &dbg_connection);

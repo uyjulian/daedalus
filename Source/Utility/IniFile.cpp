@@ -30,9 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Utility/StringUtil.h"
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 class IIniFileProperty : public CIniFileProperty
 {
 	public:
@@ -95,16 +93,12 @@ class IIniFileProperty : public CIniFileProperty
 		std::string				mValue;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 CIniFileProperty::~CIniFileProperty()
 {
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 class IIniFileSection : public CIniFileSection
 {
 	public:
@@ -145,16 +139,12 @@ class IIniFileSection : public CIniFileSection
 		PropertyVec				mProperties;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 CIniFileSection::~CIniFileSection()
 {
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 IIniFileSection::~IIniFileSection()
 {
 	for( u32 i = 0; i < mProperties.size(); ++i )
@@ -165,9 +155,7 @@ IIniFileSection::~IIniFileSection()
 	mProperties.clear();
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 bool	IIniFileSection::FindProperty( const char * p_name, const CIniFileProperty ** p_property ) const
 {
 	PropertyVec::const_iterator it( std::lower_bound( mProperties.begin(), mProperties.end(), p_name, SCompareProperties() ) );
@@ -195,9 +183,7 @@ void	IIniFileSection::AddProperty( const IIniFileProperty * p_property )
 	mProperties.insert( it, p_property );
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 class IIniFile : public CIniFile
 {
 	public:
@@ -222,9 +208,7 @@ class IIniFile : public CIniFile
 		std::vector<IIniFileSection *>	mSections;
 };
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 CIniFile::~CIniFile()
 {
 }
@@ -237,17 +221,14 @@ IIniFile::IIniFile()
 {
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 IIniFile::~IIniFile()
 {
 	delete mpDefaultSection;
 
-	for( u32 i = 0; i < mSections.size(); ++i )
+	for(IIniFileSection* section : mSections)
 	{
-		delete mSections[ i ];
-		mSections[ i ] = NULL;
+	delete section;
 	}
 }
 
@@ -289,9 +270,7 @@ static bool	trim( char * p_string, const char * p_trim_chars )
 	return true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 CIniFile *	CIniFile::Create( const char * filename )
 {
 	IIniFile * p_file( new IIniFile );
@@ -308,9 +287,7 @@ CIniFile *	CIniFile::Create( const char * filename )
 	return NULL;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 bool IIniFile::Open( const char * filename )
 {
 	const u32	BUFFER_LEN = 1024;
@@ -383,25 +360,19 @@ bool IIniFile::Open( const char * filename )
 	return true;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 const CIniFileSection *	IIniFile::GetDefaultSection() const
 {
 	return mpDefaultSection;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 u32		IIniFile::GetNumSections() const
 {
 	return mSections.size();
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 const CIniFileSection *	IIniFile::GetSection( u32 section_idx ) const
 {
 	if( section_idx < mSections.size() )
@@ -414,9 +385,7 @@ const CIniFileSection *	IIniFile::GetSection( u32 section_idx ) const
 	return NULL;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 const CIniFileSection *		IIniFile::GetSectionByName( const char * section_name ) const
 {
 	// TODO: Could use a map for this if it starts to prove expensive
