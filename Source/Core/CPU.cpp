@@ -80,6 +80,8 @@ std::string			gSaveStateFilename  = "";
 static bool			gCPUStopOnSimpleState = false;			// When stopping, try to stop in a 'simple' state (i.e. no RSP running and not in a branch delay slot)
 static Mutex		gSaveStateMutex;
 
+static u32  gVISyncRate = 1500;
+
 enum ESaveStateOperation
 {
 	SSO_NONE,
@@ -659,7 +661,7 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			}
 			else
 			{
-				VI_INTR_CYCLES = (vertical_sync_reg+1) * gViSyncRate;
+				VI_INTR_CYCLES = (vertical_sync_reg+1) * gVISyncRate;
 			}
 
 			// Apply cheatcodes, if enabled

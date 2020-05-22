@@ -29,7 +29,6 @@ class CAudioPlugin
 public:
 	virtual ~CAudioPlugin() {}
 
-	virtual bool		StartEmulation() = 0;
 	virtual void		StopEmulation() = 0;
 
 	enum ESystemType
@@ -52,7 +51,9 @@ public:
 //	This needs to be defined for all targets.
 //	The implementation can return NULL if audio is not supported
 //
-CAudioPlugin *			CreateAudioPlugin();
+bool CreateAudioPlugin();
+void DestroyAudioPlugin();
+
 extern CAudioPlugin *	gAudioPlugin;
 
 #endif // PLUGINS_AUDIOPLUGIN_H_

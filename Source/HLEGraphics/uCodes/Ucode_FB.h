@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef HLEGRAPHICS_UCODES_UCODE_FB_H_
 #define HLEGRAPHICS_UCODES_UCODE_FB_H_
 
-#ifndef DAEDALUS_PSP
 static inline CRefPtr<CNativeTexture> LoadFrameBuffer(u32 origin)
 {
 	u32 width  = Memory_VI_GetRegister( VI_WIDTH_REG );
@@ -80,12 +79,14 @@ static inline void DrawFrameBuffer(u32 origin, const CNativeTexture * texture)
 			src_offset += 2;
 		}
 	}
+	#ifdef DAEDALUS_PSP
+	sceGuTexMode( GU_PSM_5551, 0, 0, 1 );		// maxmips/a2/swizzle = 0
+	sceGuTexImage(0, texture->GetCorrectedWidth(), texture->GetCorrectedHeight(), texture->GetBlockWidth(), pixels);
+	#else
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FB_WIDTH, FB_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1, pixels);
-
+#endif
 	//ToDO: Implement me PSP
 	//Doesn't work
-	//sceGuTexMode( GU_PSM_5551, 0, 0, 1 );		// maxmips/a2/swizzle = 0
-	//sceGuTexImage(0, texture->GetCorrectedWidth(), texture->GetCorrectedHeight(), texture->GetBlockWidth(), pixels);
 
 	gRenderer->Draw2DTexture(0, 0, FB_WIDTH, FB_HEIGHT, 0, 0, FB_WIDTH, FB_HEIGHT, texture);
 
@@ -106,5 +107,4 @@ void RenderFrameBuffer(u32 origin)
 	gGraphicsPlugin->UpdateScreen();
 }
 
-#endif // DAEDALUS_PSP
 #endif // HLEGRAPHICS_UCODES_UCODE_FB_H_

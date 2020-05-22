@@ -19,24 +19,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Daedalus.h"
 
-#include "Debug/DBGConsole.h"
+#include <pspdebug.h>
 
+#include "Core/Memory.h"
+#include "Core/FramerateLimiter.h"
+#include "Debug/DBGConsole.h"
+#include "Graphics/GraphicsContext.h"
 #include "HLEGraphics/BaseRenderer.h"
 #include "HLEGraphics/TextureCache.h"
 #include "HLEGraphics/DLParser.h"
 #include "HLEGraphics/DisplayListDebugger.h"
-
-#include "Graphics/GraphicsContext.h"
 #include "HLEGraphics/GraphicsPlugin.h"
-
-#include "Utility/Profiler.h"
-#include "Core/FramerateLimiter.h"
 #include "Interface/Preferences.h"
 #include "System/Timing.h"
-
-#include <pspdebug.h>
-
-#include "Core/Memory.h"
+#include "Utility/Profiler.h"
 
 
 //#define DAEDALUS_FRAMERATE_ANALYSIS
@@ -44,6 +40,10 @@ extern void battery_warning();
 extern void HandleEndOfFrame();
 
 extern bool gFrameskipActive;
+
+
+
+CGraphicsPlugin * 	gGraphicsPlugin = NULL;
 
 u32		gSoundSync = 44100;
 bool	gTakeScreenshot = false;
@@ -116,20 +116,32 @@ static void	UpdateFramerate()
 }
 }
 
-class CGraphicsPlugin *	CreateGraphicsPlugin()
+
+bool CreateGraphicsPlugin()
 {
+	DAEDALUS_ASSERT(gGraphicsPlugin == nullptr, "The graphics plugin should not be initialised at this point");
 	DBGConsole_Msg( 0, "Initialising Graphics Plugin" );
 
 	CGraphicsPlugin * plugin = new CGraphicsPlugin();
 	if (!plugin->Initialise())
 	{
 		delete plugin;
-		plugin = NULL;
+		plugin = nullptr;
 	}
 
-	return plugin;
+	gGraphicsPlugin = plugin;
+	return plugin != nullptr;
 }
 
+void DestroyGraphicsPlugin()
+{
+	if (gGraphicsPlugin != nullptr)
+	{
+		gGraphicsPlugin->Finalise();
+		delete gGraphicsPlugin;
+		gGraphicsPlugin = nullptr;
+	}
+}
 
 CGraphicsPlugin::~CGraphicsPlugin()
 {
@@ -163,7 +175,6 @@ void CGraphicsPlugin::Finalise()
 	RSP_HLE_UnregisterDisplayListProcessor(this);
 	DLParser_Finalise();
 	CTextureCache::Destroy();
-	DestroyRenderer();
 }
 
 
@@ -217,13 +228,12 @@ void CGraphicsPlugin::UpdateScreen()
 			UpdateFramerate();
 
 		const f32 Fsync = FramerateLimiter_GetSync();
-
 		//Calc sync rates for audio and game speed //Corn
 		const f32 inv_Fsync = 1.0f / Fsync;
 		gSoundSync = (u32)(44100.0f * inv_Fsync);
-		gVISyncRate = (u32)(1500.0f * inv_Fsync);
-		if( gVISyncRate > 4000 ) gVISyncRate = 4000;
-		else if ( gVISyncRate < 1500 ) gVISyncRate = 1500;
+		// gVISyncRate = (u32)(1500.0f * inv_Fsync);
+		// if( gVISyncRate > 4000 ) gVISyncRate = 4000;
+		// else if ( gVISyncRate < 1500 ) gVISyncRate = 1500;
 
 		if(!gFrameskipActive)
 		{

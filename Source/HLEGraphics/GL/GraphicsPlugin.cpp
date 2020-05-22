@@ -14,7 +14,7 @@
 #include "SysGL/GL.h"
 #include "System/Timing.h"
 
-
+CGraphicsPlugin* gGraphicsPlugin = NULL;
 extern SDL_Window * gWindow;
 
 EFrameskipValue     gFrameskipValue = FV_DISABLED;
@@ -85,18 +85,28 @@ static void	UpdateFramerate()
 }
 }
 
-class CGraphicsPlugin *	CreateGraphicsPlugin()
+bool CreateGraphicsPlugin()
 {
-	DBGConsole_Msg( 0, "Initialising Graphics Plugin [CGL]" );
+	DAEDALUS_ASSERT(gGraphicsPlugin == nullptr, "The graphics plugin should not be initialised at this point");
 
-	CGraphicsPlugin * plugin = new CGraphicsPlugin;
+	CGraphicsPlugin * plugin = new CGraphicsPlugin();
 	if (!plugin->Initialise())
 	{
 		delete plugin;
-		plugin = NULL;
+		plugin = nullptr;
 	}
+	gGraphicsPlugin = plugin;
+	return plugin != nullptr;
+}
 
-	return plugin;
+void DestroyGraphicsPlugin()
+{
+	if (gGraphicsPlugin != nullptr)
+	{
+		gGraphicsPlugin->Finalise();
+		delete gGraphicsPlugin;
+		gGraphicsPlugin = nullptr;
+	}
 }
 
 CGraphicsPlugin::~CGraphicsPlugin()

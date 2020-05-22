@@ -49,6 +49,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/FramerateLimiter.h"
 #include "System/Thread.h"
 
+CAudioPlugin* gAudioPlugin = nullptr;
+EAudioPluginMode gAudioPluginEnabled( APM_DISABLED );
+
 #define RSP_AUDIO_INTR_CYCLES     1
 extern u32 gSoundSync;
 
@@ -69,7 +72,6 @@ public:
 
  AudioPluginPSP();
 	virtual ~AudioPluginPSP();
-	virtual bool			StartEmulation();
 	virtual void			StopEmulation();
 
 	virtual void			DacrateChanged( int system_type );
@@ -96,6 +98,28 @@ private:
 	s32 mSemaphore;
 //	u32 mBufferLenMs;
 };
+
+bool CreateAudioPlugin()
+{
+	DAEDALUS_ASSERT(gAudioPlugin == nullptr, "Why is there already an audio plugin?");
+	gAudioPlugin = new AudioPluginPSP();
+	return true;
+}
+
+void DestroyAudioPlugin()
+{
+	// Make a copy of the plugin, and set the global pointer to NULL;
+	// This stops other threads from trying to access the plugin
+	// while we're in the process of shutting it down.
+	// TODO(strmnnrmn): Still looks racey.
+	CAudioPlugin* plugin = gAudioPlugin;
+	gAudioPlugin = nullptr;
+	if (plugin != nullptr)
+	{
+		plugin->StopEmulation();
+		delete plugin;
+	}
+}
 
 class SAddSamplesJob : public SJob
 {
@@ -152,7 +176,7 @@ void AudioPluginPSP::FillBuffer(Sample * buffer, u32 num_samples)
 }
 
 
-EAudioPluginMode gAudioPluginEnabled( APM_DISABLED );
+
 
 
 AudioPluginPSP::AudioPluginPSP()
@@ -179,12 +203,6 @@ AudioPluginPSP::~AudioPluginPSP( )
   sceKernelDeleteSema(mSemaphore);
   pspAudioEnd();
 }
-
-bool		AudioPluginPSP::StartEmulation()
-{
-	return true;
-}
-
 
 void	AudioPluginPSP::StopEmulation()
 {
@@ -366,9 +384,4 @@ void AudioPluginPSP::StopAudio()
 	mKeepRunning = false;
 
 	audio_open = false;
-}
-
-CAudioPlugin *		CreateAudioPlugin()
-{
-	return new AudioPluginPSP();
 }
