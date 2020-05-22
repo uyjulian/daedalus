@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/CPU.h"
 #include "Core/Dynamo.h"
 #include "Core/ROM.h"
-#include "Core/SaveState.h"
+#include "Interface/SaveState.h"
 
 #include "SysPSP/Utility/Functor.h"
 #include "System/IO.h"
