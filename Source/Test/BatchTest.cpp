@@ -87,24 +87,7 @@ static EAssertResult BatchAssertHook( const char * expression, const char * file
 	return AR_IGNORE;
 }
 
-CBatchTestEventHandler * BatchTest_GetHandler()
-{
-	return gBatchTestEventHandler;
-}
 
-static void BatchVblHandler( void * arg )
-{
-	gBatchTestEventHandler->OnVerticalBlank();
-}
-
-class BatchDisplayListEventHandler : public DisplayListEventHandler
-{
-	void OnDisplayListComplete() override
-	{
-		gBatchTestEventHandler->OnDisplayListComplete();
-	}
-};
- 
 
 
 static void MakeNewLogFilename( IO::Filename & filepath, const char * rundir )

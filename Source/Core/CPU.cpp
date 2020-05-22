@@ -104,29 +104,23 @@ ALIGNED_GLOBAL(SCPUState, gCPUState, CACHE_ALIGN);
 static bool	CPU_IsStateSimple();
 void (* g_pCPUCore)();
 
-struct VblCallback
+
+
+static std::vector<VblEventHandler*> gVblCallbacks;
+
+VblEventHandler::~VblEventHandler() {}
+
+void CPU_RegisterVblCallback(VblEventHandler* handler)
 {
-	VblCallbackFn		Fn;
-	void *				Arg;
-};
-
-static std::vector<VblCallback>		gVblCallbacks;
-
-
-void CPU_RegisterVblCallback(VblCallbackFn fn, void * arg)
-{
-	gVblCallbacks.push_back({fn, arg});
+	gVblCallbacks.push_back(handler);
 }
 
-void CPU_UnregisterVblCallback(VblCallbackFn fn, void * arg)
+void CPU_UnregisterVblCallback(VblEventHandler* handler)
 {
-	for (auto it = gVblCallbacks.begin(); it != gVblCallbacks.end(); ++it)
+	auto it = std::find(gVblCallbacks.begin(), gVblCallbacks.end(), handler);
+	if (it != gVblCallbacks.end())
 	{
-		if (it->Fn == fn && it->Arg == arg)
-		{
-			gVblCallbacks.erase(it);
-			break;
-		}
+		gVblCallbacks.erase(it);
 	}
 }
 
@@ -695,10 +689,10 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			if ((gVerticalInterrupts & 0x3F) == 0) // once every 60 VBLs
 				Save_Flush();
 
-			for (const auto& callback : gVblCallbacks)
-			{
-				callback.Fn(callback.Arg);
-			}
+		for (VblEventHandler* handler : gVblCallbacks)
+		{
+		handler->OnVerticalBlank();
+		}
 
 			HandleSaveStateOperationOnVerticalBlank();
 		}
