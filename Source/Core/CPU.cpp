@@ -639,7 +639,7 @@ void CPU_EnableBreakPoint( u32 address, bool enable )
 }
 #endif
 
-extern u32 gVISyncRate ;
+
 extern "C"
 {
 void CPU_HANDLE_COUNT_INTERRUPT()
@@ -659,7 +659,7 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			}
 			else
 			{
-				VI_INTR_CYCLES = (vertical_sync_reg+1) * ( gVideoRateMatch ? gVISyncRate : 1500 );
+				VI_INTR_CYCLES = (vertical_sync_reg+1) * gViSyncRate;
 			}
 
 			// Apply cheatcodes, if enabled

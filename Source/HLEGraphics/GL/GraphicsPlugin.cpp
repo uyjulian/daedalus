@@ -18,7 +18,6 @@
 extern SDL_Window * gWindow;
 
 EFrameskipValue     gFrameskipValue = FV_DISABLED;
-u32                 gVISyncRate     = 1500;
 bool                gTakeScreenshot = false;
 
 namespace
@@ -121,12 +120,14 @@ bool CGraphicsPlugin::Initialise()
 		return false;
 	}
 RSP_HLE_RegisterDisplayListEventHandler(this);
+Memory_RegisterVIOriginChangedEventHandler(this);
 	return true;
 }
 
 void CGraphicsPlugin::Finalise()
 {
 	DBGConsole_Msg(0, "Finalising GLGraphics");
+	Memory_UnregisterVIOriginChangedEventHandler(this);
 	RSP_HLE_UnregisterDisplayListProcessor(this);
 	DLParser_Finalise();
 	CTextureCache::Destroy();
@@ -145,6 +146,23 @@ void CGraphicsPlugin::ProcessDisplayList()
 	DLParser_Process();
 #endif
 }
+
+extern void RenderFrameBuffer(u32);
+extern u32 gRDPFrame;
+
+void CGraphicsPlugin::OnOriginChanged(u32 origin)
+{
+	// NB: if no display lists executed, interpret framebuffer
+	if( gRDPFrame == 0 )
+	{
+		RenderFrameBuffer(origin & 0x7FFFFF);
+	}
+	else
+	{
+		UpdateScreen();
+	}
+}
+
 
 void CGraphicsPlugin::UpdateScreen()
 {

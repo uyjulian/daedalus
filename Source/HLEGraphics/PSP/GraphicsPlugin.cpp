@@ -46,7 +46,6 @@ extern void HandleEndOfFrame();
 extern bool gFrameskipActive;
 
 u32		gSoundSync = 44100;
-u32		gVISyncRate =1500;
 bool	gTakeScreenshot = false;
 bool	gTakeScreenshotSS = false;
 
@@ -117,19 +116,21 @@ static void	UpdateFramerate()
 }
 }
 
-class CGraphicsPlugin* CreateGraphicsPlugin()
+class CGraphicsPlugin *	CreateGraphicsPlugin()
 {
-	DBGConsole_Msg(0, "Initialising Graphics Plugin" );
+	DBGConsole_Msg( 0, "Initialising Graphics Plugin" );
 
 	CGraphicsPlugin * plugin = new CGraphicsPlugin();
 	if (!plugin->Initialise())
 	{
 		delete plugin;
-		plugin = nullptr;
+		plugin = NULL;
 	}
 
 	return plugin;
 }
+
+
 CGraphicsPlugin::~CGraphicsPlugin()
 {
 }
@@ -151,12 +152,14 @@ bool CGraphicsPlugin::Initialise()
 		return false;
 	}
 	RSP_HLE_RegisterDisplayListProcessor(this);
+	Memory_RegisterVIOriginChangedEventHandler(this);
 	return true;
 }
 
 void CGraphicsPlugin::Finalise()
 {
 	DBGConsole_Msg(0, "Finalising PSPGraphics");
+	Memory_UnregisterVIOriginChangedEventHandler(this);
 	RSP_HLE_UnregisterDisplayListProcessor(this);
 	DLParser_Finalise();
 	CTextureCache::Destroy();
@@ -176,11 +179,28 @@ void CGraphicsPlugin::ProcessDisplayList()
 #endif
 }
 
+extern void RenderFrameBuffer(u32);
+extern u32 gRDPFrame;
+
+void CGraphicsPlugin::OnOriginChanged(u32 origin)
+{
+	// NB: if no display lists executed, interpret framebuffer
+	if( gRDPFrame == 0 )
+	{
+		RenderFrameBuffer(origin & 0x7FFFFF);
+	}
+	else
+	{
+		UpdateScreen();
+	}
+}
+
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 extern u32 gNumInstructionsExecuted;
 extern u32 gNumDListsCulled;
 extern u32 gNumRectsClipped;
 #endif
+
 
 void CGraphicsPlugin::UpdateScreen()
 {

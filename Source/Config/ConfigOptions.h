@@ -44,7 +44,6 @@ extern bool gOSHooksEnabled;			// Apply os-hooks
 extern u32	gSpeedSyncEnabled;
 extern bool gDoubleDisplayEnabled;
 extern bool gAudioRateMatch;
-extern bool gVideoRateMatch;
 extern bool gFogEnabled;
 extern bool gMemoryAccessOptimisation;
 extern bool gCheatsEnabled;

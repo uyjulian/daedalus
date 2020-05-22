@@ -328,4 +328,16 @@ REGISTER_FUNCTIONS( DPC, DPC_BASE_REG, MEM_DPC_REG )
 
 #undef REGISTER_FUNCTIONS
 
+class VIOriginChangedEventHandler
+{
+  public:
+	virtual ~VIOriginChangedEventHandler();
+	virtual void OnOriginChanged() = 0;
+	virtual void OnOriginChanged(u32 value) = 0;
+};
+
+void Memory_RegisterVIOriginChangedEventHandler(VIOriginChangedEventHandler* handler);
+void Memory_UnregisterVIOriginChangedEventHandler(VIOriginChangedEventHandler* handler);
+
+
 #endif // CORE_MEMORY_H_

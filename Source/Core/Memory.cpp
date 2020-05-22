@@ -22,6 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Daedalus.h"
 #include "Core/Memory.h"
 
+#include <vector>
+#include <algorithm>
+
 #include "Config/ConfigOptions.h"
 #include "Core/CPU.h"
 #include "Core/DMA.h"
@@ -31,9 +34,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/ROMBuffer.h"
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
-#include "Ultra/ultra_R4300.h"
 #include "HLEAudio/AudioPlugin.h"
-#include "HLEGraphics/GraphicsPlugin.h"
+#include "Ultra/ultra_R4300.h"
+
 
 static const u32 kMaximumMemSize = MEMORY_8_MEG;
 
