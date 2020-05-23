@@ -252,7 +252,7 @@ static inline void CopyLineSwap(void * dst, const void * src, u32 bytes)
 #endif
 	{
 		// Optimize me: Bomberman, Zelda, and Quest 64 have unaligned copies here
-		//DBGConsole_Msg(0, "[WWarning CopyLineSwap: Performing slow copy]" );
+		//Console_Print( "[WWarning CopyLineSwap: Performing slow copy]" );
 
 		u8* src8 = (u8*)src32;
 		u8* dst8 = (u8*)dst32;
@@ -299,7 +299,7 @@ static inline void CopyLineSwap32(void * dst, const void * src, u32 bytes)
 #endif
 	{
 		// Have yet to see game with unaligned copies here
-		//DBGConsole_Msg(0, "[WWarning CopyLineSwap32: Performing slow copy]" );
+		//Console_Print( "[WWarning CopyLineSwap32: Performing slow copy]" );
 
 		u8* src8 = (u8*)src32;
 		u8* dst8 = (u8*)dst32;
@@ -407,7 +407,7 @@ void CRDPStateManager::LoadBlock(const SetLoadTile & load)
 
 	if (( (address + bytes) > MAX_RAM_ADDRESS) || (tmem_offset + bytes) > MAX_TMEM_ADDRESS )
 	{
-		DBGConsole_Msg(0, "[WWarning LoadBlock address is invalid]" );
+		Console_Print( "[WWarning LoadBlock address is invalid]" );
 		return;
 	}
 
@@ -522,7 +522,7 @@ void CRDPStateManager::LoadTile(const SetLoadTile & load)
 	u32 bytes_to_copy = (bytes_per_tmem_line * h);
 	if ((address + bytes_to_copy) > MAX_RAM_ADDRESS || (tmem_offset + bytes_to_copy) > MAX_TMEM_ADDRESS)
 	{
-		DBGConsole_Msg(0, "[WWarning LoadTile address is invalid]" );
+		Console_Print( "[WWarning LoadTile address is invalid]" );
 		return;
 	}
 

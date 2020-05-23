@@ -169,7 +169,7 @@ void CPU_Skip()
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 	if (CPU_IsRunning())
 	{
-		DBGConsole_Msg(0, "Already Running");
+		Console_Print( "Already Running");
 		return;
 	}
 #endif
@@ -184,7 +184,7 @@ void CPU_Step()
 		#ifdef DAEDALUS_DEBUG_CONSOLE
 	if (CPU_IsRunning())
 	{
-		DBGConsole_Msg(0, "Already Running");
+		Console_Print( "Already Running");
 		return;
 	}
 #endif

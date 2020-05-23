@@ -223,7 +223,7 @@ u32 dacrate = Memory_AI_GetRegister(AI_DACRATE_REG);
 u32 frequency = clock / (dacrate + 1);
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
-DBGConsole_Msg(0, "Audio frequency: %d", frequency);
+Console_Print( "Audio frequency: %d", frequency);
 #endif
 mFrequency = frequency;
 }

@@ -149,7 +149,7 @@ void GBIMicrocode_Cache(u32 index, u32 code_base, u32 data_base, u32 ucode_versi
 	//
 	if (index >= MAX_UCODE_CACHE_ENTRIES)
 	{
-		DBGConsole_Msg(0, "Reached max of ucode entries, spreading entry..");
+		Console_Print( "Reached max of ucode entries, spreading entry..");
 		index = FastRand() % MAX_UCODE_CACHE_ENTRIES;
 	}
 
@@ -193,7 +193,7 @@ u32	GBIMicrocode_DetectVersion( u32 code_base, u32 code_size, u32 data_base, u32
 	{
 		if ( code_hash == gMicrocodeData[i].hash )
 		{
-			//DBGConsole_Msg(0, "Ucode has been Detected in Array :[M\"%s\", Ucode %d]", str, gMicrocodeData[ i ].ucode);
+			//Console_Print( "Ucode has been Detected in Array :[M\"%s\", Ucode %d]", str, gMicrocodeData[ i ].ucode);
 			ucode_version = gMicrocodeData[ i ].ucode;
 			ucode_offset = gMicrocodeData[ i ].offset;
 		}
@@ -251,6 +251,6 @@ u32	GBIMicrocode_DetectVersion( u32 code_base, u32 code_size, u32 data_base, u32
 	}
 #endif
 
-	DBGConsole_Msg(0, "Detected %s Ucode is: [M Ucode %d, 0x%08x, \"%s\", \"%s\"]", ucode_offset == u32(~0) ? "" : "Custom", ucode_version, code_hash, str, g_ROM.settings.GameName.c_str());
+	Console_Print( "Detected %s Ucode is: [M Ucode %d, 0x%08x, \"%s\", \"%s\"]", ucode_offset == u32(~0) ? "" : "Custom", ucode_version, code_hash, str, g_ROM.settings.GameName.c_str());
 	return ucode_version;
 }

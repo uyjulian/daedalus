@@ -37,18 +37,17 @@ static const char * const kTerminalEraseLine			= "\033[2K";
 class IDebugConsole : public CDebugConsole
 {
 public:
-	virtual void		Msg(u32 type, const char * format, ...);
+	void Print(const char *format, ...) override;
 
-	virtual void		MsgOverwriteStart();
-	virtual void		MsgOverwrite(u32 type, const char * format, ...);
-	virtual void		MsgOverwriteEnd();
+void OverwriteStart() override;
+void Overwrite( const char *format, ...) override;
+void OverwriteEnd() override;
 
 private:
 	void				ParseAndDisplayString( const char * p_string, ETerminalColour default_colour );
 
 	void				DisplayString( const char * p_string );
 	void				SetCurrentTerminalColour( ETerminalColour tc );
-
 
 	char				mFormattingBuffer[ 2048 ];
 };
@@ -140,7 +139,7 @@ void IDebugConsole::ParseAndDisplayString( const char * p_string, ETerminalColou
 	SetCurrentTerminalColour( TC_DEFAULT );
 }
 
-void IDebugConsole::Msg(u32 type, const char * format, ...)
+void IDebugConsole::Print(const char * format, ...)
 {
 	va_list			va;
 
@@ -154,12 +153,12 @@ void IDebugConsole::Msg(u32 type, const char * format, ...)
 	DisplayString( "\n" );
 }
 
-void IDebugConsole::MsgOverwriteStart()
+void IDebugConsole::OverwriteStart()
 {
 	printf( kTerminalSaveCursor );
 }
 
-void IDebugConsole::MsgOverwrite(u32 type, const char * format, ...)
+void IDebugConsole::Overwrite(const char * format, ...)
 {
 	va_list			va;
 
@@ -174,7 +173,7 @@ void IDebugConsole::MsgOverwrite(u32 type, const char * format, ...)
 	ParseAndDisplayString( mFormattingBuffer, TC_w );
 }
 
-void IDebugConsole::MsgOverwriteEnd()
+void IDebugConsole::OverwriteEnd()
 {
 	printf( "\n" );		// Final newline for the terminal
 }

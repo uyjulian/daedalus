@@ -42,7 +42,7 @@ TEST_DISABLE_TIMER_FUNCS
 	if ( InsertTimer == 0 )
 	{
 		// What gives?
-		DBGConsole_Msg( 0, "[W__osInsertTimer with NULL insert timer" );
+		Console_Print( "[W__osInsertTimer with NULL insert timer" );
 
 		// We can quit, because we've not written anything
 		return PATCH_RET_NOT_PROCESSED0(__osInsertTimer);
@@ -105,7 +105,7 @@ TEST_DISABLE_TIMER_FUNCS
 	u8 * pTimeBase	 = (u8 *)ReadAddress(VAR_ADDRESS(osSystemTimeHi));
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
-	DBGConsole_Msg(0, "Initialising Timer Services");
+	Console_Print( "Initialising Timer Services");
 	#endif
 
 	QuickWrite32Bits(pTimeBase, 0x0, 0);	// TimeHi
@@ -148,7 +148,7 @@ u32 Patch_osSetTime()
 {
 TEST_DISABLE_TIMER_FUNCS
 
-	//DBGConsole_Msg(0, "osSetTime(0x%08x%08x)", TimeHi, TimeLo);
+	//Console_Print( "osSetTime(0x%08x%08x)", TimeHi, TimeLo);
 
 	u8 * pTimeBase	 = (u8 *)ReadAddress(VAR_ADDRESS(osSystemTimeHi));
 

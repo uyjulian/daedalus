@@ -34,10 +34,10 @@ class IDebugConsole : public CDebugConsole
 		IDebugConsole();
 		virtual ~IDebugConsole()	{ }
 
-		void Msg(u32 type, const char * format, ...);
+		void Print(const char * format, ...) override;
 
-		void MsgOverwriteStart() {}
-		void MsgOverwrite(u32 type, const char * format, ...)
+		void OverwriteStart() {}
+		void Overwrite(u32 type, const char * format, ...)override
 		{
 			va_list marker;
 			va_start( marker, format );
@@ -45,7 +45,7 @@ class IDebugConsole : public CDebugConsole
 			va_end( marker );
 			printf("\n");
 		}
-		void MsgOverwriteEnd() {}
+		void OverwriteEnd() override {}
 };
 
 template<> bool CSingleton< CDebugConsole >::Create()
@@ -140,7 +140,7 @@ static size_t ParseFormatString(const char * format, char * out, size_t out_len)
 	return len;
 }
 
-void IDebugConsole::Msg(u32 type, const char * format, ...)
+void IDebugConsole::Print(const char * format, ...)
 {
 	char * temp = NULL;
 

@@ -132,7 +132,7 @@ void jpeg_decode_PS0(OSTask *task)
     #ifdef DAEDALUS_DEBUG_CONSOLE
     if (task->t.flags & 0x1)
     {
-        DBGConsole_Msg(0, "jpeg_decode_PS: task yielding not implemented");
+        Console_Print( "jpeg_decode_PS: task yielding not implemented");
         return;
     }
     #endif
@@ -146,7 +146,7 @@ void jpeg_decode_PS0(OSTask *task)
     #ifdef DAEDALUS_DEBUG_CONSOLE
     if (mode != 0 && mode != 2)
     {
-        DBGConsole_Msg(0, "jpeg_decode_PS: invalid mode %d", mode);
+        Console_Print( "jpeg_decode_PS: invalid mode %d", mode);
         return;
     }
     #endif
@@ -188,7 +188,7 @@ void jpeg_decode_PS(OSTask *task)
     #ifdef DAEDALUS_DEBUG_CONSOLE
     if (task->t.flags & 0x1)
     {
-        DBGConsole_Msg(0, "jpeg_decode_PS: task yielding not implemented");
+        Console_Print( "jpeg_decode_PS: task yielding not implemented");
         return;
     }
     #endif
@@ -202,7 +202,7 @@ void jpeg_decode_PS(OSTask *task)
     #ifdef DAEDALUS_DEBUG_CONSOLE
     if (mode != 0 && mode != 2)
     {
-        DBGConsole_Msg(0, "jpeg_decode_PS: invalid mode %d", mode);
+        Console_Print( "jpeg_decode_PS: invalid mode %d", mode);
         return;
     }
     #endif

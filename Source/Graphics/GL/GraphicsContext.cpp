@@ -66,9 +66,9 @@ static u32 __attribute__((aligned(16))) ilist[256];
 u32 listNum = 0;
 extern bool g32bitColorMode;
 extern bool gTakeScreenshotSS;
-//////////////////////////////////////////////
+
 //bool CGraphicsContext::CleanScene = false;
-//////////////////////////////////////////////
+
 static u32 BUF_WIDTH = 512;
 static u32 SCR_WIDTH = 480;
 static u32 SCR_HEIGHT = 272;
@@ -82,9 +82,10 @@ int pspDveMgrCheckVideoOut();
 int pspDveMgrSetVideoOut(int, int, int, int, int, int, int);
 }
 
-int HAVE_DVE = -1; // default is no DVE Manager
-int PSP_TV_CABLE = -1; // default is no cable
-int PSP_TV_LACED = 0; // default is not interlaced
+// Defaults - No DVE Manager, TV Cable is not connected and Not interlaced
+int HAVE_DVE = -1;
+int PSP_TV_CABLE = -1;
+int PSP_TV_LACED = 0;
 
 static const ScePspIMatrix4 dither_matrixA =
 		{{-2, 1,-1, 2},
@@ -145,9 +146,6 @@ private:
 	u32					mDumpNextScreen;
 };
 
-//*************************************************************************************
-//
-//*************************************************************************************
 template<> bool CSingleton< CGraphicsContext >::Create()
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
@@ -157,9 +155,6 @@ template<> bool CSingleton< CGraphicsContext >::Create()
 	return mpInstance->Initialise();
 }
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 IGraphicsContext::IGraphicsContext()
 :	mInitialised(false)
@@ -183,10 +178,6 @@ IGraphicsContext::IGraphicsContext()
 	list[1] = (u32*)ptr;
 #endif
 }
-
-//*****************************************************************************
-//
-//*****************************************************************************
 IGraphicsContext::~IGraphicsContext()
 {
 	sceGuTerm();
@@ -194,13 +185,8 @@ IGraphicsContext::~IGraphicsContext()
 
 //*****************************************************************************
 //Also Known as do PSP Graphics Frame
-//*****************************************************************************
 void IGraphicsContext::ClearAllSurfaces()
 {
-	/*sceGuStart(GU_CALL,list[0]);
-	sceGuFinish();
-	sceGuStart(GU_CALL,list[1]);
-	sceGuFinish();*/
 
 	if(gDoubleDisplayEnabled)
 		sceGuStart(GU_CALL,list[listNum]); //Begin other Display List	return;

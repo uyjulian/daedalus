@@ -187,7 +187,7 @@ DAEDALUS_FORCEINLINE void SpeedHack(u32 pc, u32 new_pc)
 
 			if (!warned)
 			{
-				DBGConsole_Msg(0, "Missed Speedhack 0x%08x", gCPUState.CurrentPC);
+				Console_Print( "Missed Speedhack 0x%08x", gCPUState.CurrentPC);
 				warned = true;
 			}
 		}*/
@@ -536,7 +536,7 @@ void R4300_CALL_TYPE R4300_SetSR( u32 new_value )
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	if((gCPUState.CPUControl[C0_SR]._u32 & SR_FR) != (new_value & SR_FR))
 	{
-		DBGConsole_Msg(0, "[MChanging FP to %s, STATUS=%08X", (new_value & SR_FR) ? "64bit" : "32bit", (new_value & SR_FR));
+		Console_Print( "[MChanging FP to %s, STATUS=%08X", (new_value & SR_FR) ? "64bit" : "32bit", (new_value & SR_FR));
 	}
 #endif
 
@@ -588,7 +588,7 @@ static void R4300_CALL_TYPE R4300_CoPro1_Disabled( R4300_CALL_SIGNATURE )
 {
 	// Cop1 Unusable
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-	DBGConsole_Msg(0, "Thread accessing Cop1, throwing COP1 unusuable exception");
+	Console_Print( "Thread accessing Cop1, throwing COP1 unusuable exception");
 	DAEDALUS_ASSERT( (gCPUState.CPUControl[C0_SR]._u32 & SR_CU1) == 0, "COP1 usable flag in inconsistant state!" );
 #endif
 	R4300_Exception_CopUnusuable();
@@ -630,7 +630,7 @@ static void R4300_CALL_TYPE R4300_DBG_Bkpt( R4300_CALL_SIGNATURE )
 		// Set the temporary disable so we don't execute bp immediately again
 		g_BreakPoints[dwBreakPoint].mTemporaryDisable = true;
 		CPU_Halt("BreakPoint");
-		DBGConsole_Msg(0, "[RBreakPoint at 0x%08x]", gCPUState.CurrentPC);
+		Console_Print( "[RBreakPoint at 0x%08x]", gCPUState.CurrentPC);
 		DECREMENT_PC();
 	}
 	else
@@ -1182,10 +1182,10 @@ static void R4300_CALL_TYPE R4300_CACHE( R4300_CALL_SIGNATURE )
 
 	if(dwCache == 0 && (dwAction == 0 || dwAction == 4))
 	{
-		//DBGConsole_Msg( 0, "Cache invalidate - forcibly dumping dynarec contents" );
+		//Console_Print( "Cache invalidate - forcibly dumping dynarec contents" );
 		CPU_InvalidateICacheRange(address, 0x20);
 	}
-	//DBGConsole_Msg(0, "CACHE %s/%d, 0x%08x", gCacheNames[dwCache], dwAction, address);
+	//Console_Print( "CACHE %s/%d, 0x%08x", gCacheNames[dwCache], dwAction, address);
 #endif
 }
 
@@ -1880,7 +1880,7 @@ static void R4300_CALL_TYPE R4300_Cop0_MFC0( R4300_CALL_SIGNATURE )
 		// Select a value between wired and 31.
 		// We should use TLB least-recently used here too?
 		gGPR[ op_code.rt ]._s32_0 = (R4300_Rand()%(32-wired)) + wired;
-		DBGConsole_Msg(0, "[MWarning reading MFC0 random register]");
+		Console_Print( "[MWarning reading MFC0 random register]");
 	}
 	else*/
 	{
@@ -1900,25 +1900,25 @@ static void R4300_CALL_TYPE R4300_Cop0_MTC0( R4300_CALL_SIGNATURE )
 	{
 		case C0_INX:
 			gCPUState.CPUControl[C0_INX]._u32 = new_value & 0x8000003F;
-			//DBGConsole_Msg(0, "Setting EntryL0 register to 0x%08x", new_value);
+			//Console_Print( "Setting EntryL0 register to 0x%08x", new_value);
 			break;
 
 		case C0_ENTRYLO0:
 		case C0_ENTRYLO1:
 			gCPUState.CPUControl[op_code.fs]._u32 = new_value & 0x3FFFFFFF;
-			//DBGConsole_Msg(0, "Setting EntryL0 register to 0x%08x", new_value);
+			//Console_Print( "Setting EntryL0 register to 0x%08x", new_value);
 			break;
 
 		case C0_PAGEMASK:
 			gCPUState.CPUControl[C0_PAGEMASK]._u32 = new_value & 0x01FFE000;
-			//DBGConsole_Msg(0, "Setting PageMask register to 0x%08x", new_value);
+			//Console_Print( "Setting PageMask register to 0x%08x", new_value);
 			break;
 
 		case C0_WIRED:
 			// Set to top limit on write to wired
 			gCPUState.CPUControl[C0_RAND]._u32 = 31;
 			#ifdef DAEDALUS_DEBUG_CONSOLE
-			DBGConsole_Msg(0, "Setting Wired register to 0x%08x", new_value);
+			Console_Print( "Setting Wired register to 0x%08x", new_value);
 			#endif
 			gCPUState.CPUControl[C0_WIRED]._u32 = new_value;
 			break;
@@ -1929,7 +1929,7 @@ static void R4300_CALL_TYPE R4300_Cop0_MTC0( R4300_CALL_SIGNATURE )
 		case C0_CACHE_ERR:			// Furthermore, this reg must return 0 on reads.
 			// All these registers are read only - make sure that software doesn't write to them
 			#ifdef DAEDALUS_DEBUG_CONSOLE
-			DBGConsole_Msg(0, "MTC0. Software attempted to write to read only reg %s: 0x%08x", Cop0RegNames[ op_code.fs ], new_value);
+			Console_Print( "MTC0. Software attempted to write to read only reg %s: 0x%08x", Cop0RegNames[ op_code.fs ], new_value);
 			#endif
 			break;
 
@@ -1944,7 +1944,7 @@ static void R4300_CALL_TYPE R4300_Cop0_MTC0( R4300_CALL_SIGNATURE )
 			#ifdef DAEDALUS_DEBUG_CONSOLE
 				if ( (new_value&~(CAUSE_SW1|CAUSE_SW2)) != (gCPUState.CPUControl[C0_CAUSE]._u32&~(CAUSE_SW1|CAUSE_SW2))  )
 				{
-					DBGConsole_Msg( 0, "[MWas previously clobbering CAUSE REGISTER" );
+					Console_Print( "[MWas previously clobbering CAUSE REGISTER" );
 				}
 				#endif
 				#ifdef DAEDALUS_PROFILER
@@ -1969,7 +1969,7 @@ static void R4300_CALL_TYPE R4300_Cop0_MTC0( R4300_CALL_SIGNATURE )
 				//  be due to vertical blank or COMPARE
 				gCPUState.CPUControl[C0_COUNT]._u32 = new_value;
 				#ifdef DAEDALUS_DEBUG_CONSOLE
-				DBGConsole_Msg(0, "Count set - setting int");
+				Console_Print( "Count set - setting int");
 				#endif
 				// XXXX Do we need to update any existing events?
 				break;
@@ -1988,11 +1988,11 @@ static void R4300_CALL_TYPE R4300_Cop0_MTC0( R4300_CALL_SIGNATURE )
 		// WatchHi/WatchLo are used to create a Watch Trap. This may not need implementing, but we should
 		// Probably provide a warning on writes, just so that we know
 		//case C0_WATCHLO:
-		//	DBGConsole_Msg( 0, "[MWROTE TO WATCHLO REGISTER!" );
+		//	Console_Print( "[MWROTE TO WATCHLO REGISTER!" );
 		//	gCPUState.CPUControl[ C0_WATCHLO ]._u32 = new_value& 0x0FFFFFC0;
 		//	break;
 		//case C0_WATCHHI:
-		//	DBGConsole_Msg( 0, "[MWROTE TO WATCHHI REGISTER!" );
+		//	Console_Print( "[MWROTE TO WATCHHI REGISTER!" );
 		//	gCPUState.CPUControl[ C0_WATCHHI ]._u32 = 0;
 		//	break;
 
@@ -2375,11 +2375,11 @@ static void R4300_CALL_TYPE R4300_Cop1_S_DIV( R4300_CALL_SIGNATURE )
 		if ( gCPUState.FPUControl[ 31 ]._u32 & FPCSR_EZ )
 		{
 			// Exception
-			DBGConsole_Msg( 0, "[MShould trigger FPU exception for /0 here" );
+			Console_Print( "[MShould trigger FPU exception for /0 here" );
 		}
 		else
 		{
-			//DBGConsole_Msg( 0, "Float divide by zero, setting flag" );
+			//Console_Print( "Float divide by zero, setting flag" );
 			gCPUState.FPUControl[ 31 ]._u32 |= FPCSR_FZ;
 		}
 	}*/

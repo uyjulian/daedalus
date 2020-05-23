@@ -21,7 +21,7 @@ inline u16 Sample_Mask( u32 x )
 void CLEARBUFF(AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "CLEARBUFF");
+		Console_Print( "CLEARBUFF");
 		#endif
   u16 addr( command.Abi1ClearBuffer.Address );
 	u16 count( command.Abi1ClearBuffer.Count );
@@ -32,7 +32,7 @@ void CLEARBUFF(AudioHLECommand command)
 void CLEARBUFF2(AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "CLEARBUFF2");
+		Console_Print( "CLEARBUFF2");
 		#endif
   u16 addr( command.Abi2ClearBuffer.Address );
 	u16 count( command.Abi2ClearBuffer.Count );
@@ -42,7 +42,7 @@ void CLEARBUFF2(AudioHLECommand command)
 void CLEARBUFF3(AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "CLEARBUFF3");
+		Console_Print( "CLEARBUFF3");
 		#endif
   u16 addr = (u16)(command.cmd0 &  0xffff);
 	u16 count = (u16)(command.cmd1 & 0xffff);
@@ -52,7 +52,7 @@ void CLEARBUFF3(AudioHLECommand command)
 void DMEMMOVE(AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "DMEMMOVE");
+		Console_Print( "DMEMMOVE");
 		#endif
   u16 src( command.Abi1DmemMove.Src );
 	u16 dst( command.Abi1DmemMove.Dst );
@@ -65,7 +65,7 @@ void DMEMMOVE(AudioHLECommand command)
 void DMEMMOVE2(AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "DMEMMOVE2");
+		Console_Print( "DMEMMOVE2");
 		#endif
   u16 src( command.Abi2DmemMove.Src );
 	u16 dst( command.Abi2DmemMove.Dst );
@@ -77,7 +77,7 @@ void DMEMMOVE2(AudioHLECommand command)
 void DMEMMOVE3(AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "DMEMMOVE3");
+		Console_Print( "DMEMMOVE3");
 		#endif
   u16 src( command.Abi3DmemMove.Src );
 	u16 dst( command.Abi3DmemMove.Dst );
@@ -89,7 +89,7 @@ void DMEMMOVE3(AudioHLECommand command)
 void DUPLICATE2( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "DUPLICATE2");
+		Console_Print( "DUPLICATE2");
 		#endif
   u32 Count = (command.cmd0 >> 16) & 0xff;
 	u32 In  = command.cmd0&0xffff;
@@ -110,7 +110,7 @@ void DUPLICATE2( AudioHLECommand command )
 void LOADBUFF( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "LOADBUFF");
+		Console_Print( "LOADBUFF");
 		#endif
   u32 addr(command.Abi1LoadBuffer.Address );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
 
@@ -120,7 +120,7 @@ void LOADBUFF( AudioHLECommand command )
 void LOADBUFF2( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "LOADBUFF2");
+		Console_Print( "LOADBUFF2");
 		#endif
   // Needs accuracy verification...
 	u32 src( command.Abi2LoadBuffer.SrcAddr );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
@@ -133,7 +133,7 @@ void LOADBUFF2( AudioHLECommand command )
 void LOADBUFF3( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "LOADBUFF3");
+		Console_Print( "LOADBUFF3");
 		#endif
   u32 v0;
 	u32 cnt = (((command.cmd0 >> 0xC)+3)&0xFFC);
@@ -145,7 +145,7 @@ void LOADBUFF3( AudioHLECommand command )
 void SAVEBUFF( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SAVEBUFF");
+		Console_Print( "SAVEBUFF");
 		#endif
   u32 addr(command.Abi1SaveBuffer.Address );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
 
@@ -155,7 +155,7 @@ void SAVEBUFF( AudioHLECommand command )
 void SAVEBUFF2( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SAVEBUFF2");
+		Console_Print( "SAVEBUFF2");
 		#endif
   // Needs accuracy verification...
 	u32 dst( command.Abi2SaveBuffer.DstAddr );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
@@ -168,7 +168,7 @@ void SAVEBUFF2( AudioHLECommand command )
 void SAVEBUFF3( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SAVEBUFF3");
+		Console_Print( "SAVEBUFF3");
 		#endif
 	u32 cnt = (((command.cmd0 >> 0xC)+3)&0xFFC);
 	u32 v0 = (command.cmd1 & 0xfffffc);
@@ -179,7 +179,7 @@ void SAVEBUFF3( AudioHLECommand command )
 void SEGMENT( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SEGMENT - Not implemented");
+		Console_Print( "SEGMENT - Not implemented");
 		#endif
   /*u8	segment( command.Abi1SetSegment.Segment & 0xf );
 	u32	address( command.Abi1SetSegment.Address );
@@ -192,7 +192,7 @@ void SEGMENT( AudioHLECommand command )
 void SEGMENT2( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SEGMENT2");
+		Console_Print( "SEGMENT2");
 		#endif
   if (isZeldaABI) {
 		FILTER2( command );
@@ -211,7 +211,7 @@ void SEGMENT2( AudioHLECommand command )
 void SETBUFF( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SETBUFF");
+		Console_Print( "SETBUFF");
 		#endif
   u8		flags( command.Abi1SetBuffer.Flags );
 	u16		in( command.Abi1SetBuffer.In );
@@ -224,7 +224,7 @@ void SETBUFF( AudioHLECommand command )
 void SETBUFF2( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SETBUFF2");
+		Console_Print( "SETBUFF2");
 		#endif
   u16		in( command.Abi2SetBuffer.In );
 	u16		out( command.Abi2SetBuffer.Out );
@@ -241,7 +241,7 @@ void SETBUFF2( AudioHLECommand command )
 void SETLOOP( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SETLOOP");
+		Console_Print( "SETLOOP");
 		#endif
   u32	loopval( command.Abi1SetLoop.LoopVal );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
 
@@ -251,7 +251,7 @@ void SETLOOP( AudioHLECommand command )
 void SETLOOP2( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SETLOOP2");
+		Console_Print( "SETLOOP2");
 		#endif
   u32	loopval( command.Abi2SetLoop.LoopVal );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
 
@@ -261,7 +261,7 @@ void SETLOOP2( AudioHLECommand command )
 void SETLOOP3( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "SETLOOP3");
+		Console_Print( "SETLOOP3");
 		#endif
   u32	loopval( command.Abi3SetLoop.LoopVal );// + gAudioHLEState.Segments[(command.cmd1>>24)&0xf];
 

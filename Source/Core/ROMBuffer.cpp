@@ -87,7 +87,7 @@ bool	ShouldLoadAsFixed( u32 rom_size )
 		u8*	p_temp_buffer( new u8[TEMP_BUFFER_SIZE] );
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
-			CDebugConsole::Get()->MsgOverwriteStart();
+			CDebugConsole::Get()->OverwriteStart();
 #endif
 
 		u32	offset = 0;
@@ -99,7 +99,7 @@ bool	ShouldLoadAsFixed( u32 rom_size )
 #ifdef DAEDALUS_DEBUG_CONSOLE
 				if ((offset % 0x8000) == 0)
 				{
-					CDebugConsole::Get()->MsgOverwrite(0, "Converted [M%d / %d] KB", offset / 1024, total_length / 1024);
+					CDebugConsole::Get()->Overwrite(0, "Converted [M%d / %d] KB", offset / 1024, total_length / 1024);
 				}
 #endif
 				u32	length_to_process(Min( length_remaining, TEMP_BUFFER_SIZE));
@@ -120,8 +120,8 @@ bool	ShouldLoadAsFixed( u32 rom_size )
 				length_remaining -= length_to_process;
 			}
 #ifdef DAEDALUS_DEBUG_CONSOLE
-			CDebugConsole::Get()->MsgOverwrite(0, "Converted [M%d / %d] KB", offset /1024, total_length / 1024 );
-			CDebugConsole::Get()->MsgOverwriteEnd();
+			CDebugConsole::Get()->Overwrite(0, "Converted [M%d / %d] KB", offset /1024, total_length / 1024 );
+			CDebugConsole::Get()->OverwriteEnd();
 #endif
 
 			fclose(fh);
@@ -172,7 +172,7 @@ bool RomBuffer::Open()
 	if(p_rom_file == nullptr)
 	{
 		#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg(0, "Failed to create [C%s]\n", filename);
+		Console_Print( "Failed to create [C%s]\n", filename);
 		#endif
 		return false;
 	}
@@ -180,7 +180,7 @@ bool RomBuffer::Open()
 	if (!p_rom_file->Open(messages))
 	{
 		#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg(0, "Failed to open [C%s]\n", filename);
+		Console_Print( "Failed to open [C%s]\n", filename);
 		#endif
 		delete p_rom_file;
 		return false;
@@ -198,7 +198,7 @@ bool RomBuffer::Open()
 		if (!p_rom_file->LoadData( sRomSize, p_bytes, messages ) )
 		{
 			#ifdef DAEDALUS_DEBUG_CONSOLE
-			DBGConsole_Msg(0, "Failed to load [C%s]\n", filename);
+			Console_Print( "Failed to load [C%s]\n", filename);
 			#endif
 			free (p_bytes);
 			delete p_rom_file;
@@ -252,30 +252,30 @@ bool RomBuffer::Open()
 				#ifdef DAEDALUS_DEBUG_CONSOLE
 				if(compressed && byteswapped)
 				{
-					DBGConsole_Msg(0, "Rom is [Mcompressed] and [Mbyteswapped]");
+					Console_Print( "Rom is [Mcompressed] and [Mbyteswapped]");
 				}
 				else if(compressed)
 				{
-					DBGConsole_Msg(0, "Rom is [Mcompressed]");
+					Console_Print( "Rom is [Mcompressed]");
 				}
 				else
 				{
-					DBGConsole_Msg(0, "Rom is [Mbyteswapped]");
+					Console_Print( "Rom is [Mbyteswapped]");
 				}
-				DBGConsole_Msg(0, "Decompressing rom to [C%s] (this may take some time)", temp_filename);
+				Console_Print( "Decompressing rom to [C%s] (this may take some time)", temp_filename);
 				#endif
 				CNullOutputStream	local_messages;
 
 				ROMFile* p_new_file = DecompressRom(p_rom_file, temp_filename, local_messages);
 				#ifdef DAEDALUS_DEBUG_CONSOLE
-				DBGConsole_Msg( 0, "messages:\n%s", local_messages.c_str() );
+				Console_Print( "messages:\n%s", local_messages.c_str() );
 				#endif
 				messages << local_messages;
 
 				if (p_new_file != nullptr)
 				{
 					#ifdef DAEDALUS_DEBUG_CONSOLE
-					DBGConsole_Msg(0, "Decompression [gsuccessful]. Booting using decompressed rom");
+					Console_Print( "Decompression [gsuccessful]. Booting using decompressed rom");
 					#endif
 					delete p_rom_file;
 					p_rom_file = p_new_file;
@@ -283,7 +283,7 @@ bool RomBuffer::Open()
 				#ifdef DAEDALUS_DEBUG_CONSOLE
 				else
 				{
-					DBGConsole_Msg(0, "Decompression [rfailed]. Booting using original rom");
+					Console_Print( "Decompression [rfailed]. Booting using original rom");
 				}
 				#endif
 			}
@@ -294,7 +294,7 @@ bool RomBuffer::Open()
 		sRomFixed = false;
 	}
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-	DBGConsole_Msg(0, "Opened [C%s]\n", filename);
+	Console_Print( "Opened [C%s]\n", filename);
 	#endif
 	sRomLoaded = true;
 	return true;

@@ -109,7 +109,7 @@ bool ROMFile::SetHeaderMagic( u32 magic )
 	default:
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 		DAEDALUS_ERROR( "Unhandled swapping mode %08x for %s", magic, mFilename );
-		DBGConsole_Msg(0, "[CUnknown ROM format for %s: 0x%08x", mFilename, magic);
+		Console_Print( "[CUnknown ROM format for %s: 0x%08x", mFilename, magic);
 		#endif
 			return false;
 	}

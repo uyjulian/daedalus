@@ -15,7 +15,7 @@ extern bool isZeldaABI;
 void ADDMIXER( AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-    DBGConsole_Msg(0, "ADDMIXER");
+    Console_Print( "ADDMIXER");
     #endif
 //  DAEDALUS_ERROR( "ADDMIXER - broken?" );
 	u32 Count     = (command.cmd0 >> 12) & 0x00ff0;
@@ -35,7 +35,7 @@ void ADDMIXER( AudioHLECommand command)
 void HILOGAIN( AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "HILOAGAIN");
+		Console_Print( "HILOAGAIN");
 		#endif
   u32 count = command.cmd0 & 0xffff;
 	s32 hi  = (s16)((command.cmd0 >> 4) & 0xf000);
@@ -56,7 +56,7 @@ void HILOGAIN( AudioHLECommand command)
 void INTERLEAVE( AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "INTERLEAVE");
+		Console_Print( "INTERLEAVE");
 		#endif
   u16 inL( command.Abi1Interleave.LAddr );
   	u16 inR( command.Abi1Interleave.RAddr );
@@ -67,7 +67,7 @@ void INTERLEAVE( AudioHLECommand command)
 void DEINTERLEAVE2( AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "DEINTERLEAVE2");
+		Console_Print( "DEINTERLEAVE2");
 		#endif
   u16 count( command.Abi2Deinterleave.Count );
 	u16 out( command.Abi2Deinterleave.Out );
@@ -80,7 +80,7 @@ void INTERLEAVE2( AudioHLECommand command)
 {
 
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "INTERLEAVE2");
+		Console_Print( "INTERLEAVE2");
 		#endif
   u16	inR( command.Abi2Interleave.RAddr );
 	u16	inL( command.Abi2Interleave.LAddr);
@@ -100,7 +100,7 @@ void INTERLEAVE2( AudioHLECommand command)
 void INTERLEAVE3( AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "INTERLEAVE3");
+		Console_Print( "INTERLEAVE3");
 		#endif
   // Needs accuracy verification...
 	//inR = command.cmd1 & 0xFFFF;
@@ -112,7 +112,7 @@ void INTERLEAVE3( AudioHLECommand command)
 void MIXER( AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "MIXER");
+		Console_Print( "MIXER");
 		#endif
   u16 dmemin( command.Abi1Mixer.DmemIn );
   	u16 dmemout( command.Abi1Mixer.DmemOut );
@@ -124,7 +124,7 @@ void MIXER( AudioHLECommand command)
 void MIXER2( AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "MIXER2");
+		Console_Print( "MIXER2");
 		#endif
 // Needs accuracy verification
 u16 dmemin( command.Abi2Mixer.DmemIn );
@@ -140,7 +140,7 @@ gAudioHLEState.Mixer( dmemout, dmemin, gain, count );		// NB - did mult gain by 
 void MIXER3( AudioHLECommand command)
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "MIXER3");
+		Console_Print( "MIXER3");
 		#endif
   // Needs accuracy verification...
 	u16 dmemin  = (u16)(command.cmd1 >> 0x10)  + 0x4f0;

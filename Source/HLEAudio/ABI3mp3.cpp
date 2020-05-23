@@ -190,7 +190,7 @@ static const u16 DeWindowLUT [0x420] =
 void CMP3Decode::MP3AB0()
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "MP3AB0");
+		Console_Print( "MP3AB0");
 		#endif
 	// Part 2 - 100% Accurate
 	const u16 LUT2[8] = { 0xFEC4, 0xF4FA, 0xC5E4, 0xE1C4,
@@ -636,7 +636,7 @@ CMP3Decode		gMP3Decode;
 void MP3( AudioHLECommand command )
 {
 	#ifdef DEBUG_AUDIO
-		DBGConsole_Msg(0, "MP3 ");
+		Console_Print( "MP3 ");
 		#endif
 	gMP3Decode.Decode( command );
 }

@@ -1,24 +1,55 @@
+/*
+Copyright (C) 2007 StrmnNrmn
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+*/
+
 #include "Base/Daedalus.h"
 
-#include <stdio.h>
+#include <pspdebug.h>
 
 #include "Core/Memory.h"
+#include "Core/FramerateLimiter.h"
 #include "Debug/DBGConsole.h"
 #include "Graphics/GraphicsContext.h"
 #include "HLEGraphics/BaseRenderer.h"
-#include "HLEGraphics/DisplayListDebugger.h"
-#include "HLEGraphics/DLParser.h"
 #include "HLEGraphics/TextureCache.h"
-#include "Interface/Preferences.h"
+#include "HLEGraphics/DLParser.h"
+#include "HLEGraphics/DisplayListDebugger.h"
 #include "HLEGraphics/GraphicsPlugin.h"
-#include "SysGL/GL.h"
+#include "Interface/Preferences.h"
 #include "System/Timing.h"
+#include "Utility/Profiler.h"
 
-CGraphicsPlugin* gGraphicsPlugin = NULL;
-extern SDL_Window * gWindow;
 
-EFrameskipValue     gFrameskipValue = FV_DISABLED;
-bool                gTakeScreenshot = false;
+//#define DAEDALUS_FRAMERATE_ANALYSIS
+extern void battery_warning();
+extern void HandleEndOfFrame();
+
+extern bool gFrameskipActive;
+
+
+
+CGraphicsPlugin * 	gGraphicsPlugin = NULL;
+
+u32		gSoundSync = 44100;
+bool	gTakeScreenshot = false;
+bool	gTakeScreenshotSS = false;
+
+EFrameskipValue		gFrameskipValue = FV_DISABLED;
 
 namespace
 {
@@ -32,7 +63,7 @@ namespace
 #ifdef DAEDALUS_FRAMERATE_ANALYSIS
 	u32					gTotalFrames = 0;
 	u64					gFirstFrameTime = 0;
-	FILE *				gFramerateFile = NULL;
+	FILE *				gFramerateFile = nullptr;
 #endif
 
 static void	UpdateFramerate()
@@ -42,12 +73,12 @@ static void	UpdateFramerate()
 #endif
 	gFlipCount++;
 
-	u64			now;
+	u64			now = 0;
 	NTiming::GetPreciseTime( &now );
 
 	if(gLastFramerateCalcTime == 0)
 	{
-		u64		freq;
+		u64		freq = 0;
 		gLastFramerateCalcTime = now;
 
 		NTiming::GetPreciseFrequency( &freq );
@@ -55,7 +86,7 @@ static void	UpdateFramerate()
 	}
 
 #ifdef DAEDALUS_FRAMERATE_ANALYSIS
-	if( gFramerateFile == NULL )
+	if( gFramerateFile == nullptr )
 	{
 		gFirstFrameTime = now;
 		gFramerateFile = fopen( "framerate.csv", "w" );
@@ -75,7 +106,7 @@ static void	UpdateFramerate()
 		gLastFramerateCalcTime = now;
 
 #ifdef DAEDALUS_FRAMERATE_ANALYSIS
-		if( gFramerateFile != NULL )
+		if( gFramerateFile != nullptr )
 		{
 			fflush( gFramerateFile );
 		}
@@ -85,9 +116,11 @@ static void	UpdateFramerate()
 }
 }
 
+
 bool CreateGraphicsPlugin()
 {
 	DAEDALUS_ASSERT(gGraphicsPlugin == nullptr, "The graphics plugin should not be initialised at this point");
+	Console_Print( "Initialising Graphics Plugin" );
 
 	CGraphicsPlugin * plugin = new CGraphicsPlugin();
 	if (!plugin->Initialise())
@@ -95,6 +128,7 @@ bool CreateGraphicsPlugin()
 		delete plugin;
 		plugin = nullptr;
 	}
+
 	gGraphicsPlugin = plugin;
 	return plugin != nullptr;
 }
@@ -115,12 +149,12 @@ CGraphicsPlugin::~CGraphicsPlugin()
 
 bool CGraphicsPlugin::Initialise()
 {
-	if (!CreateRenderer())
+	if(!CreateRenderer())
 	{
 		return false;
 	}
 
-	if (!CTextureCache::Create())
+	if(!CTextureCache::Create())
 	{
 		return false;
 	}
@@ -129,19 +163,18 @@ bool CGraphicsPlugin::Initialise()
 	{
 		return false;
 	}
-RSP_HLE_RegisterDisplayListEventHandler(this);
-Memory_RegisterVIOriginChangedEventHandler(this);
+	RSP_HLE_RegisterDisplayListProcessor(this);
+	Memory_RegisterVIOriginChangedEventHandler(this);
 	return true;
 }
 
 void CGraphicsPlugin::Finalise()
 {
-	DBGConsole_Msg(0, "Finalising GLGraphics");
+	Console_Print( "Finalising PSPGraphics");
 	Memory_UnregisterVIOriginChangedEventHandler(this);
 	RSP_HLE_UnregisterDisplayListProcessor(this);
 	DLParser_Finalise();
 	CTextureCache::Destroy();
-	DestroyRenderer();
 }
 
 
@@ -173,28 +206,98 @@ void CGraphicsPlugin::OnOriginChanged(u32 origin)
 	}
 }
 
+#ifdef DAEDALUS_DEBUG_DISPLAYLIST
+extern u32 gNumInstructionsExecuted;
+extern u32 gNumDListsCulled;
+extern u32 gNumRectsClipped;
+#endif
+
 
 void CGraphicsPlugin::UpdateScreen()
 {
+	//gVblCount++;
+
 	u32 current_origin = Memory_VI_GetRegister(VI_ORIGIN_REG);
+	static bool Old_FrameskipActive = false;
+	static bool Older_FrameskipActive =false;
 
-	if (current_origin != LastOrigin)
+	if( current_origin != LastOrigin )
 	{
-		UpdateFramerate();
+		//printf( "Flip (%08x, %08x)\n", current_origin, last_origin );
+		if( gGlobalPreferences.DisplayFramerate )
+			UpdateFramerate();
 
-		// FIXME: safe printf
-		char string[22];
-		sprintf(string, "Daedalus | FPS %#.1f", gCurrentFramerate);
+		const f32 Fsync = FramerateLimiter_GetSync();
+		//Calc sync rates for audio and game speed //Corn
+		const f32 inv_Fsync = 1.0f / Fsync;
+		gSoundSync = (u32)(44100.0f * inv_Fsync);
+		// gVISyncRate = (u32)(1500.0f * inv_Fsync);
+		// if( gVISyncRate > 4000 ) gVISyncRate = 4000;
+		// else if ( gVISyncRate < 1500 ) gVISyncRate = 1500;
 
-	SDL_SetWindowTitle(gWindow, string);
-
-		if (gTakeScreenshot)
+		if(!gFrameskipActive)
 		{
-			CGraphicsContext::Get()->DumpNextScreen();
-			gTakeScreenshot = false;
+			if( gGlobalPreferences.DisplayFramerate )
+			{
+				pspDebugScreenSetTextColor( 0xffffffff );
+				pspDebugScreenSetBackColor(0);
+				pspDebugScreenSetXY(0, 0);
+
+				switch(gGlobalPreferences.DisplayFramerate)
+				{
+					case 1:
+						pspDebugScreenPrintf( "%#.1f  ", gCurrentFramerate );
+						break;
+					case 2:
+						pspDebugScreenPrintf( "FPS[%#.1f] VB[%d/%d] Sync[%#.1f%%]   ", gCurrentFramerate, u32( Fsync * f32( FramerateLimiter_GetTvFrequencyHz() ) ), FramerateLimiter_GetTvFrequencyHz(), Fsync * 100.0f );
+						break;
+					case 3:
+#ifdef DAEDALUS_DEBUG_DISPLAYLIST
+						pspDebugScreenPrintf( "Dlist[%d] Cull[%d] | Tris[%d] Cull[%d] | Rect[%d] Clip[%d] ", gNumInstructionsExecuted, gNumDListsCulled, gRenderer->GetNumTrisRendered(), gRenderer->GetNumTrisClipped(), gRenderer->GetNumRect(), gNumRectsClipped);
+#else
+						pspDebugScreenPrintf( "%#.1f  ", gCurrentFramerate );
+#endif
+						break;
+				}
+			}
+			if( gGlobalPreferences.BatteryWarning )
+			{
+				battery_warning();
+			}
+			if(gTakeScreenshot)
+			{
+				CGraphicsContext::Get()->DumpNextScreen();
+				gTakeScreenshot = false;
+			}
+
+			CGraphicsContext::Get()->UpdateFrame( false );
+			HandleEndOfFrame();
 		}
 
-		CGraphicsContext::Get()->UpdateFrame( false );
+		static u32 current_frame = 0;
+		current_frame++;
+
+
+		Older_FrameskipActive = Old_FrameskipActive;
+		Old_FrameskipActive = gFrameskipActive;
+
+		switch(gFrameskipValue)
+		{
+		case FV_DISABLED:
+			gFrameskipActive = false;
+			break;
+		case FV_AUTO1:
+			if(!Old_FrameskipActive && (Fsync < 0.965f)) gFrameskipActive = true;
+			else gFrameskipActive = false;
+			break;
+		case FV_AUTO2:
+			if((!Old_FrameskipActive | !Older_FrameskipActive) && (Fsync < 0.965f)) gFrameskipActive = true;
+			else gFrameskipActive = false;
+			break;
+		default:
+			gFrameskipActive = (current_frame % (gFrameskipValue - 1)) != 0;
+			break;
+		}
 
 		LastOrigin = current_origin;
 	}

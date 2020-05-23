@@ -39,7 +39,7 @@ void DLParser_GBI2_Vtx( MicroCodeCommand command )
 	if ( vend > 64 )
 	{
 		#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg( 0, "DLParser_GBI2_Vtx: Warning, attempting to load into invalid vertex positions: %d -> %d", v0, v0+n );
+		Console_Print( "DLParser_GBI2_Vtx: Warning, attempting to load into invalid vertex positions: %d -> %d", v0, v0+n );
 		#endif
 		return;
 	}
@@ -340,7 +340,7 @@ void DLParser_GBI2_MoveMem( MicroCodeCommand command )
 
 	default:
 	#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-		DBGConsole_Msg(0, "GBI2 MoveMem: Unknown Type. 0x%08x 0x%08x", command.inst.cmd0, command.inst.cmd1);
+		Console_Print( "GBI2 MoveMem: Unknown Type. 0x%08x 0x%08x", command.inst.cmd0, command.inst.cmd1);
 		#endif
 		break;
 	}

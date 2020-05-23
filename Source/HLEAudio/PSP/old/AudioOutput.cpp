@@ -173,7 +173,7 @@ AudioOutput::~AudioOutput( )
 
 void AudioOutput::SetFrequency( u32 frequency )
 {
-	DBGConsole_Msg( 0, "Audio frequency: %d", frequency );
+	Console_Print( "Audio frequency: %d", frequency );
 	mFrequency = frequency;
 }
 

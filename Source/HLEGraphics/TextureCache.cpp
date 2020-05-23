@@ -243,8 +243,8 @@ void CTextureCache::Snapshot(const MutexLock & lock, std::vector< STextureInfoSn
 	snapshot.clear();
 	for( const auto& it : mTextures )
 	{
-		STextureInfoSnapshot	info( (*it)->GetTextureInfo(), (*it)->GetTexture() );
-		snapshot.push_back( info );
+		STextureInfoSnapshot info(it->GetTextureInfo(), it->GetTexture());
+		snapshot.push_back(info);
 	}
 }
 #endif // DAEDALUS_DEBUG_DISPLAYLIST

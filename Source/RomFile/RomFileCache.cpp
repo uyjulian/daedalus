@@ -171,7 +171,7 @@ void	ROMFileCache::PurgeChunk( CacheIdx cache_idx )
 	u32		current_chunk_address( chunk_info.StartOffset );
 	if( chunk_info.InUse() )
 	{
-		//DBGConsole_Msg( 0, "[CRomCache - purging %02x %08x-%08x", cache_idx, chunk_info.StartOffset, chunk_info.StartOffset + CHUNK_SIZE );
+		//Console_Print( "[CRomCache - purging %02x %08x-%08x", cache_idx, chunk_info.StartOffset, chunk_info.StartOffset + CHUNK_SIZE );
 		u32		chunk_map_idx( AddressToChunkMapIndex( current_chunk_address ) );
 		#ifdef DAEDALUS_ENABLE_ASSERTS
 		DAEDALUS_ASSERT( chunk_map_idx < mChunkMapEntries, "Chunk address is out of range?" );
@@ -182,7 +182,7 @@ void	ROMFileCache::PurgeChunk( CacheIdx cache_idx )
 	}
 	else
 	{
-		//DBGConsole_Msg( 0, "[CRomCache - purging %02x (unused)", cache_idx );
+		//Console_Print( "[CRomCache - purging %02x (unused)", cache_idx );
 	}
 
 	// Scrub these down
@@ -239,7 +239,7 @@ ROMFileCache::CacheIdx	ROMFileCache::GetCacheIndex( u32 address )
 		u32		storage_offset( selected_idx * CHUNK_SIZE );
 		u8 *	p_dst( mpStorage + storage_offset );
 
-		//DBGConsole_Msg( 0, "[CRomCache - loading %02x, %08x-%08x", selected_idx, chunk_info.StartOffset, chunk_info.StartOffset + CHUNK_SIZE );
+		//Console_Print( "[CRomCache - loading %02x, %08x-%08x", selected_idx, chunk_info.StartOffset, chunk_info.StartOffset + CHUNK_SIZE );
 		mpROMFile->ReadChunk( chunk_info.StartOffset, p_dst, CHUNK_SIZE );
 
 		idx = selected_idx;

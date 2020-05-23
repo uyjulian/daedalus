@@ -216,7 +216,7 @@ static const char * GetContentTypeForFilename(const char * filename)
 		if (strcmp(ext, ".png") == 0)	return kImagePng;
 	}
 
-	DBGConsole_Msg(0, "Unknown filetype [C%s]", filename);
+	Console_Print( "Unknown filetype [C%s]", filename);
 	return kTextPlain;
 }
 
@@ -283,7 +283,7 @@ static int WebDebugDispatch(struct WebbyConnection *connection)
 	if (ServeResource(&dbg_connection, connection->request.uri))
 		return 0;
 
-	DBGConsole_Msg(0, "404 [R%s]", connection->request.uri);
+	Console_Print( "404 [R%s]", connection->request.uri);
 	Generate404(&dbg_connection, connection->request.uri);
 	return 1;
 }
@@ -415,7 +415,7 @@ static void AddStaticContent(const char * dir, const char * root)
 				resource.Resource = resource_path;
 				resource.FullPath = full_path;
 
-				DBGConsole_Msg(0, " adding [M%s] -> [C%s]",
+				Console_Print( " adding [M%s] -> [C%s]",
 					resource.Resource.c_str(), resource.FullPath.c_str());
 
 				gStaticResources.push_back(resource);
@@ -471,7 +471,7 @@ bool WebDebug_Init()
 
 	IO::Filename data_path;
 	IO::Path::Combine(data_path, gDaedalusExePath, "Web");
-	DBGConsole_Msg(0, "Looking for static resource in [C%s]", data_path);
+	Console_Print( "Looking for static resource in [C%s]", data_path);
 	AddStaticContent(data_path, "");
 
 	gKeepRunning = true;

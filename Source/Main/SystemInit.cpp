@@ -166,13 +166,13 @@ bool System_Init()
 		if (entry.init())
 		{
 			#ifdef DAEDALUS_DEBUG_CONSOLE
-			DBGConsole_Msg(0, "==>Initialized %s", entry.name);
+			Console_Print( "==>Initialized %s", entry.name);
 			#endif
 		}
 		else
 		{
 				#ifdef DAEDALUS_DEBUG_CONSOLE
-			DBGConsole_Msg(0, "==>Initialize %s Failed", entry.name);
+			Console_Print( "==>Initialize %s Failed", entry.name);
 			#endif
 			return false;
 		}
@@ -190,12 +190,12 @@ bool System_Open(const char* filename)
 
 		if (entry.open == NULL)	continue;
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg(0, "==>Open %s", entry.name);
+		Console_Print( "==>Open %s", entry.name);
 		#endif
 		if (!entry.open())
 		{
 				#ifdef DAEDALUS_DEBUG_CONSOLE
-			DBGConsole_Msg(0, "==>Open %s [RFAILED]", entry.name);
+			Console_Print( "==>Open %s [RFAILED]", entry.name);
 			#endif
 			return false;
 		}
@@ -212,7 +212,7 @@ void System_Close()
 
 		if (entry.close == NULL) continue;
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg(0, "==>Close %s", entry.name);
+		Console_Print( "==>Close %s", entry.name);
 		#endif
 		entry.close();
 	}
@@ -226,7 +226,7 @@ void System_Finalize()
 
 		if (entry.final == NULL) continue;
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg(0, "==>Finalize %s", entry.name);
+		Console_Print( "==>Finalize %s", entry.name);
 		#endif
 		entry.final();
 	}

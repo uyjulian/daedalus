@@ -71,7 +71,7 @@ void DMA_SP_CopyFromRDRAM()
 		// Conker needs this
 		if ( rdram_address  > gRamSize )
 		{
-			//DBGConsole_Msg( 0, "(0x%08x) (0x%08x)", spmem_address, rdram_address );
+			//Console_Print( "(0x%08x) (0x%08x)", spmem_address, rdram_address );
 			break;
 		}
 		fast_memcpy_swizzle( &g_pu8SpMemBase[spmem_address], &g_pu8RamBase[rdram_address], length );
@@ -118,7 +118,7 @@ void DMA_SP_CopyToRDRAM()
 		#ifdef DAEDALUS_DEBUG_CONSOLE
 		if ( rdram_address  > gRamSize )
 		{
-			//DBGConsole_Msg( 0, "(0x%08x) (0x%08x)", spmem_address, rdram_address );
+			//Console_Print( "(0x%08x) (0x%08x)", spmem_address, rdram_address );
 			break;
 		}
 		#endif
@@ -274,11 +274,11 @@ void DMA_PI_CopyToRDRAM()
 		#ifdef DAEDALUS_DEBUG_CONSOLE
 		else if (IsDom1Addr1(cart_address))
 		{
-			DBGConsole_Msg(0, "[YReading from Cart domain 1/addr1] (Ignored)");
+			Console_Print( "[YReading from Cart domain 1/addr1] (Ignored)");
 		}
 		else
 		{
-			DBGConsole_Msg(0, "[YUnknown PI Address 0x%08x]", cart_address);
+			Console_Print( "[YUnknown PI Address 0x%08x]", cart_address);
 		}
 		#endif
 	}
@@ -286,7 +286,7 @@ void DMA_PI_CopyToRDRAM()
 	{
 		if (cart_address < 0x1fc00000)
 		{
-			//DBGConsole_Msg(0, "[YReading from Cart domain 1/addr2]");
+			//Console_Print( "[YReading from Cart domain 1/addr2]");
 			cart_address -= PI_DOM1_ADDR2;
 			CPU_InvalidateICacheRange( 0x80000000 | mem_address, pi_length_reg );
 			RomBuffer::CopyToRam( g_pu8RamBase, mem_address, gRamSize, cart_address, pi_length_reg );
@@ -297,7 +297,7 @@ void DMA_PI_CopyToRDRAM()
 		else
 		{
 			// Paper Mario
-			DBGConsole_Msg(0, "[YReading from Cart domain 1/addr3]");
+			Console_Print( "[YReading from Cart domain 1/addr3]");
 		}
 		#endif
 	}
@@ -322,8 +322,8 @@ void DMA_PI_CopyFromRDRAM()
 	/*
 	if(pi_length_reg & 0x1)
 	{
-		DBGConsole_Msg(0, "PI Copy RDRAM to CART %db from %08X to %08X", pi_length_reg, cart_address|0xA0000000, mem_address);
-		DBGConsole_Msg(0, "Warning, PI DMA, odd length");
+		Console_Print( "PI Copy RDRAM to CART %db from %08X to %08X", pi_length_reg, cart_address|0xA0000000, mem_address);
+		Console_Print( "Warning, PI DMA, odd length");
 
 		// Tonic Trouble triggers this !
 
@@ -339,7 +339,7 @@ void DMA_PI_CopyFromRDRAM()
 		cart_address -= PI_DOM2_ADDR2;
 
 		#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg(0, "[YWriting to Cart domain 2/addr2 0x%08x]", cart_address);
+		Console_Print( "[YWriting to Cart domain 2/addr2 0x%08x]", cart_address);
 		#endif
 
 		if (g_ROM.settings.SaveType != SAVE_TYPE_FLASH)
@@ -352,7 +352,7 @@ void DMA_PI_CopyFromRDRAM()
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 		else
 		{
-			DBGConsole_Msg(0, "[YUnknown PI Address 0x%08x]", cart_address);
+			Console_Print( "[YUnknown PI Address 0x%08x]", cart_address);
 		}
 	#endif
 	Memory_PI_ClrRegisterBits(PI_STATUS_REG, PI_STATUS_DMA_BUSY);

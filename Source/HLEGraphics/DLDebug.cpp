@@ -493,11 +493,11 @@ DLDebugOutput * DLDebug_CreateFileOutput()
 	if (!output->Open(filepath))
 	{
 		delete output;
-		DBGConsole_Msg(0, "RDP: Couldn't create dumpfile %s", filepath);
+		Console_Print( "RDP: Couldn't create dumpfile %s", filepath);
 		return nullptr;
 	}
 
-	DBGConsole_Msg(0, "RDP: Dumping Display List as %s", filepath);
+	Console_Print( "RDP: Dumping Display List as %s", filepath);
 	return output;
 }
 

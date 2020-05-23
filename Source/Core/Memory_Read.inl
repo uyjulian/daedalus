@@ -21,7 +21,7 @@ static void * ReadInvalid( u32 address )
 {
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 	DPF( DEBUG_MEMORY, "Illegal Memory Access - Tried to Read From 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC );
-	DBGConsole_Msg(0, "Illegal Memory Access - Tried to Read From 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC);
+	Console_Print( "Illegal Memory Access - Tried to Read From 0x%08x (PC: 0x%08x)", address, gCPUState.CurrentPC);
 	#endif
 
 	u8* temp = (u8 *)g_pMemoryBuffers[MEM_UNUSED];
@@ -104,7 +104,7 @@ static void * Read_8410_841F( u32 address )
 static void * Read_8420_842F( u32 address )
 {
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-	DBGConsole_Msg( 0, "Read from DP Span Registers is unhandled (0x%08x, PC: 0x%08x)", address, gCPUState.CurrentPC );
+	Console_Print( "Read from DP Span Registers is unhandled (0x%08x, PC: 0x%08x)", address, gCPUState.CurrentPC );
 	#endif
 	return ReadInvalid(address);
 }
@@ -134,7 +134,7 @@ static void * Read_8440_844F( u32 address )
 		u32 vi_pos = Memory_VI_GetRegister(VI_CURRENT_REG);
 		vi_pos = (vi_pos + 2) % 512;
 
-		//DBGConsole_Msg(0, "Reading vi pos: %d", vi_pos);
+		//Console_Print( "Reading vi pos: %d", vi_pos);
 		*(u32*)temp = vi_pos;
 	}
 	return temp;
@@ -186,7 +186,7 @@ static void * ReadFlashRam( u32 address )
 			return (u8 *)&FlashStatus[0];
 	}
 #ifdef DAEDALUS_DEBUG_CONSOLE
-	DBGConsole_Msg(0, "[GRead from FlashRam (0x%08x) is invalid", address);
+	Console_Print( "[GRead from FlashRam (0x%08x) is invalid", address);
 	#endif
 	return ReadInvalid(address);
 }
@@ -212,7 +212,7 @@ static void * Read_9FC0_9FCF( u32 address )
 	if ((offset < 0x7C0) || (offset > 0x7FF))
 	{
 		#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg(0, "[GRead from PIF (0x%08x) is invalid", address);
+		Console_Print( "[GRead from PIF (0x%08x) is invalid", address);
 		#endif
 		return g_pMemoryBuffers[MEM_UNUSED];
 	}

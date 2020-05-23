@@ -221,7 +221,7 @@ namespace IO
 					{
 						if (_strcmpi(FindExtension( file ), p_extension) == 0)
 						{
-							//DBGConsole_Msg(0, "Deleting [C%s]",file);
+							//Console_Print( "Deleting [C%s]",file);
 							sceIoRemove( file );
 						}
 
@@ -231,7 +231,7 @@ namespace IO
 			}
 			else
 			{
-				//DBGConsole_Msg(0, "Couldn't open the directory");
+				//Console_Print( "Couldn't open the directory");
 			}
 
 			return 0;

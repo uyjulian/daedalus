@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DebugLog.h"
 
 #include <stdio.h>
+#include <string>
 
 #include "Debug/DBGConsole.h"
 #include "Debug/Dump.h"
@@ -33,18 +34,20 @@ static FILE* g_hOutputLog = NULL;
 
 bool Debug_InitLogging()
 {
-	std::string log_filename = IO::Path::Join(Dump_GetDumpDirectory(""), "daedalus.txt");
+	IO::Filename log_filename;
+
+	Dump_GetDumpDirectory(log_filename, "");
+
+	IO::Path::Append(log_filename, "daedalus.txt");
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
-	if (CDebugConsole::IsAvailable())
+	if ( CDebugConsole::IsAvailable() )
 	{
-		CDebugConsole::Get()->Msg(0, "Creating Dump file '%s'", log_filename.c_str());
+		CDebugConsole::Get()->Print( 0, "Creating Dump file '%s'", log_filename );
 	}
 #endif
-	g_hOutputLog = fopen(log_filename.c_str(), "w");
-	if (!g_hOutputLog) {
-		DBGConsole_Msg(0, "Can't open %s", log_filename.c_str());
-	}
+	g_hOutputLog = fopen( log_filename, "w" );
+
 	return g_hOutputLog != NULL;
 }
 

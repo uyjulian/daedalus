@@ -355,7 +355,7 @@ void BaseRenderer::UpdateViewport()
 	s32		vp_w = s32( psp_max.x - psp_min.x );
 	s32		vp_h = s32( psp_max.y - psp_min.y );
 
-	//DBGConsole_Msg(0, "[WViewport Changed (%d) (%d)]",vp_w,vp_h );
+	//Console_Print( "[WViewport Changed (%d) (%d)]",vp_w,vp_h );
 
 #if defined(DAEDALUS_PSP)
 	const u32 vx = 2048;
@@ -442,7 +442,7 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 	}
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	DL_PF("    Tri: %d,%d,%d (Rendered)", v0, v1, v2);yeah
+	DL_PF("    Tri: %d,%d,%d (Rendered)", v0, v1, v2);
 	++mNumTrisRendered;
 #endif
 
@@ -1161,7 +1161,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 
 void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 {
-	//DBGConsole_Msg(0, "In SetNewVertexInfo");
+	//Console_Print( "In SetNewVertexInfo");
 	const FiddledVtx * const pVtxBase( (const FiddledVtx*)(g_pu8RamBase + address) );
 	const Matrix4x4 & mat_project = mProjectionMat;
 	const Matrix4x4 & mat_world = mModelViewStack[mModelViewTop];
@@ -1601,7 +1601,7 @@ void BaseRenderer::ModifyVertexInfo(u32 whered, u32 vert, u32 val)
 
 		default:
 		#ifdef DAEDALUS_DEBUG_CONSOLE
-			DBGConsole_Msg( 0, "ModifyVtx - Setting vert data where: 0x%02x, vert: 0x%08x, val: 0x%08x", whered, vert, val );
+			Console_Print( "ModifyVtx - Setting vert data where: 0x%02x, vert: 0x%08x, val: 0x%08x", whered, vert, val );
 			DL_PF( "    Setting unknown value: where: 0x%02x, vert: 0x%08x, val: 0x%08x", whered, vert, val );
 			#endif
 			break;

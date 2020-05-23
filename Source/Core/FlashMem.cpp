@@ -87,7 +87,7 @@ void Flash_DoCommand(u32 FlashRAM_Command)
 	case 0xD2000000:
 		switch (FlashFlag) {
 				#ifdef DAEDALUS_DEBUG_CONSOLE
-			DBGConsole_Msg(0, "Writing %X to flash ram command register\nFlashFlag: %d",FlashRAM_Command,FlashFlag);
+			Console_Print( "Writing %X to flash ram command register\nFlashFlag: %d",FlashRAM_Command,FlashFlag);
 			#endif
 			case FLASHRAM_MODE_NOPES:
 				break;
@@ -105,7 +105,7 @@ void Flash_DoCommand(u32 FlashRAM_Command)
 				break;
 								#ifdef DAEDALUS_DEBUG_CONSOLE
 			default:
-				DBGConsole_Msg(0, "Writing %X to flash ram command register\nFlashFlag: %d",FlashRAM_Command,FlashFlag);
+				Console_Print( "Writing %X to flash ram command register\nFlashFlag: %d",FlashRAM_Command,FlashFlag);
 				#endif
 		}
 		FlashFlag = FLASHRAM_MODE_NOPES;
@@ -138,7 +138,7 @@ void Flash_DoCommand(u32 FlashRAM_Command)
 			#ifdef DAEDALUS_DEBUG_CONSOLE
 	default:
 
-		DBGConsole_Msg(0, "Writing %X to flash ram command register",FlashRAM_Command);
+		Console_Print( "Writing %X to flash ram command register",FlashRAM_Command);
 		#endif
 	}
 }

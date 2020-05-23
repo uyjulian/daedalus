@@ -956,7 +956,7 @@ void			IInputManager::SetConfiguration( u32 configuration_idx )
 	{
 		mpControllerConfig = mControllerConfigs[ configuration_idx ];
 			#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg( 0, "Setting the controller to [c%s]", mpControllerConfig->GetName() );
+		Console_Print( "Setting the controller to [c%s]", mpControllerConfig->GetName() );
 		#endif
 	}
 		#ifdef DAEDALUS_DEBUG_CONSOLE

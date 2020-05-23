@@ -304,11 +304,11 @@ DAEDALUS_STATIC_ASSERT(ARRAYSIZE(kRegisterNames) == 32);
 void SCPUState::Dump()
 {
 
-	DBGConsole_Msg(0, "Emulation CPU State:");
+	Console_Print( "Emulation CPU State:");
 	{
 		for(int i = 0; i < 32; i += 4)
 		{
-			DBGConsole_Msg(0, "%s:%08X %s:%08X %s:%08X %s:%08X",
+			Console_Print( "%s:%08X %s:%08X %s:%08X %s:%08X",
 						   kRegisterNames[i + 0], gCPUState.CPU[i + 0]._u32_0,
 						   kRegisterNames[i + 1], gCPUState.CPU[i + 1]._u32_0,
 						   kRegisterNames[i + 2], gCPUState.CPU[i + 2]._u32_0,
@@ -316,9 +316,9 @@ void SCPUState::Dump()
 		}
 		}
 
-		DBGConsole_Msg(0, "TargetPC: %08x", gCPUState.TargetPC);
-		DBGConsole_Msg(0, "CurrentPC: %08x", gCPUState.CurrentPC);
-		DBGConsole_Msg(0, "Delay: %08x", gCPUState.Delay);
+		Console_Print( "TargetPC: %08x", gCPUState.TargetPC);
+		Console_Print( "CurrentPC: %08x", gCPUState.CurrentPC);
+		Console_Print( "Delay: %08x", gCPUState.Delay);
 	}
 }
 #endif
@@ -326,7 +326,7 @@ void SCPUState::Dump()
 bool CPU_RomOpen()
 {
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-	DBGConsole_Msg(0, "Resetting CPU");
+	Console_Print( "Resetting CPU");
 #endif
 
 	gLastAddress = nullptr;
@@ -478,14 +478,14 @@ static void HandleSaveStateOperationOnVerticalBlank()
 		break;
 	case SSO_SAVE:
 		#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg(0, "Saving '%s'\n", gSaveStateFilename.c_str());
+		Console_Print( "Saving '%s'\n", gSaveStateFilename.c_str());
 		#endif
 		SaveState_SaveToFile( gSaveStateFilename.c_str() );
 		gSaveStateOperation = SSO_NONE;
 		break;
 	case SSO_LOAD:
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg(0, "Loading '%s'\n", gSaveStateFilename.c_str());
+		Console_Print( "Loading '%s'\n", gSaveStateFilename.c_str());
 		#endif
 		// Try to load the savestate immediately. If this fails, it
 		// usually means that we're running the correct rom (we should have a
@@ -526,7 +526,7 @@ static bool HandleSaveStateOperationOnCPUStopRunning()
 	#ifdef DAEDALUS_DEBUG_CONSOLE
 	else
 	{
-		DBGConsole_Msg(0, "Couldn't find matching rom for %s\n", gSaveStateFilename.c_str());
+		Console_Print( "Couldn't find matching rom for %s\n", gSaveStateFilename.c_str());
 		// Keep running with the current rom.
 	}
 	#endif
@@ -566,7 +566,7 @@ bool CPU_Run()
 void CPU_Halt( const char * reason )
 {
 	#ifdef DAEDALUS_DEBUG_CONSOLE
-	DBGConsole_Msg( 0, "CPU Halting: %s", reason );
+	Console_Print( "CPU Halting: %s", reason );
 	#endif
 	gCPUStopOnSimpleState = true;
 	gCPUState.AddJob( CPU_STOP_RUNNING );
@@ -582,12 +582,12 @@ void CPU_AddBreakPoint( u32 address )
 
 	if (!Memory_GetInternalReadAddress(address, (void**)&pdwOp))
 	{
-		DBGConsole_Msg(0, "Invalid Address for BreakPoint: 0x%08x", address);
+		Console_Print( "Invalid Address for BreakPoint: 0x%08x", address);
 	}
 	else
 	{
 		DBG_BreakPoint bpt;
-		DBGConsole_Msg(0, "[YInserting BreakPoint at 0x%08x]", address);
+		Console_Print( "[YInserting BreakPoint at 0x%08x]", address);
 
 		bpt.mOriginalOp       = *pdwOp;
 		bpt.mEnabled          = true;
@@ -610,7 +610,7 @@ void CPU_EnableBreakPoint( u32 address, bool enable )
 
 	if (!Memory_GetInternalReadAddress(address, (void**)&pdwOp))
 	{
-		DBGConsole_Msg(0, "Invalid Address for BreakPoint: 0x%08x", address);
+		Console_Print( "Invalid Address for BreakPoint: 0x%08x", address);
 	}
 	else
 	{
@@ -618,7 +618,7 @@ void CPU_EnableBreakPoint( u32 address, bool enable )
 
 		if (op_code.op != OP_DBG_BKPT)
 		{
-			DBGConsole_Msg(0, "[YNo breakpoint is set at 0x%08x]", address);
+			Console_Print( "[YNo breakpoint is set at 0x%08x]", address);
 			return;
 		}
 
@@ -730,12 +730,12 @@ void CPU_SetCompare(u32 value)
 
 	#ifdef DAEDALUS_PROFILE
 	DPF( DEBUG_REGS, "COMPARE set to 0x%08x.", value );
-	//DBGConsole_Msg(0, "COMPARE set to 0x%08x Count is 0x%08x.", value, gCPUState.CPUControl[C0_COUNT]._u32);
+	//Console_Print( "COMPARE set to 0x%08x Count is 0x%08x.", value, gCPUState.CPUControl[C0_COUNT]._u32);
 	#endif
 	// Add an event for this compare:
 	if (value == gCPUState.CPUControl[C0_COMPARE]._u32)
 	{
-		//DBGConsole_Msg(0, "Clear");
+		//Console_Print( "Clear");
 	}
 	else
 	{
@@ -749,14 +749,14 @@ void CPU_SetCompare(u32 value)
 			// If seems to keep setting a delta of 140624981 when the counter is close to wrapping.
 			// if (value < gCPUState.CPUControl[C0_COUNT]._u32)
 			// {
-			// 	DBGConsole_Msg(0, "SetCompare wrapping: %d -> %d = %d", gCPUState.CPUControl[C0_COUNT]._u32, value, delta);
+			// 	Console_Print( "SetCompare wrapping: %d -> %d = %d", gCPUState.CPUControl[C0_COUNT]._u32, value, delta);
 			// }
 			CPU_SetCompareEvent( delta );
 		}
 		#ifdef DAEDALUS_DEBUG_CONSOLE
 		else
 		{
-			//DBGConsole_Msg(0, "[RIgnoring SetCompare 0] - is this right?");
+			//Console_Print( "[RIgnoring SetCompare 0] - is this right?");
 		}
 		#endif
 		gCPUState.CPUControl[C0_COMPARE]._u32 = value;

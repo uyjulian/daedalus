@@ -228,7 +228,7 @@ bool IRomSettingsDB::OpenSettingsFile( const char * filename )
 	if( p_ini_file == nullptr )
 	{
 		#ifdef DAEDALUS_DEBUG_CONSOLE
-		DBGConsole_Msg( 0, "Failed to open RomDB from %s\n", filename );
+		Console_Print( "Failed to open RomDB from %s\n", filename );
 		#endif
 		return false;
 	}

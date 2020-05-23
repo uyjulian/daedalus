@@ -120,7 +120,7 @@ static void	UpdateFramerate()
 bool CreateGraphicsPlugin()
 {
 	DAEDALUS_ASSERT(gGraphicsPlugin == nullptr, "The graphics plugin should not be initialised at this point");
-	DBGConsole_Msg( 0, "Initialising Graphics Plugin" );
+	Console_Print( "Initialising Graphics Plugin" );
 
 	CGraphicsPlugin * plugin = new CGraphicsPlugin();
 	if (!plugin->Initialise())
@@ -170,7 +170,7 @@ bool CGraphicsPlugin::Initialise()
 
 void CGraphicsPlugin::Finalise()
 {
-	DBGConsole_Msg(0, "Finalising PSPGraphics");
+	Console_Print( "Finalising PSPGraphics");
 	Memory_UnregisterVIOriginChangedEventHandler(this);
 	RSP_HLE_UnregisterDisplayListProcessor(this);
 	DLParser_Finalise();

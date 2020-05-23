@@ -53,7 +53,7 @@ void Dump_GetDumpDirectory(char *rootdir, const char* subdir)
 #ifdef DAEDALUS_DEBUG_CONSOLE
 	if (CDebugConsole::IsAvailable())
 	{
-		// DBGConsole_Msg( 0, "Dump dir: [C%s]", rootdir );
+		// Console_Print( "Dump dir: [C%s]", rootdir );
 	}
 #endif
 	IO::Directory::EnsureExists(rootdir);

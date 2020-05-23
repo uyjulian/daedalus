@@ -5,7 +5,7 @@ u32 Patch___osAtomicDec()
 {
 TEST_DISABLE_UTIL_FUNCS
 #ifdef DAEDALUS_DEBUG_CONSOLE
-	DBGConsole_Msg(0, "osAtomicDec");
+	Console_Print( "osAtomicDec");
 #endif
 	u8 *p = (u8*)ReadAddress(gGPR[REG_a0]._u32_0);
 	u32 value = QuickRead32Bits(p, 0x0);
@@ -43,7 +43,7 @@ TEST_DISABLE_UTIL_FUNCS
 #if 1	//1->Fast, 0->Old way
 	fast_memcpy_swizzle( (void *)ReadAddress(dst), (void *)ReadAddress(src), len);
 #else
-	//DBGConsole_Msg(0, "memcpy(0x%08x, 0x%08x, %d)", dst, src, len);
+	//Console_Print( "memcpy(0x%08x, 0x%08x, %d)", dst, src, len);
 	u8 *pdst = (u8*)ReadAddress(dst);
 	u8 *psrc = (u8*)ReadAddress(src);
 	while(len--)
@@ -117,7 +117,7 @@ u32 Patch_strcmp()
 	u32 len = gGPR[REG_a2]._u32_0;
 	u8 A, B;
 #ifdef DAEDALUS_DEBUG_CONSOLE
-	DBGConsole_Msg(0, "strcmp(%s,%s,%d)", sA, sB, len);
+	Console_Print( "strcmp(%s,%s,%d)", sA, sB, len);
 #endif
 	for (i = 0; (A = Read8Bits(sA+i)) != 0 && i < len; i++)
 	{
@@ -156,7 +156,7 @@ TEST_DISABLE_UTIL_FUNCS
 		return PATCH_RET_JR_RA;
 
 
-	//DBGConsole_Msg(0, "bcopy(0x%08x,0x%08x,%d)", src, dst, len);
+	//Console_Print( "bcopy(0x%08x,0x%08x,%d)", src, dst, len);
 	u8 *pdst = (u8*)ReadAddress(dst);
 	u8 *psrc = (u8*)ReadAddress(src);
 
