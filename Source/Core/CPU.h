@@ -218,7 +218,7 @@ inline void CPU_TakeBranch( u32 new_pc ) { gCPUState.TargetPC = new_pc; gCPUStat
 
 #define COUNTER_INCREMENT_PER_OP			1
 
-extern u8 *		gLastAddress;
+extern const u8* gLastAddress;
 
 // Take advantage of the cooperative multitasking
 // of the PSP to make locking/unlocking as fast as possible.
@@ -249,19 +249,19 @@ extern	void (* g_pCPUCore)();
 //
 // From ReadAddress
 //
-#define CPU_FETCH_INSTRUCTION(ptr, pc)								\
-	const MemFuncRead & m( g_MemoryLookupTableRead[ pc >> 18 ] );	\
-	if( DAEDALUS_EXPECT_LIKELY(m.pRead != nullptr) )					\
-	{																\
-/* Access through pointer with no function calls at all (Fast) */	\
-		ptr = ( m.pRead + pc );										\
-	}																\
-	else															\
-	{																\
-/* ROM or TLB and possible trigger for an exception (Slow)*/		\
-		ptr = (u8*)m.ReadFunc( pc );								\
-		if( gCPUState.GetStuffToDo() )								\
-			return;													\
+#define CPU_FETCH_INSTRUCTION(ptr, pc)                                    \
+	const MemReadEntry& entry = gMemReadLUT[pc >> 18];                    \
+	if (DAEDALUS_EXPECT_LIKELY(entry.base != nullptr))                    \
+	{                                                                     \
+		/* Access through pointer with no function calls at all (Fast) */ \
+		ptr = entry.base + pc;                                            \
+	}                                                                     \
+	else                                                                  \
+	{                                                                     \
+		/* ROM or TLB and possible trigger for an exception (Slow)*/      \
+		ptr = (u8*)entry.read_func(pc);                                   \
+		if (gCPUState.GetStuffToDo())                                     \
+			return;                                                       \
 	}
 
 //***********************************************

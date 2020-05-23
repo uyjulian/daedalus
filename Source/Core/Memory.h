@@ -66,16 +66,16 @@ static const u32 MEMORY_8_MEG( 8*1024*1024 );
 typedef const void * (*ReadFunction )( u32 address );
 typedef void (*WriteFunction )( u32 address, u32 value );
 
-struct MemFuncWrite
+struct MemWriteEntry
 {
-	u8			  *pWrite;
-	WriteFunction WriteFunc;
+	u8*           base;
+	WriteFunction write_func;
 };
 
-struct MemFuncRead
+struct MemReadEntry
 {
-	u8			 *pRead;
-	ReadFunction ReadFunc;
+	const u8*    base;
+	ReadFunction read_func;
 };
 
 extern u32		gRamSize;
@@ -104,34 +104,34 @@ typedef void (*WriteFunction )( u32 address, u32 value );
 typedef bool (*InternalMemFastFunction)( u32 address, void ** p_translated );
 #endif
 
-extern MemFuncRead  				g_MemoryLookupTableRead[0x4000];
-extern MemFuncWrite 				g_MemoryLookupTableWrite[0x4000];
+extern MemReadEntry  gMemReadLUT[0x4000];
+extern MemWriteEntry gMemWriteLUT[0x4000];
 
 // Fast memory access
 inline const void* ReadAddress( u32 address )
 {
-	const MemFuncRead & m( g_MemoryLookupTableRead[ address >> 18 ] );
+		const MemReadEntry& entry = gMemReadLUT[address >> 18];
 
 	// Access through pointer with no function calls at all (Fast)
-	if( m.pRead )
-		return (void*)( m.pRead + address );
+		if (entry.base)
+		return (void*)(entry.base + address);
 
 	// Need to go through the HW access handlers or TLB (Slow)
-	return m.ReadFunc( address );
+	return entry.read_func(address);
 }
 
 inline void WriteAddress( u32 address, u32 value )
 {
-	const MemFuncWrite & m( g_MemoryLookupTableWrite[ address >> 18 ] );
+	const MemWriteEntry& entry = gMemWriteLUT[address >> 18];
 
 	// Access through pointer with no function calls at all (Fast)
-	if( m.pWrite )
+	if (entry.base)
 	{
-		*(u32*)( m.pWrite + address ) = value;
+		*(u32*)(entry.base + address) = value;
 		return;
 	}
 	// Need to go through the HW access handlers or TLB (Slow)
-	m.WriteFunc( address, value );
+	entry.write_func(address, value);
 }
 
 #ifndef DAEDALUS_SILENT

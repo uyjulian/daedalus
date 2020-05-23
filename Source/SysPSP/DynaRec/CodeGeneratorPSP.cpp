@@ -67,7 +67,7 @@ using namespace AssemblyUtils;
 
 #define NOT_IMPLEMENTED( x )	DAEDALUS_ERROR( x )
 
-extern "C" { const void * g_MemoryLookupTableReadForDynarec = g_MemoryLookupTableRead; }	//Important pointer for Dynarec see DynaRecStubs.s
+extern "C" { const void * g_MemoryLookupTableReadForDynarec = gMemReadLUT; }	//Important pointer for Dynarec see DynaRecStubs.s
 
 extern "C" { void _DDIV( s64 Num, s32 Div ); }	//signed 64bit division  //Corn
 extern "C" { void _DDIVU( u64 Num, u32 Div ); }	//unsigned 64bit division  //Corn
@@ -1849,10 +1849,10 @@ inline bool	CCodeGeneratorPSP::GenerateDirectLoad( EPspReg psp_dst, EN64Reg base
 			ADDIU( PspReg_A3, PspReg_R0, shift);	//copy low 2 bits to A3
 		}
 
-		const MemFuncRead & m( g_MemoryLookupTableRead[ address >> 18 ] );
-		if( m.pRead )
+		const MemReadEntry & entry( gMemReadLUT[ address >> 18 ] );
+		if( entry.base )
 		{
-			void * p_memory( (void*)( m.pRead + address ) );
+			void * p_memory( (void*)( entry.base + address ) );
 
 			//printf( "Loading from %s %08x + %04x (%08x) op %d\n", RegNames[ base ], base_address, u16(offset), address, load_op );
 
@@ -2172,10 +2172,10 @@ inline bool	CCodeGeneratorPSP::GenerateDirectStore( EPspReg psp_src, EN64Reg bas
 		u32		base_address( mRegisterCache.GetKnownValue( base, 0 )._u32 );
 		u32		address( (base_address + s32( offset )) ^ swizzle );
 
-		const MemFuncWrite & m( g_MemoryLookupTableWrite[ address >> 18 ] );
-		if( m.pWrite )
+		const MemWriteEntry & entry( gMemWriteLUT[ address >> 18 ] );
+		if( entry.base )
 		{
-			void * p_memory( (void*)( m.pWrite + address ) );
+			void * p_memory( (void*)( entry.base + address ) );
 
 			//printf( "Storing to %s %08x + %04x (%08x) op %d\n", RegNames[ base ], base_address, u16(offset), address, store_op );
 
