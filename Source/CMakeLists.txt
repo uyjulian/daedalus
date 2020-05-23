@@ -14,7 +14,6 @@ set(CMAKE_CXX_STANDARD 17)
 project (DaedalusX64)
 
 				#Default Files for build
-				set (TEMP Plugins/GraphicsPlugin.cpp)
 				set (CONFIG_FILES Config/ConfigOptions.cpp)
 				set (CORE_FILES Core/Cheats.cpp Core/CPU.cpp Core/DMA.cpp Core/Disassemble.cpp Core/Dynamo.cpp Core/FlashMem.cpp Core/FramerateLimiter.cpp Core/Interpret.cpp Core/Interrupt.cpp Core/JpegTask.cpp Core/Memory.cpp Core/PIF.cpp Core/PrintOpCode.cpp Core/R4300.cpp Core/Registers.cpp Core/ROM.cpp Core/ROMBuffer.cpp Core/ROMImage.cpp Core/RomSettings.cpp Core/RSP_HLE.cpp Core/Save.cpp Interface/SaveState.cpp Core/TLB.cpp)
 				set (DEBUG_FILES Debug/DebugConsoleImpl.cpp Debug/DebugLog.cpp Debug/Dump.cpp Debug/Synchroniser.cpp)
@@ -35,7 +34,8 @@ project (DaedalusX64)
 
 
 				#PSP Build
-				set (PSP_DEBUG_FILES SysPSP/Debug/DaedalusAssertPSP.cpp SysPSP/Debug/DBGConsolePSP.cpp )
+			  set (PSP_BASE Base/PSP/Assert.cpp )
+				set (PSP_DEBUG_FILES SysPSP/Debug/DBGConsolePSP.cpp )
 				set (PSP_DVEMGR_FILES SysPSP/PRX/DveMgr/pspDveManager.S)
 				set (PSP_DYNAREC_FILES SysPSP/DynaRec/AssemblyWriterPSP.cpp SysPSP/DynaRec/AssemblyUtilsPSP.cpp SysPSP/DynaRec/CodeBufferManagerPSP.cpp SysPSP/DynaRec/CodeGeneratorPSP.cpp SysPSP/DynaRec/DynaRecStubs.S SysPSP/DynaRec/N64RegisterCachePSP.cpp)
 				set (PSP_GRAPHICS_FILES SysPSP/Graphics/DrawText.cpp SysPSP/Graphics/GraphicsContext.cpp SysPSP/Graphics/NativeTexturePSP.cpp SysPSP/Graphics/VideoMemoryManager.cpp SysPSP/Graphics/intraFont/intraFont.c SysPSP/Graphics/intraFont/libccc.c)
@@ -51,7 +51,7 @@ project (DaedalusX64)
 				set (PSP_MAIN_FILES Platform/PSP/main.cpp)
 
 
-				set (PSP_BUILD ${PSP_DEBUG_FILES} ${PSP_DVEMGR_FILES} ${PSP_DYNAREC_FILES} ${PSP_GRAPHICS_FILES} ${PSP_HLEAUDIO_FILES} ${PSP_HLEGRAPHICS_FILES} ${PSP_INPUTMANAGER_FILES} ${PSP_KERNELBUTTON_FILES} ${PSP_MEDIAENGINEFILES} ${PSP_SYSTEM_FILES} ${PSP_UI_FILES} ${PSP_UTILITY_FILES})
+				set (PSP_BUILD ${PSP_BASE} ${PSP_DEBUG_FILES} ${PSP_DVEMGR_FILES} ${PSP_DYNAREC_FILES} ${PSP_GRAPHICS_FILES} ${PSP_HLEAUDIO_FILES} ${PSP_HLEGRAPHICS_FILES} ${PSP_INPUTMANAGER_FILES} ${PSP_KERNELBUTTON_FILES} ${PSP_MEDIAENGINEFILES} ${PSP_SYSTEM_FILES} ${PSP_UI_FILES} ${PSP_UTILITY_FILES})
 				set (PSP_DEFINES -DDAEDALUS_PSP -DDAEDALUS_ENABLE_DYNAREC -DDAEDALUS_PSP_USE_ME -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_PSP_USE_VFPU -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE)
 				Set(PSPSDK_LIBS -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpsplibc -lpsputility -lpspuser -lpspkernel -lpspaudiolib)
 

@@ -36,7 +36,7 @@
 #include <pspdisplay.h>
 
 
-DaedalusAssertHook gAssertHook = NULL;
+DaedalusAssertHook gAssertHook = nullptr;
 
 //
 //	Return -1 to ignore once, 0 to ignore permenantly, 1 to break
