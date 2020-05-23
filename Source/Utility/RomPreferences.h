@@ -74,7 +74,7 @@ struct SRomPreferences
 //	bool						AudioAdaptFrequency;
 	ETextureHashFrequency		CheckTextureHashFrequency;
 	EFrameskipValue				Frameskip;
-	EAudioPluginMode			AudioEnabled;
+	EAudioMode			AudioEnabled;
 	f32							ZoomX;
 	u32							SpeedSyncEnabled;
 	u32							ControllerIndex;

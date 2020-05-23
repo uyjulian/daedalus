@@ -88,7 +88,7 @@ private:
 };
 
 CAudioPlugin* gAudioPlugin = nullptr;
-EAudioPluginMode gAudioPluginEnabled( APM_ENABLED_SYNC );
+EAudioMode gAudioPluginMode( AM_ENABLED_SYNC );
 
 
 CAudioPluginW32::CAudioPluginW32()
@@ -131,7 +131,7 @@ bool CAudioPluginW32::Initialise()
 	if (CreateThread( "Audio", AudioThread, this ) == kInvalidThreadHandle)
 	{
 		DAEDALUS_ERROR("Failed to start the audio thread!");
-		gAudioPluginEnabled = APM_DISABLED;
+		gAudioPluginMode = AM_DISABLED;
 	}
 #endif
 	return true;
@@ -188,7 +188,7 @@ void CAudioPluginW32::DacrateChanged( int SystemType )
 
 void CAudioPluginW32::LenChanged()
 {
-	if( gAudioPluginEnabled == APM_DISABLED )
+	if( gAudioPluginMode == AM_DISABLED )
 		return;
 
 	u32 len, count;
@@ -322,13 +322,13 @@ EProcessResult	CAudioPluginW32::ProcessAList()
 
 	EProcessResult	result( PR_NOT_STARTED );
 
-	switch( gAudioPluginEnabled )
+	switch( gAudioPluginMode )
 	{
-	case APM_DISABLED:
+	case AM_DISABLED:
 		result = PR_COMPLETED;
 		break;
 
-	case APM_ENABLED_SYNC:
+	case AM_ENABLED_SYNC:
 		Audio_Ucode();
 		result = PR_COMPLETED;
 		break;

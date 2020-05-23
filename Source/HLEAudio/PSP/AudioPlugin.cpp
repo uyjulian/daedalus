@@ -50,7 +50,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Thread.h"
 
 CAudioPlugin* gAudioPlugin = nullptr;
-EAudioPluginMode gAudioPluginEnabled( APM_DISABLED );
+EAudioMode gAudioPluginMode( AM_DISABLED );
 
 #define RSP_AUDIO_INTR_CYCLES     1
 extern u32 gSoundSync;
@@ -231,7 +231,7 @@ mFrequency = frequency;
 
 void	AudioPluginPSP::LenChanged()
 {
-	if( gAudioPluginEnabled > APM_DISABLED )
+	if( gAudioPluginMode > AM_DISABLED )
 	{
 		u32 address = Memory_AI_GetRegister(AI_DRAM_ADDR_REG) & 0xFFFFFF;
 		u32	length = Memory_AI_GetRegister(AI_LEN_REG);
@@ -289,19 +289,19 @@ EProcessResult	AudioPluginPSP::ProcessAList()
 
 	EProcessResult	result = PR_NOT_STARTED;
 
-	switch( gAudioPluginEnabled )
+	switch( gAudioPluginMode )
 	{
-		case APM_DISABLED:
+		case AM_DISABLED:
 			result = PR_COMPLETED;
 			break;
-		case APM_ENABLED_ASYNC:
+		case AM_ENABLED_ASYNC:
 			{
 				SHLEStartJob	job;
 				gJobManager.AddJob( &job, sizeof( job ) );
 			}
 			result = PR_STARTED;
 			break;
-		case APM_ENABLED_SYNC:
+		case AM_ENABLED_SYNC:
 			Audio_Ucode();
 			result = PR_COMPLETED;
 			break;
@@ -346,12 +346,12 @@ void AudioPluginPSP::AddBuffer( u8 *start, u32 length )
 
 	u32 num_samples = length / sizeof( Sample );
 
-	switch( gAudioPluginEnabled )
+	switch( gAudioPluginMode )
 	{
-	case APM_DISABLED:
+	case AM_DISABLED:
 		break;
 
-	case APM_ENABLED_ASYNC:
+	case AM_ENABLED_ASYNC:
 		{
 			SAddSamplesJob	job( mAudioBufferUncached, reinterpret_cast< const Sample * >( start ), num_samples, mFrequency, kOutputFrequency );
 
@@ -359,7 +359,7 @@ void AudioPluginPSP::AddBuffer( u8 *start, u32 length )
 		}
 		break;
 
-	case APM_ENABLED_SYNC:
+	case AM_ENABLED_SYNC:
 		{
 			mAudioBufferUncached->AddSamples( reinterpret_cast< const Sample * >( start ), num_samples, mFrequency, kOutputFrequency );
 		}

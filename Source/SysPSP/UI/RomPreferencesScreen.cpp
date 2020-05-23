@@ -85,28 +85,28 @@ namespace
 	class CAudioSetting : public CUISetting
 	{
 	public:
-		CAudioSetting( EAudioPluginMode * setting, const char * name, const char * description )
+		CAudioSetting( EAudioMode * setting, const char * name, const char * description )
 			:	CUISetting( name, description )
 			,	mSetting( setting )
 		{
 		}
 
-		virtual	void			OnNext()				{ *mSetting = (*mSetting < APM_ENABLED_SYNC) ? static_cast<EAudioPluginMode>(*mSetting + 1) : APM_DISABLED; }
-		virtual	void			OnPrevious()			{ *mSetting = (*mSetting > APM_DISABLED)     ? static_cast<EAudioPluginMode>(*mSetting - 1) : APM_ENABLED_SYNC; }
+		virtual	void			OnNext()				{ *mSetting = (*mSetting < AM_ENABLED_SYNC) ? static_cast<EAudioMode>(*mSetting + 1) : AM_DISABLED; }
+		virtual	void			OnPrevious()			{ *mSetting = (*mSetting > AM_DISABLED)     ? static_cast<EAudioMode>(*mSetting - 1) : AM_ENABLED_SYNC; }
 
 		virtual const char *	GetSettingName() const
 		{
 			switch ( *mSetting )
 			{
-				case APM_DISABLED:			return "Disabled";
-				case APM_ENABLED_ASYNC:		return "Asynchronous";
-				case APM_ENABLED_SYNC:		return "Synchronous";
+				case AM_DISABLED:			return "Disabled";
+				case AM_ENABLED_ASYNC:		return "Asynchronous";
+				case AM_ENABLED_SYNC:		return "Synchronous";
 			}
 			return "Unknown";
 		}
 
 	private:
-		EAudioPluginMode		*mSetting;
+		EAudioMode		*mSetting;
 	};
 
 	class CZoomSetting : public CUISetting
@@ -131,14 +131,14 @@ namespace
 	class CAdjustFrequencySetting : public CUISetting
 	{
 	public:
-		CAdjustFrequencySetting( bool * setting, EAudioPluginMode * audio_enabled, const char * name, const char * description )
+		CAdjustFrequencySetting( bool * setting, EAudioMode * audio_enabled, const char * name, const char * description )
 			:	CUISetting( name, description )
 			,	mSetting( setting )
 			,	mAudioEnabled( audio_enabled )
 		{
 		}
 
-		virtual bool			IsReadOnly() const		{ return *mAudioEnabled > APM_DISABLED; }		// Disable this if no audio enabled;
+		virtual bool			IsReadOnly() const		{ return *mAudioEnabled > AM_DISABLED; }		// Disable this if no audio enabled;
 
 		virtual	void			OnNext()				{ if( !IsReadOnly() ) *mSetting = !*mSetting; }
 		virtual	void			OnPrevious()			{ if( !IsReadOnly() ) *mSetting = !*mSetting; }
@@ -147,7 +147,7 @@ namespace
 
 	private:
 		bool *					mSetting;
-		EAudioPluginMode *		mAudioEnabled;
+		EAudioMode *		mAudioEnabled;
 	};
 
 

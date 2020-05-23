@@ -45,10 +45,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // Audio is disabled on the PSP by default, but enabled on other platforms.
 #ifdef DAEDALUS_PSP
-static const EAudioPluginMode      kDefaultAudioPluginMode      = APM_DISABLED;
+static const EAudioMode      kDefaultAudioPluginMode      = AM_DISABLED;
 static const ETextureHashFrequency kDefaultTextureHashFrequency = THF_DISABLED;
 #else
-static const EAudioPluginMode      kDefaultAudioPluginMode      = APM_ENABLED_SYNC;
+static const EAudioMode      kDefaultAudioPluginMode      = AM_ENABLED_SYNC;
 static const ETextureHashFrequency kDefaultTextureHashFrequency = THF_EVERY_FRAME;
 #endif
 
@@ -258,10 +258,10 @@ bool IPreferences::OpenPreferencesFile( const char * filename )
 		{
 			int audio_enabled = atoi( property->GetValue() );
 
-			if( audio_enabled >= APM_DISABLED && audio_enabled <= APM_ENABLED_SYNC )
-				preferences.AudioEnabled = static_cast<EAudioPluginMode>( audio_enabled );
+			if( audio_enabled >= AM_DISABLED && audio_enabled <= AM_ENABLED_SYNC )
+				preferences.AudioEnabled = static_cast<EAudioMode>( audio_enabled );
 			else
-				preferences.AudioEnabled = APM_DISABLED;
+				preferences.AudioEnabled = AM_DISABLED;
 		}
 //		if( section->FindProperty( "AudioAdaptFrequency", &property ) )
 //		{
@@ -489,7 +489,7 @@ void SRomPreferences::Apply() const
 	gFrameskipValue             = Frameskip;
 	gZoomX                      = ZoomX;
 	gCheatsEnabled              = g_ROM.settings.CheatsEnabled || CheatsEnabled;
-	gAudioPluginEnabled         = AudioEnabled;
+	gAudioPluginMode         = AudioEnabled;
 //	gAdaptFrequency             = AudioAdaptFrequency;
 	gControllerIndex            = ControllerIndex;							//Used during ROM initialization
 #ifdef DAEDALUS_PSP

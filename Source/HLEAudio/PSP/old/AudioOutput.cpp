@@ -247,12 +247,12 @@ void AudioOutput::AddBuffer( u8 *start, u32 length )
 
 	}
 */
-	switch( gAudioPluginEnabled )
+	switch( gAudioPluginMode )
 	{
-	case APM_DISABLED:
+	case AM_DISABLED:
 		break;
 
-	case APM_ENABLED_ASYNC:
+	case AM_ENABLED_ASYNC:
 		{
 			SAddSamplesJob	job( mAudioBufferUncached, reinterpret_cast< const Sample * >( start ), num_samples, mFrequency, 44100 );
 
@@ -260,7 +260,7 @@ void AudioOutput::AddBuffer( u8 *start, u32 length )
 		}
 		break;
 
-	case APM_ENABLED_SYNC:
+	case AM_ENABLED_SYNC:
 		{
 			mAudioBufferUncached->AddSamples( reinterpret_cast< const Sample * >( start ), num_samples, mFrequency, 44100 );
 		}

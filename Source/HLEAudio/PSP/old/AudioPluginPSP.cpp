@@ -52,7 +52,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //*****************************************************************************
 //
 //*****************************************************************************
-EAudioPluginMode gAudioPluginEnabled( APM_DISABLED );
+EAudioMode gAudioPluginMode( AM_DISABLED );
 //bool gAdaptFrequency( false );
 
 //*****************************************************************************
@@ -62,7 +62,7 @@ CAudioPluginPsp::CAudioPluginPsp()
 :	mAudioOutput( new AudioOutput )
 {
 	//mAudioOutput->SetAdaptFrequency( gAdaptFrequency );
-	//gAudioPluginEnabled = APM_ENABLED_SYNC; // for testing
+	//gAudioPluginMode = AM_ENABLED_SYNC; // for testing
 }
 
 //*****************************************************************************
@@ -123,7 +123,7 @@ void	CAudioPluginPsp::DacrateChanged( int SystemType )
 //*****************************************************************************
 void	CAudioPluginPsp::LenChanged()
 {
-	if( gAudioPluginEnabled > APM_DISABLED )
+	if( gAudioPluginMode > AM_DISABLED )
 	{
 		//mAudioOutput->SetAdaptFrequency( gAdaptFrequency );
 
@@ -191,19 +191,19 @@ EProcessResult	CAudioPluginPsp::ProcessAList()
 
 	EProcessResult	result( PR_NOT_STARTED );
 
-	switch( gAudioPluginEnabled )
+	switch( gAudioPluginMode )
 	{
-		case APM_DISABLED:
+		case AM_DISABLED:
 			result = PR_COMPLETED;
 			break;
-		case APM_ENABLED_ASYNC:
+		case AM_ENABLED_ASYNC:
 			{
 				SHLEStartJob	job;
 				gJobManager.AddJob( &job, sizeof( job ) );
 			}
 			result = PR_STARTED;
 			break;
-		case APM_ENABLED_SYNC:
+		case AM_ENABLED_SYNC:
 			Audio_Ucode();
 			result = PR_COMPLETED;
 			break;

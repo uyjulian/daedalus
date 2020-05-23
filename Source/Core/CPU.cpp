@@ -42,8 +42,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/RSP_HLE.h"
 #include "Core/Save.h"
 #include "Debug/Console.h"
-#include "Debug/DebugLog.h
-#include "Debug/Synchroniser.h""
+#include "Debug/DebugLog.h"
+#include "Debug/Synchroniser.h"
 #include "Interface/SaveState.h"
 #include "Ultra/ultra_R4300.h"
 #include "Main/SystemInit.h"
