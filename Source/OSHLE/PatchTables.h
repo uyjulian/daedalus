@@ -155,7 +155,7 @@ NULL};
 
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
 
-extern PatchSymbol * g_PatchSymbols[];
+extern PatchSymbol * gPatchSymbols[];
 extern PatchVariable * g_PatchVariables[];
 
 #endif

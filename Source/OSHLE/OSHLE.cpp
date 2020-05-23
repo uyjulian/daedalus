@@ -157,9 +157,9 @@ void OSHLE_ResetSymbolTable()
 {
 	u32 i = 0;
 	// Loops through all symbols, until name is nullptr
-	for (i = 0; g_PatchSymbols[i] != nullptr; i++)
+	for (i = 0; gPatchSymbols[i] != nullptr; i++)
 	{
-		g_PatchSymbols[i]->Found = false;
+		gPatchSymbols[i]->Found = false;
 	}
 	nPatchSymbols = i;
 
@@ -209,11 +209,11 @@ void OSHLE_PatchAll()
 #endif
 	for (u32 i = 0; i < nPatchSymbols; i++)
 	{
-		if (g_PatchSymbols[i]->Found)
+		if (gPatchSymbols[i]->Found)
 		{
 #ifdef DUMPOSFUNCTIONS
 			IO::Filename buf;
-			PatchSymbol * ps = g_PatchSymbols[i];
+			PatchSymbol * ps = gPatchSymbols[i];
 			Dump_GetDumpDirectory(buf, "oshle");
 			IO::Path::Append(buf, ps->Name);
 
@@ -234,12 +234,12 @@ void OSHLE_PatchAll()
 void OSHLE_ApplyPatch(u32 i)
 {
 #ifdef DAEDALUS_ENABLE_DYNAREC
-	u32 pc = g_PatchSymbols[i]->Location;
+	u32 pc = gPatchSymbols[i]->Location;
 
 	CFragment *frag = new CFragment(gFragmentCache.GetCodeBufferManager(),
 									PHYS_TO_K0(pc),
-									g_PatchSymbols[i]->Signatures->NumOps,
-									(void*)g_PatchSymbols[i]->Function);
+									gPatchSymbols[i]->Signatures->NumOps,
+									(void*)gPatchSymbols[i]->Function);
 
 	gFragmentCache.InsertFragment(frag);
 #endif
@@ -253,11 +253,11 @@ u32 OSHLE_GetSymbolAddress(const char * name)
 	for (u32 p = 0; p < nPatchSymbols; p++)
 	{
 		// Skip symbol if already found, or if it is a variable
-		if (!g_PatchSymbols[p]->Found)
+		if (!gPatchSymbols[p]->Found)
 			continue;
 
-		if (_strcmpi(g_PatchSymbols[p]->Name, name) == 0)
-			return PHYS_TO_K0(g_PatchSymbols[p]->Location);
+		if (_strcmpi(gPatchSymbols[p]->Name, name) == 0)
+			return PHYS_TO_K0(gPatchSymbols[p]->Location);
 
 	}
 
@@ -279,16 +279,16 @@ const char * OSHLE_GetJumpAddressName(u32 jump)
 	for (u32 p = 0; p < nPatchSymbols; p++)
 	{
 		// Skip symbol if already found, or if it is a variable
-		if (!g_PatchSymbols[p]->Found)
+		if (!gPatchSymbols[p]->Found)
 			continue;
 
-		const void * patch_base = gu32RamBase + (g_PatchSymbols[p]->Location>>2);
+		const void * patch_base = gu32RamBase + (gPatchSymbols[p]->Location>>2);
 
 		// Symbol not found, attempt to locate on this pass. This may
 		// fail if all dependent symbols are not found
 		if (patch_base == mem_base)
 		{
-			return g_PatchSymbols[p]->Name;
+			return gPatchSymbols[p]->Name;
 		}
 
 	}
@@ -525,7 +525,7 @@ void OSHLE_RecurseAndFind()
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 		CDebugConsole::Get()->Overwrite(0, "OS HLE: %d / %d Looking for [G%s]",
-			i, nPatchSymbols, g_PatchSymbols[i]->Name);
+			i, nPatchSymbols, gPatchSymbols[i]->Name);
 		fflush(stdout);
 #else
 #ifdef DAEDALUS_PSP
@@ -534,18 +534,18 @@ void OSHLE_RecurseAndFind()
 		CGraphicsContext::Get()->ClearToBlack();
 		//intraFontPrintf( ltn8, 480/2, (272>>1)-50, "Searching for os functions. This may take several seconds...");
 		intraFontPrintf( ltn8, 480/2, (272>>1), "OS HLE Patching: %d%%", i * 100 / (nPatchSymbols-1));
-		intraFontPrintf( ltn8, 480/2, (272>>1)-50, "Searching for %s", g_PatchSymbols[i]->Name );
+		intraFontPrintf( ltn8, 480/2, (272>>1)-50, "Searching for %s", gPatchSymbols[i]->Name );
 		CGraphicsContext::Get()->EndFrame();
 		CGraphicsContext::Get()->UpdateFrame( true );
 #endif
 #endif //DAEDALUS_DEBUG_CONSOLE
 		// Skip symbol if already found, or if it is a variable
-		if (g_PatchSymbols[i]->Found)
+		if (gPatchSymbols[i]->Found)
 			continue;
 
 		// Symbol not found, attempt to locate on this pass. This may
 		// fail if all dependent symbols are not found
-		if (OSHLE_LocateFunction(g_PatchSymbols[i]))
+		if (OSHLE_LocateFunction(gPatchSymbols[i]))
 			nFound++;
 	}
 
@@ -571,9 +571,9 @@ void OSHLE_RecurseAndFind()
 	nFound = 0;
 	for (u32 i = 0; i < nPatchSymbols; i++)
 	{
-		if (!g_PatchSymbols[i]->Found)
+		if (!gPatchSymbols[i]->Found)
 		{
-			//Console_Print( "[W%s] not found", g_PatchSymbols[i]->Name);
+			//Console_Print( "[W%s] not found", gPatchSymbols[i]->Name);
 		}
 		else
 		{
@@ -582,37 +582,37 @@ void OSHLE_RecurseAndFind()
 			bool found_duplicate( false );
 			for (u32 j = 0; j < i; j++)
 			{
-				if (g_PatchSymbols[i]->Found &&
-					g_PatchSymbols[j]->Found &&
-					(g_PatchSymbols[i]->Location ==
-					 g_PatchSymbols[j]->Location))
+				if (gPatchSymbols[i]->Found &&
+					gPatchSymbols[j]->Found &&
+					(gPatchSymbols[i]->Location ==
+					 gPatchSymbols[j]->Location))
 				{
 					#ifdef DAEDALUS_DEBUG_CONSOLE
 						Console_Print( "Warning [C%s==%s]",
-							g_PatchSymbols[i]->Name,
-							g_PatchSymbols[j]->Name);
+							gPatchSymbols[i]->Name,
+							gPatchSymbols[j]->Name);
 							#endif
 
 					// Don't patch!
-					g_PatchSymbols[i]->Found = false;
-					g_PatchSymbols[j]->Found = false;
+					gPatchSymbols[i]->Found = false;
+					gPatchSymbols[j]->Found = false;
 					found_duplicate = true;
 					break;
 				}
 			}
 			// Disable certain os funcs where it causes issues in some games ex Zelda
 			//
-			if( OSHLE_Hacks(g_PatchSymbols[i]) )
+			if( OSHLE_Hacks(gPatchSymbols[i]) )
 			{
 				#ifdef DAEDALUS_DEBUG_CONSOLE
-				Console_Print( "[ROS Hack : Disabling %s]", g_PatchSymbols[i]->Name);
+				Console_Print( "[ROS Hack : Disabling %s]", gPatchSymbols[i]->Name);
 				#endif
-				g_PatchSymbols[i]->Found = false;
+				gPatchSymbols[i]->Found = false;
 			}
 
 			if (!found_duplicate)
 			{
-				u32 location = g_PatchSymbols[i]->Location;
+				u32 location = gPatchSymbols[i]->Location;
 				if (location < first) first = location;
 				if (location > last)  last = location;
 
@@ -972,14 +972,14 @@ static void OSHLE_FlushCache()
 
 		for (u32 i = 0; i < nPatchSymbols; i++)
 		{
-			if (g_PatchSymbols[i]->Found )
+			if (gPatchSymbols[i]->Found )
 			{
-				data = g_PatchSymbols[i]->Location;
+				data = gPatchSymbols[i]->Location;
 				fwrite(&data, 1, sizeof(data), fp);
 				for(data = 0; ;data++)
 				{
-					if (g_PatchSymbols[i]->Signatures[data].Function ==
-						g_PatchSymbols[i]->Function)
+					if (gPatchSymbols[i]->Signatures[data].Function ==
+						gPatchSymbols[i]->Function)
 						break;
 				}
 				fwrite(&data, 1, sizeof(data), fp);
@@ -1038,13 +1038,13 @@ static bool OSHLE_GetCache()
 			fread(&data, 1, sizeof(data), fp);
 			if (data != 0)
 			{
-				g_PatchSymbols[i]->Found = true;
-				g_PatchSymbols[i]->Location = data;
+				gPatchSymbols[i]->Found = true;
+				gPatchSymbols[i]->Location = data;
 				fread(&data, 1, sizeof(data), fp);
-				g_PatchSymbols[i]->Function = g_PatchSymbols[i]->Signatures[data].Function;
+				gPatchSymbols[i]->Function = gPatchSymbols[i]->Signatures[data].Function;
 			}
 			else
-				g_PatchSymbols[i]->Found = false;
+				gPatchSymbols[i]->Found = false;
 		}
 
 		for (u32 i = 0; i < nPatchVariables; i++)
