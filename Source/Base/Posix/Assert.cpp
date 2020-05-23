@@ -31,6 +31,10 @@
 
 DaedalusAssertHook gAssertHook = nullptr;
 
+static const char* const kColour_R = "\033[1;31m";
+static const char* const kColour_W = "\033[1;37m";
+static const char* const kDefaultColour = "\033[0m";
+
 EAssertResult DaedalusAssert( const char * expression, const char * file, unsigned int line, const char * msg, ... )
 {
 	char buffer[ 1024 ];
@@ -40,12 +44,10 @@ EAssertResult DaedalusAssert( const char * expression, const char * file, unsign
 	buffer[1023] = 0;
 	va_end(va);
 
-	printf( "************************************************************\n" );
-	printf( "Assert Failed: %s\n", expression );
-	printf( "Location: %s(%d)\n", file, line );
-	printf( "\n" );
-	printf( "%s\n", buffer );
-	printf( "\n" );
+	printf("%s%s:%d: %sAssert Failed%s\n",
+		kColour_W, file, line, kColour_R, kDefaultColour);
+	printf("    %sCondition%s: %s\n", kColour_W, kDefaultColour, expression);
+	printf("    %sMessage%s: %s\n", kColour_W, kDefaultColour, buffer);
 
 	bool done = false;
 	while (!done)
