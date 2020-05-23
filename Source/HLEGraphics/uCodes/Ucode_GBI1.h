@@ -432,8 +432,8 @@ void DLParser_GBI1_GeometryMode( MicroCodeCommand command )
 		DL_PF("    Clearing mask -> 0x%08x", mask);
 		#endif
 	}
-
 	TnLMode TnL;
+	TnL._u32 = 0;
 
 	TnL.Light		= gGeometryMode.GBI1_Lighting;
 	TnL.TexGen		= gGeometryMode.GBI1_TexGen;

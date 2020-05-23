@@ -392,6 +392,7 @@ void DLParser_GBI2_GeometryMode( MicroCodeCommand command )
 	DL_PF("    PointLight %s", (gGeometryMode.GBI2_PointLight) ? "On" : "Off");
 #endif
 	TnLMode TnL;
+	TnL._u32 = 0;
 
 	TnL.Light		= gGeometryMode.GBI2_Lighting;
 	TnL.TexGen		= gGeometryMode.GBI2_TexGen;
