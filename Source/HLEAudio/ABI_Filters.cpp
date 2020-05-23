@@ -8,7 +8,7 @@
 #include "Core/Memory.h"
 #include "Base/MathUtil.h"
 
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 
 extern bool isMKABI;
 extern bool isZeldaABI;

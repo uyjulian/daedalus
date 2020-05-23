@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <pspsdk.h>
 #include <pspkernel.h>
 
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "SysPSP/PRX/MediaEngine/me.h"
 #include "SysPSP/Utility/CacheUtil.h"
 #include "SysPSP/Utility/ModulePSP.h"

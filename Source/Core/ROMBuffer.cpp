@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/MathUtil.h"
 
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 
 #include "Interface/Preferences.h"
 #include "RomFile/RomFile.h"
@@ -69,10 +69,6 @@ bool	ShouldLoadAsFixed( u32 rom_size )
 		return true;
 #endif
 	}
-
-	bool RomBuffer::IsRomLoaded() { return gRomLoaded; }
-
-u32 RomBuffer::GetRomSize() { return gRomSize; }
 
 #ifdef DAEDALUS_COMPRESSED_ROM_SUPPORT
 	ROMFile*	DecompressRom( ROMFile* p_rom_file, const char * temp_filename, COutputStream & messages )
@@ -369,7 +365,7 @@ namespace
 }
 
 
-void RomBuffer::GetRomBytesRaw(void* p_dst, u32 rom_start, u32 length)
+void RomBuffer::GetRomBytesRaw( void* p_dst, u32 rom_start, u32 length )
 {
 	if( sRomFixed )
 	{
@@ -410,7 +406,7 @@ void* RomBuffer::GetAddressRaw( u32 rom_start )
 }
 
 
-void RomBuffer::CopyToRam(u8*dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length)
+void RomBuffer::CopyToRam( u8* p_dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length )
 {
 	if(sRomFixed)
 	{

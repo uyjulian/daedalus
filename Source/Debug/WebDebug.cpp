@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Base/MathUtil.h"
 #include "System/Paths.h"
 #include "System/IO.h"

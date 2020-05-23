@@ -10,7 +10,7 @@
 #include <pspkernel.h>
 
 #include "Config/ConfigOptions.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Math/Math.h"	// VFPU Math
 #include "Base/MathUtil.h"
 #include "SysPSP/Utility/PathsPSP.h"
