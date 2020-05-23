@@ -50,7 +50,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Thread.h"
 
 CAudioPlugin* gAudioPlugin = nullptr;
-EAudioMode gAudioPluginMode( AM_DISABLED );
+EAudioMode gAudioMode( AM_DISABLED );
 
 #define RSP_AUDIO_INTR_CYCLES     1
 extern u32 gSoundSync;
@@ -72,7 +72,7 @@ public:
 
  AudioPluginPSP();
 	virtual ~AudioPluginPSP();
-	virtual void			StopEmulation();
+	virtual void			Stop();
 
 	virtual void			DacrateChanged( ESystemType SystemType );
 	virtual void			LenChanged();
@@ -113,11 +113,14 @@ void DestroyAudioPlugin()
 	// This stops other threads from trying to access the plugin
 	// while we're in the process of shutting it down.
 	// TODO(strmnnrmn): Still looks racey.
-	CAudioPlugin* plugin = gAudioPlugin;
+	AudioPluginPSP* plugin = static_cast<AudioPluginPSP*>(gAudioPlugin);
 	gAudioPlugin = nullptr;
 	if (plugin != nullptr)
 	{
-		plugin->StopEmulation();
+		plugin->Stop();
+    pspAudioEndPre();
+    sceKernelDelayThread(100000);
+    pspAudioEnd();
 		delete plugin;
 	}
 }
@@ -197,23 +200,18 @@ AudioPluginPSP::AudioPluginPSP()
 	dcache_wbinv_range_unaligned( mAudioBuffer, mAudioBuffer+sizeof( CAudioBuffer ) );
 }
 
-AudioPluginPSP::~AudioPluginPSP( )
+AudioPluginPSP::~AudioPluginPSP()
 {
 	mAudioBuffer->~CAudioBuffer();
   free(mAudioBuffer);
-  sceKernelDeleteSema(mSemaphore);
+
   pspAudioEnd();
 }
 
-void	AudioPluginPSP::StopEmulation()
+void	AudioPluginPSP::Stop()
 {
     Audio_Reset();
   	StopAudio();
-    sceKernelDeleteSema(mSemaphore);
-    pspAudioEndPre();
-    sceKernelDelayThread(100000);
-    pspAudioEnd();
-
 
 }
 
@@ -232,7 +230,7 @@ mFrequency = frequency;
 
 void	AudioPluginPSP::LenChanged()
 {
-	if( gAudioPluginMode > AM_DISABLED )
+	if( gAudioMode > AM_DISABLED )
 	{
 		u32 address = Memory_AI_GetRegister(AI_DRAM_ADDR_REG) & 0xFFFFFF;
 		u32	length = Memory_AI_GetRegister(AI_LEN_REG);
@@ -290,7 +288,7 @@ EProcessResult	AudioPluginPSP::ProcessAList()
 
 	EProcessResult	result = PR_NOT_STARTED;
 
-	switch( gAudioPluginMode )
+	switch( gAudioMode )
 	{
 		case AM_DISABLED:
 			result = PR_COMPLETED;
@@ -347,7 +345,7 @@ void AudioPluginPSP::AddBuffer( u8 *start, u32 length )
 
 	u32 num_samples = length / sizeof( Sample );
 
-	switch( gAudioPluginMode )
+	switch( gAudioMode )
 	{
 	case AM_DISABLED:
 		break;

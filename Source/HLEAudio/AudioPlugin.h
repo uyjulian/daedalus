@@ -36,7 +36,6 @@ public:
 		ST_MPAL,
 	};
 
-	virtual void           StopEmulation()                        = 0;
 	virtual void           DacrateChanged(ESystemType SystemType) = 0;
 	virtual void           LenChanged()                           = 0;
 	virtual u32            ReadLength()                           = 0;

@@ -60,7 +60,7 @@ public:
 	bool Initialise();
 
 	virtual ~CAudioPluginW32() {}
-	virtual void			StopEmulation();
+	void Stop();
 
 	virtual void			DacrateChanged( ESystemType SystemType );
 	virtual void			LenChanged();
