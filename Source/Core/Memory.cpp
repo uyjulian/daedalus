@@ -260,7 +260,7 @@ bool Memory_Reset()
 		}
 	}
 
-	gDMAUsed = false;
+		DMA_Reset();
 	return true;
 }
 
@@ -362,7 +362,7 @@ void Memory_InitTables()
 		gMemReadLUT[i].read_func   = ReadMapped;
 		gMemWriteLUT[i].write_func = WriteValueMapped;
 	}
-	
+
 	u32 rom_size = RomBuffer::GetRomSize();
 	u32 ram_size = gRamSize;
 
