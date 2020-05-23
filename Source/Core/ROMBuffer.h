@@ -57,7 +57,7 @@ class RomBuffer
 		}
 
 
-		static void* GetAddressRaw( u32 rom_start );
+		static const void* GetAddressRaw( u32 rom_start );
 
 		static void CopyToRam(u8* dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length);
 

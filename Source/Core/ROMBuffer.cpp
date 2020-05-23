@@ -382,7 +382,7 @@ void RomBuffer::GetRomBytesRaw( void* p_dst, u32 rom_start, u32 length )
 
 
 
-void* RomBuffer::GetAddressRaw( u32 rom_start )
+const void* RomBuffer::GetAddressRaw( u32 rom_start )
 {
 	if (rom_start < sRomSize)
 	{

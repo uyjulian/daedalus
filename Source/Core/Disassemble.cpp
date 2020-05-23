@@ -106,6 +106,7 @@ static void Dump_DisassembleRSPRange(FILE* fh, u32 address_offset, const OpCode*
 
 void Dump_Disassemble(u32 start, u32 end, const char* p_file_name)
 {
+		#ifdef DAEDALUS_DEBUG_CONSOLE
 	IO::Filename file_path;
 
 	// Cute hack - if the end of the range is less than the start,
@@ -122,40 +123,58 @@ void Dump_Disassemble(u32 start, u32 end, const char* p_file_name)
 		IO::Path::Assign(file_path, p_file_name);
 	}
 
-	u8* p_base;
-	#ifdef DAEDALUS_DEBUG_CONSOLE
-	if (!Memory_GetInternalReadAddress(start, (void**)&p_base))
+	const void * vstart;
+
+
+	if (!Memory_GetInternalReadAddress(start, &vstart))
 	{
 		Console_Print( "[Ydis: Invalid base 0x%08x]", start);
 		return;
 	}
-	#endif
+	const void * vend;
+if (!Memory_GetInternalReadAddress(end, &vend))
+{
+	Console_Print("[Ydis: Invalid end 0x%08x]", end);
+	return;
+}
+
+
 
 	FILE* fp(fopen(file_path, "w"));
 	if (fp == NULL) return;
 
 	Console_Print( "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path);
 
-	const OpCode* op_start(reinterpret_cast<const OpCode*>(p_base));
-	const OpCode* op_end(reinterpret_cast<const OpCode*>(p_base + (end - start)));
-
-	Dump_DisassembleMIPSRange(fp, start, op_start, op_end);
-
+	Dump_DisassembleMIPSRange(fp, start, static_cast<const OpCode*>(vstart), static_cast<const OpCode*>(vend));
 	fclose(fp);
+		#endif
 }
 
 void Dump_RSPDisassemble(const char* p_file_name)
 {
-	u8* base;
-	u32 start = 0xa4000000;
-	u32 end = 0xa4002000;
+	u32 dstart = 0xa4000000;
+	u32 istart = 0xa4001000;
+	u32 iend = 0xa4002000;
+const void* dstart_ptr;
+const void* istart_ptr;
+const void* iend_ptr;
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
-	if (!Memory_GetInternalReadAddress(start, (void**)&base))
-	{
-		Console_Print( "[Yrdis: Invalid base 0x%08x]", start);
-		return;
-	}
+if (!Memory_GetInternalReadAddress(dstart, &dstart_ptr))
+{
+	Console_Print("[Yrdis: Invalid dstart 0x%08x]", dstart);
+	return;
+}
+if (!Memory_GetInternalReadAddress(istart, &istart_ptr))
+{
+	Console_Print("[Yrdis: Invalid istart 0x%08x]", istart);
+	return;
+}
+if (!Memory_GetInternalReadAddress(iend, &iend_ptr))
+{
+		Console_Print("[Yrdis: Invalid iend 0x%08x]", iend);
+	return;
+}
 	#endif
 
 	IO::Filename file_path;
@@ -170,20 +189,17 @@ void Dump_RSPDisassemble(const char* p_file_name)
 		IO::Path::Assign(file_path, p_file_name);
 	}
 
-	Console_Print( "Disassembling from 0x%08x to 0x%08x ([C%s])", start, end, file_path);
+	Console_Print( "Disassembling from 0x%08x to 0x%08x ([C%s])", dstart, iend, file_path);
 
 	FILE* fp(fopen(file_path, "w"));
 	if (fp == NULL) return;
 
-	const u32* mem_start(reinterpret_cast<const u32*>(base + 0x0000));
-	const u32* mem_end(reinterpret_cast<const u32*>(base + 0x1000));
-
-	Dump_MemoryRange(fp, start, mem_start, mem_end);
-
-	const OpCode* op_start(reinterpret_cast<const OpCode*>(base + 0x1000));
-	const OpCode* op_end(reinterpret_cast<const OpCode*>(base + 0x2000));
-
-	Dump_DisassembleRSPRange(fp, start + 0x1000, op_start, op_end);
+	Dump_MemoryRange(fp, dstart,
+		static_cast<const u32*>(dstart_ptr),
+		static_cast<const u32*>(istart_ptr));
+	Dump_DisassembleRSPRange(fp, istart,
+		static_cast<const OpCode*>(istart_ptr),
+		static_cast<const OpCode*>(iend_ptr));
 
 	fclose(fp);
 }
