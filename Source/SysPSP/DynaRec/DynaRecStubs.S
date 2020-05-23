@@ -101,7 +101,7 @@ invalidate_next:
 #
 #	a0 - fragment function to enter
 #	a1 - gCPUState base pointer
-#	a2 - Memory base offset (i.e. g_pu8RamBase - 0x80000000 )
+#	a2 - Memory base offset (i.e. gu8RamBase - 0x80000000 )
 #	a3 - Memory upper bound (e.g. 0x80400000)
 #
 #

@@ -26,6 +26,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/AtomicPrimitives.h"
 #include "System/Endian.h"
 
+bool Memory_Init();
+void Memory_Fini();
+bool Memory_Reset();
+void Memory_Cleanup();
+
 enum MEMBANKTYPE
 {
 	MEM_UNUSED = 0,			// Simplifies code so that we don't have to check for illegal memory accesses
@@ -81,10 +86,15 @@ extern u32		gTLBWriteHit;
 extern void *	gMemBuffers[NUM_MEM_BUFFERS];
 extern const u32 gMemBufferSizes[NUM_MEM_BUFFERS];
 
-bool			Memory_Init();
-void			Memory_Fini();
-bool			Memory_Reset();
-void			Memory_Cleanup();
+// Useful defines for making code look nicer:
+#define gu8RamBase ((u8*)gMemBuffers[MEM_RD_RAM])
+#define gs8RamBase ((s8*)gMemBuffers[MEM_RD_RAM])
+#define gu32RamBase ((u32*)gMemBuffers[MEM_RD_RAM])
+
+#define gu8SpMemBase ((u8*)gMemBuffers[MEM_SP_MEM])
+#define gu8SpImemBase ((u8*)gMemBuffers[MEM_SP_MEM] + SP_DMA_IMEM)
+
+extern u8* gu8RamBase_8000;
 
 
 typedef const void * (*ReadFunction )( u32 address );
@@ -170,19 +180,6 @@ inline void QuickWrite32Bits( u8 *p_base, u32 value )
 	*(u32 *)(p_base) = value;
 }
 
-// Useful defines for making code look nicer:
-#define g_pu8RamBase ((u8*)gMemBuffers[MEM_RD_RAM])
-#define g_ps8RamBase ((s8*)gMemBuffers[MEM_RD_RAM])
-#define g_pu16RamBase ((u16*)gMemBuffers[MEM_RD_RAM])
-#define g_pu32RamBase ((u32*)gMemBuffers[MEM_RD_RAM])
-
-#define g_pu8SpMemBase ((u8*)gMemBuffers[MEM_SP_MEM])
-#define g_ps8SpMemBase ((s8*)gMemBuffers[MEM_SP_MEM])
-#define g_pu16SpMemBase ((u16*)gMemBuffers[MEM_SP_MEM])
-#define g_pu32SpMemBase ((u32*)gMemBuffers[MEM_SP_MEM])
-
-#define g_pu8SpDmemBase	((u8*)gMemBuffers[MEM_SP_MEM] + SP_DMA_DMEM)
-#define g_pu8SpImemBase	((u8*)gMemBuffers[MEM_SP_MEM] + SP_DMA_IMEM)
 
 #define MEMORY_SIZE_RDRAM				0x400000
 #define MEMORY_SIZE_EXRDRAM				0x400000
@@ -237,8 +234,8 @@ inline void QuickWrite32Bits( u8 *p_base, u32 value )
 #define FLASHRAM_READ_ADDR		0x08000000
 #define FLASHRAM_WRITE_ADDR		0x08010000
 
-extern u8 * g_pu8RamBase_8000;
-//extern u8 * g_pu8RamBase_A000;
+extern u8 * gu8RamBase_8000;
+//extern u8 * gu8RamBase_A000;
 
 
 //#define MEMORY_CHECK_ALIGN( address, align )	DAEDALUS_ASSERT( (address & ~(align-1)) == 0, "Unaligned memory access" )

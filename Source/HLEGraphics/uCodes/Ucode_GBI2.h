@@ -289,7 +289,7 @@ void DLParser_GBI2_MoveMem( MicroCodeCommand command )
 			}
 
 			light_idx -= 2;
-			N64Light *light = (N64Light*)(g_pu8RamBase + address);
+			N64Light *light = (N64Light*)(gu8RamBase + address);
 			RDP_MoveMemLight(light_idx, light);
 
 			gRenderer->SetLightPosition(light_idx, light->x1, light->y1, light->z1, 1.0f);
@@ -473,7 +473,7 @@ void DLParser_GBI2_Quad( MicroCodeCommand command )
 {
 	// While the next command pair is Tri2, add vertices
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 * pCmdBase = (u32 *)(gu8RamBase + pc);
 
 	bool tris_added = false;
 
@@ -517,7 +517,7 @@ void DLParser_GBI2_Line3D( MicroCodeCommand command )
 {
 	// While the next command pair is Tri2, add vertices
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 * pCmdBase = (u32 *)(gu8RamBase + pc);
 
 	bool tris_added = false;
 
@@ -558,7 +558,7 @@ void DLParser_GBI2_Tri1( MicroCodeCommand command )
 
 	// While the next command pair is Tri1, add vertices
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 * pCmdBase = (u32 *)(gu8RamBase + pc);
 
 	bool tris_added = false;
 
@@ -592,7 +592,7 @@ void DLParser_GBI2_Tri2( MicroCodeCommand command )
 {
 
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 * pCmdBase = (u32 *)(gu8RamBase + pc);
 
 	bool tris_added = false;
 

@@ -57,7 +57,7 @@ u32 TextureInfo::GenerateHashValue() const
 	//More rows will use more CPU...
 	u32 CHK_ROW = 5;
 	u32 hash_value = 0;
-	u8 *ptr_u8  = g_pu8RamBase + GetLoadAddress();
+	u8 *ptr_u8  = gu8RamBase + GetLoadAddress();
 
 	if( g_ROM.GameHacks == YOSHI )
 	{
@@ -65,7 +65,7 @@ u32 TextureInfo::GenerateHashValue() const
 		if (GetFormat() == G_IM_FMT_CI)
 		{
 			//Check palette changes too but only first 16 palette values//Corn
-			const u32* ptr_u32 = (u32*)(g_pu8RamBase + GetTlutAddress());
+			const u32* ptr_u32 = (u32*)(gu8RamBase + GetTlutAddress());
 			for (u32 z = 0; z < 8; z++) hash_value = ((hash_value << 1) | (hash_value >> 0x1F)) ^ *ptr_u32++;
 		}
 	}
@@ -75,7 +75,7 @@ u32 TextureInfo::GenerateHashValue() const
 		if (GetFormat() == G_IM_FMT_CI)
 		{
 			//Check palette changes too but only first 16 palette values//Corn
-			const u32* ptr_u32 = (u32*)(g_pu8RamBase + GetTlutAddress());
+			const u32* ptr_u32 = (u32*)(gu8RamBase + GetTlutAddress());
 			for (u32 z = 0; z < 8; z++) hash_value = ((hash_value << 1) | (hash_value >> 0x1F)) ^ *ptr_u32++;
 		}
 	}
@@ -119,7 +119,7 @@ u32 TextureInfo::GenerateHashValue() const
 	//Used in OOT for the sky, really minor so is not worth the CPU time to always check for it
 	/*if (GetFormat() == G_IM_FMT_CI)
 	{
-	const u32* ptr_u32 = (u32*)(g_pu8RamBase + GetTlutAddress()); 
+	const u32* ptr_u32 = (u32*)(gu8RamBase + GetTlutAddress()); 
 		for (u32 z = 0; z < ((GetSize() == G_IM_SIZ_4b)? 8 : 128); z++) hash_value ^= *ptr_u32++;
 	}*/
 

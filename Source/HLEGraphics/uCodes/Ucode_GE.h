@@ -33,7 +33,7 @@ void DLParser_RDPHalf1_GoldenEye( MicroCodeCommand command )
 		return;
 
 	u32 pc = gDlistStack.address[gDlistStackPointer];		// This points to the next instruction
-	u32 * Cmd = (u32 *)(g_pu8RamBase + pc);
+	u32 * Cmd = (u32 *)(gu8RamBase + pc);
 
 	// Indices
 	u32 a1 = *Cmd+8*0+4;

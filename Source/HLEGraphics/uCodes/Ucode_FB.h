@@ -74,7 +74,7 @@ static inline void DrawFrameBuffer(u32 origin, const CNativeTexture * texture)
 
 		for (u32 x = 0; x < FB_WIDTH; ++x)
 		{
-			pixels[dst_offset] = (g_pu8RamBase[(origin + src_offset)^U8_TWIDDLE]<<8) | g_pu8RamBase[(origin + src_offset+  1)^U8_TWIDDLE] | 1;  // NB: or 1 to ensure we have alpha
+			pixels[dst_offset] = (gu8RamBase[(origin + src_offset)^U8_TWIDDLE]<<8) | gu8RamBase[(origin + src_offset+  1)^U8_TWIDDLE] | 1;  // NB: or 1 to ensure we have alpha
 			dst_offset += 1;
 			src_offset += 2;
 		}

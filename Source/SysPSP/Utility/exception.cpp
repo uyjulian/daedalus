@@ -52,8 +52,8 @@ static void DumpInformation(PspDebugRegBlock * regs)
 	if (fp == nullptr)
 		return;
 
-	const u32 RDRAM_base {(u32)g_pu8RamBase};
-	const u32 RDRAM_end {(u32)g_pu8RamBase + 8 * 1024 * 1024 - 1};
+	const u32 RDRAM_base {(u32)gu8RamBase};
+	const u32 RDRAM_end {(u32)gu8RamBase + 8 * 1024 * 1024 - 1};
 
 	fprintf(fp, "Exception details:\n");
 	{
@@ -172,8 +172,8 @@ static void DumpInformation(PspDebugRegBlock * regs)
 
 void ExceptionHandler(PspDebugRegBlock * regs)
 {
-	const u32 RDRAM_base {(u32)g_pu8RamBase};
-	const u32 RDRAM_end {(u32)g_pu8RamBase + 8 * 1024 * 1024 - 1};
+	const u32 RDRAM_base {(u32)gu8RamBase};
+	const u32 RDRAM_end {(u32)gu8RamBase + 8 * 1024 * 1024 - 1};
     SceCtrlData pad;
 	bool exit {false};
 

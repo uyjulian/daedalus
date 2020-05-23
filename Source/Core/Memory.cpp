@@ -101,13 +101,16 @@ u32	  g_pWriteRom;
 bool  g_RomWritten;
 
 // Ram base, offset by 0x80000000 and 0xa0000000
-u8 * g_pu8RamBase_8000 = nullptr;
-//u8 * g_pu8RamBase_A000 = nullptr;
+u8 * gu8RamBase_8000 = nullptr;
+//u8 * gu8RamBase_A000 = nullptr;
 
 MemFuncRead  	g_MemoryLookupTableRead[0x4000];
 MemFuncWrite 	g_MemoryLookupTableWrite[0x4000];
 void * 			gMemBuffers[NUM_MEM_BUFFERS];
 
+
+#define FLASHRAM_READ_ADDR 0x08000000
+#define FLASHRAM_WRITE_ADDR 0x08010000
 
 #include "Memory_Read.inl"
 #include "Memory_WriteValue.inl"
@@ -178,9 +181,9 @@ bool Memory_Init()
 	//printf("%d bytes used of memory\n",count);
 #endif
 
-	g_pu8RamBase_8000 = ((u8*)gMemBuffers[MEM_RD_RAM]) - 0x80000000;
-	//g_pu8RamBase_A000 = ((u8*)gMemBuffers[MEM_RD_RAM]) - 0xa0000000;
-	//g_pu8RamBase_A000 = ((u8*)MAKE_UNCACHED_PTR(gMemBuffers[MEM_RD_RAM])) - 0xa0000000;
+	gu8RamBase_8000 = ((u8*)gMemBuffers[MEM_RD_RAM]) - 0x80000000;
+	//gu8RamBase_A000 = ((u8*)gMemBuffers[MEM_RD_RAM]) - 0xa0000000;
+	//gu8RamBase_A000 = ((u8*)MAKE_UNCACHED_PTR(gMemBuffers[MEM_RD_RAM])) - 0xa0000000;
 
 	g_RomWritten = false;
 
@@ -220,8 +223,8 @@ void Memory_Fini(void)
 	}
 #endif
 
-	g_pu8RamBase_8000 = nullptr;
-	//g_pu8RamBase_A000 = nullptr;
+	gu8RamBase_8000 = nullptr;
+	//gu8RamBase_A000 = nullptr;
 
 	memset( gMemBuffers, 0, sizeof( gMemBuffers ) );
 }

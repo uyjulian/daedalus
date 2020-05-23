@@ -266,7 +266,7 @@ const EPspReg	gRegistersToUseForCaching[] =
 	PspReg_S4,
 	PspReg_S5,
 //	PspReg_S6,		// Memory upper bound
-//	PspReg_S7,		// Used for g_pu8RamBase - 0x80000000
+//	PspReg_S7,		// Used for gu8RamBase - 0x80000000
 //	PspReg_S8,		// Used for base register (&gCPUState)
 //	PspReg_K0,		//Used as load base register. Normally it is reserved for Kernel but seems to work if we borrow it...(could come back and bite us if we use kernel stuff?) //Corn
 //	PspReg_K1,		//Used as store base register. Normally it is reserved for Kernel but seems to work if we borrow it...(could come back and bite us if we use kernel stuff?)

@@ -130,7 +130,7 @@ void	CAudioPluginPsp::LenChanged()
 		u32		address( Memory_AI_GetRegister(AI_DRAM_ADDR_REG) & 0xFFFFFF );
 		u32		length(Memory_AI_GetRegister(AI_LEN_REG));
 
-		mAudioOutput->AddBuffer( g_pu8RamBase + address, length );
+		mAudioOutput->AddBuffer( gu8RamBase + address, length );
 	}
 	else
 	{

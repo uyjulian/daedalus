@@ -149,7 +149,7 @@ void DLParser_GBI1_MoveMem( MicroCodeCommand command )
 		case G_MV_L7:
 			{
 				u32 light_idx = (type-G_MV_L0) >> 1;
-				N64Light *light = (N64Light*)(g_pu8RamBase + address);
+				N64Light *light = (N64Light*)(gu8RamBase + address);
 				RDP_MoveMemLight(light_idx, light);
 			}
 			break;
@@ -566,7 +566,7 @@ void DLParser_GBI1_Tri2( MicroCodeCommand command )
 {
 	// While the next command pair is Tri2, add vertices
 	u32 pc = gDlistStack.address[gDlistStackPointer];
-	u32 * pCmdBase = (u32 *)(g_pu8RamBase + pc);
+	u32 * pCmdBase = (u32 *)(gu8RamBase + pc);
 
 	bool tris_added = false;
 
@@ -618,7 +618,7 @@ void DLParser_GBI1_Line3D( MicroCodeCommand command )
 	// While the next command pair is Tri1, add vertices
 	u32 pc	= gDlistStack.address[gDlistStackPointer];
 	u32 stride = gVertexStride;
-	u32 * pCmdBase = (u32 *)( g_pu8RamBase + pc );
+	u32 * pCmdBase = (u32 *)( gu8RamBase + pc );
 
 	bool tris_added = false;
 
@@ -656,7 +656,7 @@ void DLParser_GBI1_Tri1( MicroCodeCommand command )
 	// While the next command pair is Tri1, add vertices
 	u32 pc	= gDlistStack.address[gDlistStackPointer];
 	u32 stride = gVertexStride;
-	u32 * pCmdBase = (u32 *)( g_pu8RamBase + pc );
+	u32 * pCmdBase = (u32 *)( gu8RamBase + pc );
 
 	bool tris_added = false;
 

@@ -844,7 +844,7 @@ void BaseRenderer::PrepareTrisUnclipped( TempVerts * temp_verts ) const
 #ifdef DAEDALUS_PSP_USE_VFPU
 void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 {
-	const FiddledVtx * const pVtxBase( (const FiddledVtx*)(g_pu8RamBase + address) );
+	const FiddledVtx * const pVtxBase( (const FiddledVtx*)(gu8RamBase + address) );
 
 	UpdateWorldProject();
 	PokeWorldProject();
@@ -1005,7 +1005,7 @@ v3 BaseRenderer::LightPointVert( const v4 & w ) const
 
 void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 {
-	const FiddledVtx * pVtxBase = (const FiddledVtx*)(g_pu8RamBase + address);
+	const FiddledVtx * pVtxBase = (const FiddledVtx*)(gu8RamBase + address);
 	UpdateWorldProject();
 	PokeWorldProject();
 
@@ -1145,14 +1145,14 @@ void BaseRenderer::SetNewVertexInfo(u32 address, u32 v0, u32 n)
 #ifdef DAEDALUS_PSP_USE_VFPU
 void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 {
-	const FiddledVtx * const pVtxBase( (const FiddledVtx*)(g_pu8RamBase + address) );
+	const FiddledVtx * const pVtxBase( (const FiddledVtx*)(gu8RamBase + address) );
 	const Matrix4x4 & mat_project = mProjectionMat;
 	const Matrix4x4 & mat_world = mModelViewStack[mModelViewTop];
 #ifdef DAEDALUS_ENABLE_PROFILING
 	DL_PF( "    Ambient color RGB[%f][%f][%f] Texture scale X[%f] Texture scale Y[%f]", mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z, mTnL.TextureScaleX, mTnL.TextureScaleY);
 	DL_PF( "    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light)? "On":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
 #endif
-	const s8 *mn = (s8*)(g_pu8RamBase + gAuxAddr);
+	const s8 *mn = (s8*)(gu8RamBase + gAuxAddr);
 	_TnLVFPUCBFD( &mat_world, &mat_project, pVtxBase, &mVtxProjected[v0], n, &mTnL, mn, v0<<1 );
 }
 
@@ -1162,7 +1162,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 {
 	//Console_Print( "In SetNewVertexInfo");
-	const FiddledVtx * const pVtxBase( (const FiddledVtx*)(g_pu8RamBase + address) );
+	const FiddledVtx * const pVtxBase( (const FiddledVtx*)(gu8RamBase + address) );
 	const Matrix4x4 & mat_project = mProjectionMat;
 	const Matrix4x4 & mat_world = mModelViewStack[mModelViewTop];
 #ifdef DAEDALUS_ENABLE_PROFILING
@@ -1170,7 +1170,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 	DL_PF( "    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light)? "On":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
 #endif
 	//Model normal base vector
-	const s8 *mn = (const s8*)(g_pu8RamBase + gAuxAddr);
+	const s8 *mn = (const s8*)(gu8RamBase + gAuxAddr);
 
 	// Transform and Project + Lighting or Transform and Project with Colour
 	//
@@ -1309,7 +1309,7 @@ void BaseRenderer::SetNewVertexInfoConker(u32 address, u32 v0, u32 n)
 
 void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboard)
 {
-	uintptr_t pVtxBase = reinterpret_cast<uintptr_t>(g_pu8RamBase + address);
+	uintptr_t pVtxBase = reinterpret_cast<uintptr_t>(gu8RamBase + address);
 	const Matrix4x4 & mat_world_project = mModelViewStack[mDKRMatIdx];
 #ifdef DAEDALUS_ENABLE_PROFILING
 	DL_PF( "    Ambient color RGB[%f][%f][%f] Texture scale X[%f] Texture scale Y[%f]", mTnL.Lights[mTnL.NumLights].Colour.x, mTnL.Lights[mTnL.NumLights].Colour.y, mTnL.Lights[mTnL.NumLights].Colour.z, mTnL.TextureScaleX, mTnL.TextureScaleY);
@@ -1422,7 +1422,7 @@ void BaseRenderer::SetNewVertexInfoDKR(u32 address, u32 v0, u32 n, bool billboar
 #ifdef DAEDALUS_PSP_USE_VFPU
 void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 {
-	const FiddledVtxPD * const pVtxBase = (const FiddledVtxPD*)(g_pu8RamBase + address);
+	const FiddledVtxPD * const pVtxBase = (const FiddledVtxPD*)(gu8RamBase + address);
 
 	const Matrix4x4 & mat_world = mModelViewStack[mModelViewTop];
 	const Matrix4x4 & mat_project = mProjectionMat;
@@ -1432,7 +1432,7 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 	DL_PF( "    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light)? "On":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
 #endif
 	//Model & Color base vector
-	const u8 *mn = (u8*)(g_pu8RamBase + gAuxAddr);
+	const u8 *mn = (u8*)(gu8RamBase + gAuxAddr);
 
 	_TnLVFPUPD( &mat_world, &mat_project, pVtxBase, &mVtxProjected[v0], n, &mTnL, mn );
 }
@@ -1440,7 +1440,7 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 #else
 void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 {
-	const FiddledVtxPD * const pVtxBase = (const FiddledVtxPD*)(g_pu8RamBase + address);
+	const FiddledVtxPD * const pVtxBase = (const FiddledVtxPD*)(gu8RamBase + address);
 
 	const Matrix4x4 & mat_world = mModelViewStack[mModelViewTop];
 	const Matrix4x4 & mat_project = mProjectionMat;
@@ -1449,7 +1449,7 @@ void BaseRenderer::SetNewVertexInfoPD(u32 address, u32 v0, u32 n)
 	DL_PF( "    Light[%s] Texture[%s] EnvMap[%s] Fog[%s]", (mTnL.Flags.Light)? "On":"Off", (mTnL.Flags.Texture)? "On":"Off", (mTnL.Flags.TexGen)? (mTnL.Flags.TexGenLin)? "Linear":"Spherical":"Off", (mTnL.Flags.Fog)? "On":"Off");
 #endif
 	//Model normal and color base vector
-	const u8 *mn = (u8*)(g_pu8RamBase + gAuxAddr);
+	const u8 *mn = (u8*)(gu8RamBase + gAuxAddr);
 
 	for (u32 i = v0; i < v0 + n; i++)
 	{

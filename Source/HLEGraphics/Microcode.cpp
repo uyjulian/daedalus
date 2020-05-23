@@ -64,7 +64,7 @@ static bool	GBIMicrocode_DetectVersionString( u32 data_base, u32 data_size, char
 
 	DAEDALUS_ASSERT( data_base < (MAX_RAM_ADDRESS + data_size),"Microcode data its out of bounds %08X", data_base );
 
-	const s8 * ram( g_ps8RamBase );
+	const s8 * ram = gs8RamBase;
 
 	for ( u32 i = 0; i+2 < data_size; i++ )
 	{
@@ -78,7 +78,7 @@ static bool	GBIMicrocode_DetectVersionString( u32 data_base, u32 data_size, char
 			// Loop while we haven't filled our buffer, and there's space for our terminator
 			while (p+1 < e)
 			{
-				char c( ram[ (data_base + i)  ^ U8_TWIDDLE ] );
+				char c = ram[ (data_base + i)  ^ U8_TWIDDLE ];
 				if( c < ' ')
 					break;
 
@@ -97,7 +97,7 @@ static u32 GBIMicrocode_MicrocodeHash(u32 code_base, u32 code_size)
 	// Needed for Conker's Bad Fur Day
 	if( code_size == 0 ) code_size = 0x1000;
 
-	const u8 * ram( g_pu8RamBase );
+	const u8 * ram = gu8RamBase;
 
 	u32 hash = 0;
 	for (u32 i = 0; i < code_size; ++i)
@@ -138,7 +138,7 @@ static const MicrocodeData gMicrocodeData[] =
 	{ GBI_PD,		GBI_0,	0xcac47dc4	},	//"", "Perfect Dark (v1.1)"},
 	{ GBI_SE,		GBI_0,	0x6cbb521d	},	//"RSP SW Version: 2.0D, 04-01-96", "Star Wars - Shadows of the Empire (v1.0)"},
 	{ GBI_LL,		GBI_1,	0xdd560323	},	//"", "Toukon Road - Brave Spirits"},
-	{ GBI_WR,		GBI_0,	0x64cc729d	},	//"RSP SW Version: 2.0D, 04-01-96", "Wave Race 64"}, 
+	{ GBI_WR,		GBI_0,	0x64cc729d	},	//"RSP SW Version: 2.0D, 04-01-96", "Wave Race 64"},
 };
 
 void GBIMicrocode_Cache(u32 index, u32 code_base, u32 data_base, u32 ucode_version)
