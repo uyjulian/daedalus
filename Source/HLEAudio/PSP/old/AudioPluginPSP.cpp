@@ -52,7 +52,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //*****************************************************************************
 //
 //*****************************************************************************
-EAudioMode gAudioPluginMode( AM_DISABLED );
+EAudioMode gAudioMode( AM_DISABLED );
 //bool gAdaptFrequency( false );
 
 //*****************************************************************************
@@ -62,7 +62,7 @@ CAudioPluginPsp::CAudioPluginPsp()
 :	mAudioOutput( new AudioOutput )
 {
 	//mAudioOutput->SetAdaptFrequency( gAdaptFrequency );
-	//gAudioPluginMode = AM_ENABLED_SYNC; // for testing
+	//gAudioMode = AM_ENABLED_SYNC; // for testing
 }
 
 //*****************************************************************************
@@ -123,7 +123,7 @@ void	CAudioPluginPsp::DacrateChanged( int SystemType )
 //*****************************************************************************
 void	CAudioPluginPsp::LenChanged()
 {
-	if( gAudioPluginMode > AM_DISABLED )
+	if( gAudioMode > AM_DISABLED )
 	{
 		//mAudioOutput->SetAdaptFrequency( gAdaptFrequency );
 
@@ -191,7 +191,7 @@ EProcessResult	CAudioPluginPsp::ProcessAList()
 
 	EProcessResult	result( PR_NOT_STARTED );
 
-	switch( gAudioPluginMode )
+	switch( gAudioMode )
 	{
 		case AM_DISABLED:
 			result = PR_COMPLETED;

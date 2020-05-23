@@ -489,7 +489,7 @@ void SRomPreferences::Apply() const
 	gFrameskipValue             = Frameskip;
 	gZoomX                      = ZoomX;
 	gCheatsEnabled              = g_ROM.settings.CheatsEnabled || CheatsEnabled;
-	gAudioPluginMode         = AudioEnabled;
+	gAudioMode         = AudioEnabled;
 //	gAdaptFrequency             = AudioAdaptFrequency;
 	gControllerIndex            = ControllerIndex;							//Used during ROM initialization
 #ifdef DAEDALUS_PSP

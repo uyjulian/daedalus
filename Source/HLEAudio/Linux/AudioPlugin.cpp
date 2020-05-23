@@ -3,7 +3,7 @@
 #include "Config/ConfigOptions.h"
 
 CAudioPlugin* gAudioPlugin = nullptr;
-EAudioMode gAudioPluginMode = AM_DISABLED;
+EAudioMode gAudioMode = AM_DISABLED;
 
 
 bool CreateAudioPlugin()

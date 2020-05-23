@@ -247,7 +247,7 @@ void AudioOutput::AddBuffer( u8 *start, u32 length )
 
 	}
 */
-	switch( gAudioPluginMode )
+	switch( gAudioMode )
 	{
 	case AM_DISABLED:
 		break;
