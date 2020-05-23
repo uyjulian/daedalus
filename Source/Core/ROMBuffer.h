@@ -45,7 +45,6 @@ class RomBuffer
 		/// Copy bytes of memory from the cart, with no swizzling etc
 		/// rom_start is 0-based (i.e. not a full rom address)
 		static void	GetRomBytesRaw(void * p_dst, u32 rom_start, u32 length);
-		static void	PutRomBytesRaw(u32 rom_start, const void * p_src, u32 length);
 
 		template< typename T >
 			T static ReadValueRaw( u32 rom_start )
@@ -57,10 +56,6 @@ class RomBuffer
 			return result;
 		}
 
-		template< typename T > static void WriteValueRaw( u32 rom_start, T value)
-		{
-			PutRomBytesRaw( rom_start, &value, sizeof( T ) );
-		}
 
 		static void* GetAddressRaw( u32 rom_start );
 

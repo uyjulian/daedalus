@@ -381,16 +381,6 @@ void RomBuffer::GetRomBytesRaw( void* p_dst, u32 rom_start, u32 length )
 }
 
 
-void RomBuffer::PutRomBytesRaw( u32 rom_start, const void* p_src, u32 length )
-{
-	#ifdef DAEDALUS_ENABLE_ASSERTS
-	DAEDALUS_ASSERT( IsRomAddressFixed(), "Cannot put rom bytes when the data isn't fixed" );
-	#endif
-
-	memcpy((u8*)spRomData + rom_start, p_src, length);
-
-}
-
 
 void* RomBuffer::GetAddressRaw( u32 rom_start )
 {
