@@ -3,7 +3,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiCreateAccessQueue()
+u32 OSHLE___osSiCreateAccessQueue()
 {
 TEST_DISABLE_SI_FUNCS
 #ifdef DAED_OS_MESSAGE_QUEUES
@@ -22,7 +22,7 @@ TEST_DISABLE_SI_FUNCS
 	gGPR[REG_a1]._u32_0 = 0;		// Msg value is unimportant
 	gGPR[REG_a2]._u32_0 = OS_MESG_NOBLOCK;
 
-	return Patch_osSendMesg();
+	return OSHLE_osSendMesg();
 
 	//return PATCH_RET_JR_RA;
 
@@ -36,34 +36,34 @@ TEST_DISABLE_SI_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiGetAccess()
+u32 OSHLE___osSiGetAccess()
 {
 TEST_DISABLE_SI_FUNCS
 	u32 created = Read32Bits(VAR_ADDRESS(osSiAccessQueueCreated));
 
 	if (created == 0)
 	{
-		Patch___osSiCreateAccessQueue();	// Ignore return
+		OSHLE___osSiCreateAccessQueue();	// Ignore return
 	}
 
 	gGPR[REG_a0]._u32_0 = VAR_ADDRESS(osSiAccessQueue);
 	gGPR[REG_a1]._u32_0 = gGPR[REG_sp]._u32_0 - 4;		// Place on stack and ignore
 	gGPR[REG_a2]._u32_0 = OS_MESG_BLOCK;
 
-	return Patch_osRecvMesg();
+	return OSHLE_osRecvMesg();
 }
 
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiRelAccess()
+u32 OSHLE___osSiRelAccess()
 {
 TEST_DISABLE_SI_FUNCS
 	gGPR[REG_a0]._u32_0 = VAR_ADDRESS(osSiAccessQueue);
 	gGPR[REG_a1]._u32_0 = 0;		// Place on stack and ignore
 	gGPR[REG_a2]._u32_0 = OS_MESG_NOBLOCK;
 
-	return Patch_osSendMesg();
+	return OSHLE_osSendMesg();
 }
 
 //*****************************************************************************
@@ -82,7 +82,7 @@ inline bool IsSiDeviceBusy()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiDeviceBusy()
+u32 OSHLE___osSiDeviceBusy()
 {
 	gGPR[REG_v0]._s64 = (s64)IsSiDeviceBusy();
 
@@ -92,7 +92,7 @@ u32 Patch___osSiDeviceBusy()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiRawReadIo_Mario()
+u32 OSHLE___osSiRawReadIo_Mario()
 {
 	u32 port = gGPR[REG_a0]._u32_0;
 	u32 valAddr = gGPR[REG_a1]._u32_0;
@@ -111,7 +111,7 @@ u32 Patch___osSiRawReadIo_Mario()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiRawReadIo_Zelda()
+u32 OSHLE___osSiRawReadIo_Zelda()
 {
 	u32 port = gGPR[REG_a0]._u32_0;
 	u32 valAddr = gGPR[REG_a1]._u32_0;
@@ -130,7 +130,7 @@ u32 Patch___osSiRawReadIo_Zelda()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiRawWriteIo_Mario()
+u32 OSHLE___osSiRawWriteIo_Mario()
 {
 	u32 port = gGPR[REG_a0]._u32_0;
 	u32 val = gGPR[REG_a1]._u32_0;
@@ -149,7 +149,7 @@ u32 Patch___osSiRawWriteIo_Mario()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiRawWriteIo_Zelda()
+u32 OSHLE___osSiRawWriteIo_Zelda()
 {
 	u32 port = gGPR[REG_a0]._u32_0;
 	u32 val = gGPR[REG_a1]._u32_0;
@@ -168,7 +168,7 @@ u32 Patch___osSiRawWriteIo_Zelda()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiRawStartDma_Mario()
+u32 OSHLE___osSiRawStartDma_Mario()
 {
 	u32 RWflag = gGPR[REG_a0]._u32_0;
 	u32 SIAddr = gGPR[REG_a1]._u32_0;
@@ -206,7 +206,7 @@ u32 Patch___osSiRawStartDma_Mario()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSiRawStartDma_Rugrats()
+u32 OSHLE___osSiRawStartDma_Rugrats()
 {
 	u32 RWflag = gGPR[REG_a0]._u32_0;
 	u32 SIAddr = gGPR[REG_a1]._u32_0;

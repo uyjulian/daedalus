@@ -120,7 +120,7 @@ inline void vfpu_matrix_Ortho(u8 *m, float left, float right, float bottom, floa
 }
 #endif
 
-u32 Patch_guMtxIdentF()
+u32 OSHLE_guMtxIdentF()
 {
 TEST_DISABLE_GU_FUNCS
 	const u32 address = gGPR[REG_a0]._u32_0;
@@ -157,7 +157,7 @@ TEST_DISABLE_GU_FUNCS
 
 
 
-u32 Patch_guMtxIdent()
+u32 OSHLE_guMtxIdent()
 {
 TEST_DISABLE_GU_FUNCS
 	const u32 address = gGPR[REG_a0]._u32_0;
@@ -191,7 +191,7 @@ TEST_DISABLE_GU_FUNCS
 	return PATCH_RET_JR_RA;
 }
 
-u32 Patch_guTranslateF()
+u32 OSHLE_guTranslateF()
 {
 TEST_DISABLE_GU_FUNCS
 	const u32 address = gGPR[REG_a0]._u32_0;
@@ -230,7 +230,7 @@ TEST_DISABLE_GU_FUNCS
 	return PATCH_RET_JR_RA;
 }
 
-u32 Patch_guTranslate()
+u32 OSHLE_guTranslate()
 {
 TEST_DISABLE_GU_FUNCS
 	const f32 fScale = 65536.0f;
@@ -277,7 +277,7 @@ TEST_DISABLE_GU_FUNCS
 	return PATCH_RET_JR_RA;
 }
 
-u32 Patch_guScaleF()
+u32 OSHLE_guScaleF()
 {
 TEST_DISABLE_GU_FUNCS
 	const u32 address = gGPR[REG_a0]._u32_0;
@@ -315,7 +315,7 @@ TEST_DISABLE_GU_FUNCS
 	return PATCH_RET_JR_RA;
 }
 
-u32 Patch_guScale()
+u32 OSHLE_guScale()
 {
 TEST_DISABLE_GU_FUNCS
 	const f32 fScale = 65536.0f;
@@ -365,7 +365,7 @@ TEST_DISABLE_GU_FUNCS
 	return PATCH_RET_JR_RA;
 }
 
-u32 Patch_guMtxF2L()
+u32 OSHLE_guMtxF2L()
 {
 TEST_DISABLE_GU_FUNCS
 
@@ -417,7 +417,7 @@ TEST_DISABLE_GU_FUNCS
 }
 
 //Using VFPU and no memcpy (works without hack?) //Corn
-u32 Patch_guNormalize_Mario()
+u32 OSHLE_guNormalize_Mario()
 {
 TEST_DISABLE_GU_FUNCS
 	u8 * pXBase  = (u8 *)ReadAddress(gGPR[REG_a0]._u32_0);
@@ -448,7 +448,7 @@ TEST_DISABLE_GU_FUNCS
 
 // NOT the same function as guNormalise_Mario
 // This take one pointer, not 3
-u32 Patch_guNormalize_Rugrats() //Using VFPU and no memcpy //Corn
+u32 OSHLE_guNormalize_Rugrats() //Using VFPU and no memcpy //Corn
 {
 TEST_DISABLE_GU_FUNCS
 	u8 * pBase  = (u8 *)ReadAddress(gGPR[REG_a0]._u32_0);
@@ -479,7 +479,7 @@ TEST_DISABLE_GU_FUNCS
 	return PATCH_RET_JR_RA;
 }
 
-u32 Patch_guOrthoF()
+u32 OSHLE_guOrthoF()
 {
 TEST_DISABLE_GU_FUNCS
 	REG32 l, r, b, t, n, f, s;
@@ -546,7 +546,7 @@ TEST_DISABLE_GU_FUNCS
 }
 
 //Do the float version on a temporary matrix and convert to fixed point in VFPU & CPU //Corn
-u32 Patch_guOrtho()
+u32 OSHLE_guOrtho()
 {
 TEST_DISABLE_GU_FUNCS
 
@@ -604,7 +604,7 @@ TEST_DISABLE_GU_FUNCS
 }
 
 //RotateF //Corn
-u32 Patch_guRotateF()
+u32 OSHLE_guRotateF()
 {
 TEST_DISABLE_GU_FUNCS
 

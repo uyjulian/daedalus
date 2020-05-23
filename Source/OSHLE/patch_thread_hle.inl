@@ -2,7 +2,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osCreateThread_Mario()
+u32 OSHLE_osCreateThread_Mario()
 {
 TEST_DISABLE_THREAD_FUNCS
 	u32 thread = gGPR[REG_a0]._u32_0;
@@ -66,17 +66,17 @@ TEST_DISABLE_THREAD_FUNCS
 //
 //*****************************************************************************
 // Identical to Mario code - just more optimised
-u32 Patch_osCreateThread_Rugrats()
+u32 OSHLE_osCreateThread_Rugrats()
 {
 TEST_DISABLE_THREAD_FUNCS
-	return Patch_osCreateThread_Mario();
+	return OSHLE_osCreateThread_Mario();
 }
 
 //*****************************************************************************
 //
 //*****************************************************************************
 // ToDo : Implement me
-u32 Patch_osSetThreadPri()
+u32 OSHLE_osSetThreadPri()
 {
 TEST_DISABLE_THREAD_FUNCS
 	u32 thread = gGPR[REG_a0]._u32_0;
@@ -97,7 +97,7 @@ TEST_DISABLE_THREAD_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osGetThreadPri()
+u32 OSHLE_osGetThreadPri()
 {
 TEST_DISABLE_THREAD_FUNCS
 	u32 thread = gGPR[REG_a0]._u32_0;
@@ -117,7 +117,7 @@ TEST_DISABLE_THREAD_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osDequeueThread()
+u32 OSHLE___osDequeueThread()
 {
 TEST_DISABLE_THREAD_FUNCS
 	u32 queue = gGPR[REG_a0]._u32_0;
@@ -149,7 +149,7 @@ TEST_DISABLE_THREAD_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osDispatchThread_Mario()
+u32 OSHLE___osDispatchThread_Mario()
 {
 TEST_DISABLE_THREAD_FUNCS
 	// First pop the first thread off the stack (copy of osPopThread code):
@@ -259,16 +259,16 @@ TEST_DISABLE_THREAD_FUNCS
 //
 //*****************************************************************************
 // Neither of these are correct- they ignore the interrupt mask thing
-u32 Patch___osDispatchThread_MarioKart()
+u32 OSHLE___osDispatchThread_MarioKart()
 {
 TEST_DISABLE_THREAD_FUNCS
-	return Patch___osDispatchThread_Mario();
+	return OSHLE___osDispatchThread_Mario();
 }
 
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osDispatchThread_Rugrats()
+u32 OSHLE___osDispatchThread_Rugrats()
 {
 TEST_DISABLE_THREAD_FUNCS
 
@@ -424,7 +424,7 @@ TEST_DISABLE_THREAD_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osDestroyThread_Mario()
+u32 OSHLE_osDestroyThread_Mario()
 {
 TEST_DISABLE_THREAD_FUNCS
 
@@ -496,7 +496,7 @@ TEST_DISABLE_THREAD_FUNCS
 //
 //*****************************************************************************
 // ToDo : Implement me
-u32 Patch_osDestroyThread_Zelda()
+u32 OSHLE_osDestroyThread_Zelda()
 {
 TEST_DISABLE_THREAD_FUNCS
 #ifdef DAEDALUS_DEBUG_CONSOLE
@@ -509,7 +509,7 @@ TEST_DISABLE_THREAD_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osEnqueueThread_Mario()
+u32 OSHLE___osEnqueueThread_Mario()
 {
 TEST_DISABLE_THREAD_FUNCS
 	u32 queue = gGPR[REG_a0]._u32_0;
@@ -547,7 +547,7 @@ TEST_DISABLE_THREAD_FUNCS
 //
 //*****************************************************************************
 // Identical - just different compilation
-u32 Patch___osEnqueueThread_Rugrats()
+u32 OSHLE___osEnqueueThread_Rugrats()
 {
 TEST_DISABLE_THREAD_FUNCS
 	u32 queue = gGPR[REG_a0]._u32_0;
@@ -585,7 +585,7 @@ TEST_DISABLE_THREAD_FUNCS
 //
 //*****************************************************************************
 // Gets active thread in a1. Adds to queue in a0 (if specified), dispatches
-u32 Patch___osEnqueueAndYield_Mario()
+u32 OSHLE___osEnqueueAndYield_Mario()
 {
 TEST_DISABLE_THREAD_FUNCS
 	// Get the active thread
@@ -655,17 +655,17 @@ TEST_DISABLE_THREAD_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osEnqueueAndYield_MarioKart()
+u32 OSHLE___osEnqueueAndYield_MarioKart()
 {
 TEST_DISABLE_THREAD_FUNCS
-	return Patch___osEnqueueAndYield_Mario();
+	return OSHLE___osEnqueueAndYield_Mario();
 
 }
 
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osStartThread()
+u32 OSHLE_osStartThread()
 {
 TEST_DISABLE_THREAD_FUNCS
 	u32 thread = gGPR[REG_a0]._u32_0;
@@ -786,7 +786,7 @@ TEST_DISABLE_THREAD_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osPopThread()
+u32 OSHLE___osPopThread()
 {
 TEST_DISABLE_THREAD_FUNCS
 	u32 queue = gGPR[REG_a0]._u32_0;

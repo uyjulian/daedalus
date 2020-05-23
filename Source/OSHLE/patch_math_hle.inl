@@ -4,7 +4,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___ull_mul()
+u32 OSHLE___ull_mul()
 {
 TEST_DISABLE_MATH_FUNCS
 	u32 HiA = gGPR[REG_a0]._u32_0;
@@ -28,7 +28,7 @@ TEST_DISABLE_MATH_FUNCS
 //*****************************************************************************
 // By Jun Su
 // Used by SM64 and Space station Silicon Valley
-u32 Patch___ll_div()
+u32 OSHLE___ll_div()
 {
 TEST_DISABLE_MATH_FUNCS
 	// Fixed by  StrmnNrmn - regs cast to 32 bits so shift didn't work
@@ -84,7 +84,7 @@ TEST_DISABLE_MATH_FUNCS
 //*****************************************************************************
 // By Jun Su
 //Used by AeroGauge
-u32 Patch___ull_div()
+u32 OSHLE___ull_div()
 {
 TEST_DISABLE_MATH_FUNCS
 	// Fixed by  StrmnNrmn - regs cast to 32 bits so shift didn't work
@@ -137,7 +137,7 @@ TEST_DISABLE_MATH_FUNCS
 //*****************************************************************************
 // By Jun Su
 //Used heavily by Super Smash Brothers
-u32 Patch___ull_rshift()
+u32 OSHLE___ull_rshift()
 {
 TEST_DISABLE_MATH_FUNCS
 
@@ -160,7 +160,7 @@ TEST_DISABLE_MATH_FUNCS
 //
 //*****************************************************************************
 // By Jun Su
-u32 Patch___ll_lshift()
+u32 OSHLE___ll_lshift()
 {
 TEST_DISABLE_MATH_FUNCS
 
@@ -182,7 +182,7 @@ TEST_DISABLE_MATH_FUNCS
 //*****************************************************************************
 // By Jun Su
 //Used by SSV
-u32 Patch___ll_rshift()
+u32 OSHLE___ll_rshift()
 {
 TEST_DISABLE_MATH_FUNCS
 
@@ -203,7 +203,7 @@ TEST_DISABLE_MATH_FUNCS
 //
 //*****************************************************************************
 // By Jun Su
-u32 Patch___ll_mod()
+u32 OSHLE___ll_mod()
 {
 TEST_DISABLE_MATH_FUNCS
 
@@ -229,7 +229,7 @@ TEST_DISABLE_MATH_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_sqrtf()
+u32 OSHLE_sqrtf()
 {
 TEST_DISABLE_MATH_FUNCS
 	// FP12 is input
@@ -244,7 +244,7 @@ TEST_DISABLE_MATH_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_sinf()
+u32 OSHLE_sinf()
 {
 TEST_DISABLE_MATH_FUNCS
 	// FP12 is input
@@ -259,7 +259,7 @@ TEST_DISABLE_MATH_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_cosf()
+u32 OSHLE_cosf()
 {
 TEST_DISABLE_MATH_FUNCS
 	// FP12 is input
@@ -275,7 +275,7 @@ TEST_DISABLE_MATH_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___ull_rem()
+u32 OSHLE___ull_rem()
 {
 	u64 op1 = (u64)((u64)gGPR[REG_a0]._u32_0 << 32 | (u64)gGPR[REG_a1]._u32_0);
 	u64 op2 = (u64)((u64)gGPR[REG_a2]._u32_0 << 32 | (u64)gGPR[REG_a3]._u32_0);
@@ -297,7 +297,7 @@ u32 Patch___ull_rem()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___ull_divremi()
+u32 OSHLE___ull_divremi()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }
@@ -305,7 +305,7 @@ u32 Patch___ull_divremi()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___lldiv()
+u32 OSHLE___lldiv()
 {
 	//Calls ll_div and ull_mul
 	return PATCH_RET_NOT_PROCESSED;
@@ -314,7 +314,7 @@ u32 Patch___lldiv()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___ldiv()
+u32 OSHLE___ldiv()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }

@@ -3,7 +3,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osPiCreateAccessQueue()
+u32 OSHLE___osPiCreateAccessQueue()
 {
 TEST_DISABLE_PI_FUNCS
 
@@ -22,7 +22,7 @@ TEST_DISABLE_PI_FUNCS
 	gGPR[REG_a1]._u32_0 = 0;		// Msg value is unimportant
 	gGPR[REG_a2]._u32_0 = OS_MESG_NOBLOCK;
 
-	return Patch_osSendMesg();
+	return OSHLE_osSendMesg();
 
 	//return PATCH_RET_JR_RA;
 
@@ -34,34 +34,34 @@ TEST_DISABLE_PI_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osPiGetAccess()
+u32 OSHLE___osPiGetAccess()
 {
 TEST_DISABLE_PI_FUNCS
 	u32 created = Read32Bits(VAR_ADDRESS(osPiAccessQueueCreated));
 
 	if (created == 0)
 	{
-		Patch___osPiCreateAccessQueue();	// Ignore return
+		OSHLE___osPiCreateAccessQueue();	// Ignore return
 	}
 
 	gGPR[REG_a0]._u32_0 = VAR_ADDRESS(osPiAccessQueue);
 	gGPR[REG_a1]._u32_0 = gGPR[REG_sp]._u32_0 - 4;		// Place on stack and ignore
 	gGPR[REG_a2]._u32_0 = OS_MESG_BLOCK;
 
-	return Patch_osRecvMesg();
+	return OSHLE_osRecvMesg();
 }
 
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osPiRelAccess()
+u32 OSHLE___osPiRelAccess()
 {
 TEST_DISABLE_PI_FUNCS
 	gGPR[REG_a0]._u32_0 = VAR_ADDRESS(osPiAccessQueue);
 	gGPR[REG_a1]._u32_0 = 0;		// Place on stack and ignore
 	gGPR[REG_a2]._u32_0 = OS_MESG_NOBLOCK;
 
-	return Patch_osSendMesg();
+	return OSHLE_osSendMesg();
 }
 
 //*****************************************************************************
@@ -80,7 +80,7 @@ inline bool IsPiDeviceBusy()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osPiRawStartDma()
+u32 OSHLE_osPiRawStartDma()
 {
 TEST_DISABLE_PI_FUNCS
 	u32 RWflag = gGPR[REG_a0]._u32_0;

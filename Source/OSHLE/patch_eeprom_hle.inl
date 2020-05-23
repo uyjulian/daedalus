@@ -3,7 +3,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osEepStatus()
+u32 OSHLE___osEepStatus()
 {
 TEST_DISABLE_EEPROM_FUNCS
 	// Return status of Eeeprom in OSContStatus struct passed in a1.
@@ -40,7 +40,7 @@ TEST_DISABLE_EEPROM_FUNCS
 }
 
 // Is this intended? Seems odd to have the whole body commented out. Strmnnrnm.
-u32 Patch_osContInit()
+u32 OSHLE_osContInit()
 {
 TEST_DISABLE_FUNCS
 	//s32		osContInit(OSMesgQueue * mq, u8 *, OSContStatus * cs);
@@ -74,7 +74,7 @@ TEST_DISABLE_FUNCS
 //
 //*****************************************************************************
 // Used in Mario Kart
-u32 Patch_osEepromProbe()
+u32 OSHLE_osEepromProbe()
 {
 TEST_DISABLE_EEPROM_FUNCS
 	// Returns 1 on EEPROM detected, 0 on error/no eeprom
@@ -104,7 +104,7 @@ TEST_DISABLE_EEPROM_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osEepromRead()
+u32 OSHLE_osEepromRead()
 {
 TEST_DISABLE_EEPROM_FUNCS
 	// s32 osEepromRead(OSMesgQueue * mq, u8 page, u8 * buf);
@@ -122,7 +122,7 @@ TEST_DISABLE_EEPROM_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osEepromLongRead()
+u32 OSHLE_osEepromLongRead()
 {
 TEST_DISABLE_EEPROM_FUNCS
 	//u32 dwMQ   = gGPR[REG_a0]._u32_0;
@@ -141,7 +141,7 @@ TEST_DISABLE_EEPROM_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osEepromWrite()
+u32 OSHLE_osEepromWrite()
 {
 TEST_DISABLE_EEPROM_FUNCS
 	// s32 osEepromWrite(OSMesgQueue * mq, u8 page, u8 * buf);
@@ -162,7 +162,7 @@ TEST_DISABLE_EEPROM_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osEepromLongWrite()
+u32 OSHLE_osEepromLongWrite()
 {
 TEST_DISABLE_EEPROM_FUNCS
 	//u32 dwMQ   = gGPR[REG_a0]._u32_0;
@@ -184,7 +184,7 @@ TEST_DISABLE_EEPROM_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osContGetInitData()
+u32 OSHLE___osContGetInitData()
 {
 TEST_DISABLE_EEPROM_FUNCS
 	//u32 data = gGPR[REG_a0]._u32_0;

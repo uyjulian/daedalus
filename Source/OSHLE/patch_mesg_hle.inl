@@ -3,7 +3,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osSetEventMesg_Mario()
+u32 OSHLE_osSetEventMesg_Mario()
 {
 TEST_DISABLE_MESG_FUNCS
 	u32 vent = gGPR[REG_a0]._u32_0;
@@ -31,7 +31,7 @@ TEST_DISABLE_MESG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osSetEventMesg_Zelda()
+u32 OSHLE_osSetEventMesg_Zelda()
 {
 TEST_DISABLE_MESG_FUNCS
 
@@ -60,7 +60,7 @@ TEST_DISABLE_MESG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osCreateMesgQueue_Mario()
+u32 OSHLE_osCreateMesgQueue_Mario()
 {
 TEST_DISABLE_MESG_FUNCS
 
@@ -81,7 +81,7 @@ TEST_DISABLE_MESG_FUNCS
 //
 //*****************************************************************************
 // Exactly the same - just optimised slightly
-u32 Patch_osCreateMesgQueue_Rugrats()
+u32 OSHLE_osCreateMesgQueue_Rugrats()
 {
 TEST_DISABLE_MESG_FUNCS
 
@@ -101,7 +101,7 @@ TEST_DISABLE_MESG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osRecvMesg()
+u32 OSHLE_osRecvMesg()
 {
 TEST_DISABLE_MESG_FUNCS
 
@@ -196,13 +196,13 @@ TEST_DISABLE_MESG_FUNCS
 	{
 		//Console_Print( "  Activating sleeping thread");
 
-		// From Patch___osPopThread():
+		// From OSHLE___osPopThread():
 		QuickWrite32Bits(pBase, 0x04, NextThread);
 
 		gGPR[REG_a0]._u32_0 = FullQueueThread;
 
 		// FIXME - How to we set the status flag here?
-		return Patch_osStartThread();
+		return OSHLE_osStartThread();
 	}
 
 	// Set success status
@@ -214,11 +214,11 @@ TEST_DISABLE_MESG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osSendMesg()
+u32 OSHLE_osSendMesg()
 {
 TEST_DISABLE_MESG_FUNCS
 
-	// Zelda Hack handled now in Patch_RecurseAndFind
+	// Zelda Hack handled now in OSHLE_RecurseAndFind
 	// osSendMesg brakes OOT's in-game menu
 	// ToDo : Fix Me
 	/*if( g_ROM.GameHacks == ZELDA_OOT )
@@ -306,13 +306,13 @@ TEST_DISABLE_MESG_FUNCS
 	{
 		//Console_Print( "  Activating sleeping thread");
 
-		// From Patch___osPopThread():
+		// From OSHLE___osPopThread():
 		QuickWrite32Bits(pBase, 0x00, NextThread);
 
 		gGPR[REG_a0]._u32_0 = EmptyQueueThread;
 
 		// FIXME - How to we set the status flag here?
-		return Patch_osStartThread();
+		return OSHLE_osStartThread();
 	}
 
 	// Set success status

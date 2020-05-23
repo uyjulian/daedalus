@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Synchroniser.h"
 #include "Interface/RomDB.h"
 #include "Base/MathUtil.h"
-#include "OSHLE/OSHLE.h"			// Patch_ApplyPatches
+#include "OSHLE/OSHLE.h"			// OSHLE_ApplyPatches
 #include "Ultra/ultra_os.h"		// System type
 #include "Ultra/ultra_R4300.h"
 #include "HLEAudio/AudioPlugin.h"
@@ -299,7 +299,7 @@ bool ROM_ReBoot()
 #endif
 
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-	Patch_Reset();
+	OSHLE_Reset();
 #endif
 
 	// This will always return false since we always simulate boot code instead of loading from file

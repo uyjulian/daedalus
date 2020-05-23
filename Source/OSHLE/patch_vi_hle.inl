@@ -3,7 +3,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osViSetMode()
+u32 OSHLE_osViSetMode()
 {
 TEST_DISABLE_VI_FUNCS
 	//u32 dwViMode = gGPR[REG_a0]._u32_0;
@@ -25,7 +25,7 @@ TEST_DISABLE_VI_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osViBlack()
+u32 OSHLE_osViBlack()
 {
 TEST_DISABLE_VI_FUNCS
 	//u32 dwVal = gGPR[REG_a0]._u32_0;
@@ -39,7 +39,7 @@ TEST_DISABLE_VI_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osViSwapBuffer()
+u32 OSHLE_osViSwapBuffer()
 {
 TEST_DISABLE_VI_FUNCS
 	// Ignore stack change
@@ -61,7 +61,7 @@ TEST_DISABLE_VI_FUNCS
 //
 //*****************************************************************************
 // ToDo : Implement me
-u32 Patch_osViSetEvent()
+u32 OSHLE_osViSetEvent()
 {
 TEST_DISABLE_MESG_FUNCS
 

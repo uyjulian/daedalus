@@ -118,7 +118,7 @@ static PatchCrossRef g_##label##_x[] = {
 static PatchSignature	g_##name##_sig[] = {
 
 #define PATCH_SIGNATURE_LIST_ENTRY(label, numops, firstop, partial, crc) \
-{ numops, g_##label##_x, Patch_##label, firstop, partial, crc },
+{ numops, g_##label##_x, OSHLE_##label, firstop, partial, crc },
 
 #define END_PATCH_SIGNATURE_LIST() \
 { 0, NULL, NULL, 0, 0 }         \

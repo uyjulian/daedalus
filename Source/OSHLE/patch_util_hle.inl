@@ -1,7 +1,7 @@
 #define TEST_DISABLE_UTIL_FUNCS //DAEDALUS_PROFILE(__FUNCTION__);
 
 
-u32 Patch___osAtomicDec()
+u32 OSHLE___osAtomicDec()
 {
 TEST_DISABLE_UTIL_FUNCS
 #ifdef DAEDALUS_DEBUG_CONSOLE
@@ -26,7 +26,7 @@ TEST_DISABLE_UTIL_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_memcpy()
+u32 OSHLE_memcpy()
 {
 TEST_DISABLE_UTIL_FUNCS
 	u32 dst = gGPR[REG_a0]._u32_0;
@@ -59,7 +59,7 @@ TEST_DISABLE_UTIL_FUNCS
 //
 //*****************************************************************************
 // Used by Killer Instinct
-u32 Patch_strlen()
+u32 OSHLE_strlen()
 {
 TEST_DISABLE_UTIL_FUNCS
 	u32 string = gGPR[REG_a0]._u32_0;
@@ -77,7 +77,7 @@ TEST_DISABLE_UTIL_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_strchr()
+u32 OSHLE_strchr()
 {
 TEST_DISABLE_UTIL_FUNCS
 	u32 string = gGPR[REG_a0]._u32_0;
@@ -109,7 +109,7 @@ TEST_DISABLE_UTIL_FUNCS
 //
 //*****************************************************************************
 // Have yet to see a game that uses this
-u32 Patch_strcmp()
+u32 OSHLE_strcmp()
 {
 	u32 i;
 	u32 sA = gGPR[REG_a0]._u32_0;
@@ -139,7 +139,7 @@ u32 Patch_strcmp()
 //*****************************************************************************
 /*void * bcopy(const void * src, void * dst, len) */
 // Note different order to src/dst than memcpy!
-u32 Patch_bcopy()
+u32 OSHLE_bcopy()
 {
 TEST_DISABLE_UTIL_FUNCS
 	u32 src = gGPR[REG_a0]._u32_0;
@@ -191,7 +191,7 @@ TEST_DISABLE_UTIL_FUNCS
 //
 //*****************************************************************************
 // By Jun Su
-u32 Patch_bzero()
+u32 OSHLE_bzero()
 {
 	u32 dst = gGPR[REG_a0]._u32_0;
 	u32 len = gGPR[REG_a1]._u32_0;

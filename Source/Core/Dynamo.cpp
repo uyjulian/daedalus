@@ -132,7 +132,7 @@ template< bool TraceEnabled > DAEDALUS_FORCEINLINE void CPU_EXECUTE_OP()
 
  	const u8 * p_Instruction;
  	CPU_FETCH_INSTRUCTION( p_Instruction, gCPUState.CurrentPC );
- 	OpCode op_code = *(const OpCode*)p_Instruction; 
+ 	OpCode op_code = *(const OpCode*)p_Instruction;
 
 	// Cache instruction base pointer (used for SpeedHack() @ R4300.0)
 	gLastAddress = p_Instruction;
@@ -483,7 +483,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 							gFragmentCache.Clear();
 							gHotTraceCountMap.clear();		// Makes sense to clear this now, to get accurate usage stats
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-							Patch_PatchAll();
+							OSHLE_PatchAll();
 #endif
 						}
 #ifdef DAEDALUS_DEBUG_CONSOLE
@@ -500,7 +500,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 						gFragmentCache.Clear();
 						gHotTraceCountMap.clear();		// Makes sense to clear this now, to get accurate usage stats
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-						Patch_PatchAll();
+						OSHLE_PatchAll();
 #endif
 					}
 
@@ -514,7 +514,7 @@ void CPU_HandleDynaRecOnBranch( bool backwards, bool trace_already_enabled )
 						gHotTraceCountMap.clear();
 						gFragmentCache.Clear();
 #ifdef DAEDALUS_ENABLE_OS_HOOKS
-						Patch_PatchAll();
+						OSHLE_PatchAll();
 #endif
 					}
 					else if( trace_count == gHotTraceThreshold )

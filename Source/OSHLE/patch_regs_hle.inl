@@ -3,7 +3,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osDisableInt_Mario()
+u32 OSHLE___osDisableInt_Mario()
 {
 TEST_DISABLE_REG_FUNCS
 	u32 CurrSR = gCPUState.CPUControl[C0_SR]._u32;
@@ -17,7 +17,7 @@ TEST_DISABLE_REG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osDisableInt_Zelda()
+u32 OSHLE___osDisableInt_Zelda()
 {
 TEST_DISABLE_REG_FUNCS
 	// Same as the above
@@ -33,7 +33,7 @@ TEST_DISABLE_REG_FUNCS
 //
 //*****************************************************************************
 // This patch gives alot of speed!
-u32 Patch___osRestoreInt()
+u32 OSHLE___osRestoreInt()
 {
 TEST_DISABLE_REG_FUNCS
 	gCPUState.CPUControl[C0_SR]._u32 |= gGPR[REG_a0]._u32_0;
@@ -51,7 +51,7 @@ TEST_DISABLE_REG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osGetCount()
+u32 OSHLE_osGetCount()
 {
 TEST_DISABLE_REG_FUNCS
 
@@ -63,7 +63,7 @@ TEST_DISABLE_REG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osGetCause()
+u32 OSHLE___osGetCause()
 {
 TEST_DISABLE_REG_FUNCS
 
@@ -75,7 +75,7 @@ TEST_DISABLE_REG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSetCompare()
+u32 OSHLE___osSetCompare()
 {
 TEST_DISABLE_REG_FUNCS
 
@@ -87,7 +87,7 @@ TEST_DISABLE_REG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSetSR()
+u32 OSHLE___osSetSR()
 {
 TEST_DISABLE_REG_FUNCS
 
@@ -101,7 +101,7 @@ TEST_DISABLE_REG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osGetSR()
+u32 OSHLE___osGetSR()
 {
 TEST_DISABLE_REG_FUNCS
 
@@ -114,7 +114,7 @@ TEST_DISABLE_REG_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSetFpcCsr()
+u32 OSHLE___osSetFpcCsr()
 {
 TEST_DISABLE_REG_FUNCS
 	gGPR[REG_v0]._s64 = (s64)gCPUState.FPUControl[31]._u32;

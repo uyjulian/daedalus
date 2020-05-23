@@ -109,16 +109,16 @@ static bool gPatchesApplied = false;
 //u32 g_dwOSEnd   = 0x00380000;
 
 
-void Patch_ResetSymbolTable();
-void Patch_RecurseAndFind();
-static bool Patch_LocateFunction(PatchSymbol * ps);
-static bool Patch_VerifyLocation(PatchSymbol * ps, u32 index);
-static bool Patch_VerifyLocation_CheckSignature(PatchSymbol * ps, PatchSignature * psig, u32 index);
-static bool Patch_GetCache();
-static void Patch_FlushCache();
+void OSHLE_ResetSymbolTable();
+void OSHLE_RecurseAndFind();
+static bool OSHLE_LocateFunction(PatchSymbol * ps);
+static bool OSHLE_VerifyLocation(PatchSymbol * ps, u32 index);
+static bool OSHLE_VerifyLocation_CheckSignature(PatchSymbol * ps, PatchSignature * psig, u32 index);
+static bool OSHLE_GetCache();
+static void OSHLE_FlushCache();
 
-static void Patch_ApplyPatches();
-static void Patch_ApplyPatch(u32 i);
+static void OSHLE_ApplyPatches();
+static void OSHLE_ApplyPatch(u32 i);
 static u32  nPatchSymbols;
 static u32  nPatchVariables;
 
@@ -128,7 +128,7 @@ class PatchDMAEventHandler : public DMAEventHandler
 	{
 		// Note the rom is only scanned when the ROM jumps to the game boot address
 		// ToDO: try to reapply patches - certain roms load in more of the OS after a number of transfers ?
-		Patch_ApplyPatches();
+		OSHLE_ApplyPatches();
 	}
 };
 static PatchDMAEventHandler gPatchDMAEventHandler;
@@ -146,14 +146,14 @@ void OSHLE_Finalise()
 }
 
 
-void Patch_Reset()
+void OSHLE_Reset()
 {
 	gPatchesApplied = false;
 	gNumOfOSFunctions = 0;
-	Patch_ResetSymbolTable();
+	OSHLE_ResetSymbolTable();
 }
 
-void Patch_ResetSymbolTable()
+void OSHLE_ResetSymbolTable()
 {
 	u32 i = 0;
 	// Loops through all symbols, until name is nullptr
@@ -172,19 +172,19 @@ void Patch_ResetSymbolTable()
 	nPatchVariables = i;
 }
 
-void Patch_ApplyPatches()
+void OSHLE_ApplyPatches()
 {
 	gPatchesApplied = true;
 
 	if (!gOSHooksEnabled)
 		return;
 
-	if (!Patch_GetCache())
+	if (!OSHLE_GetCache())
 	{
-		Patch_RecurseAndFind();
+		OSHLE_RecurseAndFind();
 
 		// Tip : Disable this when working on oshle funcs, you save the time to delete hle cache everyttime you need to test :p
-		Patch_FlushCache();
+		OSHLE_FlushCache();
 	}
 
 	// Do this every time or just when originally patched
@@ -192,13 +192,13 @@ void Patch_ApplyPatches()
 }
 
 
-void Patch_PatchAll()
+void OSHLE_PatchAll()
 {
 	gNumOfOSFunctions = 0;
 
 	if (!gPatchesApplied)
 	{
-		Patch_ApplyPatches();
+		OSHLE_ApplyPatches();
 	}
 #ifdef DUMPOSFUNCTIONS
 	FILE *fp;
@@ -223,7 +223,7 @@ void Patch_PatchAll()
 			fprintf(fp, "%s 0x%08x\n", ps->Name, PHYS_TO_K0(ps->Location));
 #endif
 			gNumOfOSFunctions++;
-			Patch_ApplyPatch(i);
+			OSHLE_ApplyPatch(i);
 		}
 	}
 #ifdef DUMPOSFUNCTIONS
@@ -231,7 +231,7 @@ void Patch_PatchAll()
 #endif
 }
 
-void Patch_ApplyPatch(u32 i)
+void OSHLE_ApplyPatch(u32 i)
 {
 #ifdef DAEDALUS_ENABLE_DYNAREC
 	u32 pc = g_PatchSymbols[i]->Location;
@@ -247,7 +247,7 @@ void Patch_ApplyPatch(u32 i)
 
 #ifndef DAEDALUS_SILENT
 // Return the location of a symbol
-u32 Patch_GetSymbolAddress(const char * name)
+u32 OSHLE_GetSymbolAddress(const char * name)
 {
 	// Search new list
 	for (u32 p = 0; p < nPatchSymbols; p++)
@@ -269,7 +269,7 @@ u32 Patch_GetSymbolAddress(const char * name)
 // Given a location, this function returns the name of the matching
 // symbol (if there is one)
 
-const char * Patch_GetJumpAddressName(u32 jump)
+const char * OSHLE_GetJumpAddressName(u32 jump)
 {
 	const void * mem_base;
 	if (!Memory_GetInternalReadAddress(jump, &mem_base))
@@ -300,7 +300,7 @@ const char * Patch_GetJumpAddressName(u32 jump)
 
 #ifdef DUMPOSFUNCTIONS
 
-void Patch_DumpOsThreadInfo()
+void OSHLE_DumpOsThreadInfo()
 {
 	u32 dwThread;
 	u32 dwCurrentThread;
@@ -352,7 +352,7 @@ void Patch_DumpOsThreadInfo()
 	}
 }
 
-void Patch_DumpOsQueueInfo()
+void OSHLE_DumpOsQueueInfo()
 {
 #ifdef DAED_OS_MESSAGE_QUEUES
 
@@ -421,7 +421,7 @@ u32		dwMsg        = q.GetMesgArray();
 }
 
 
-void Patch_DumpOsEventInfo()
+void OSHLE_DumpOsEventInfo()
 {
 	u32 dwQueue;
 	u32 dwMsg;
@@ -447,7 +447,7 @@ void Patch_DumpOsEventInfo()
 
 #endif // DUMPOSFUNCTIONS
 
-bool Patch_Hacks( PatchSymbol * ps )
+bool OSHLE_Hacks( PatchSymbol * ps )
 {
 	bool	Found( false );
 
@@ -498,7 +498,7 @@ bool Patch_Hacks( PatchSymbol * ps )
 
 
 //ToDo: Add Status bar for loading OSHLE Patch Symbols.
-void Patch_RecurseAndFind()
+void OSHLE_RecurseAndFind()
 {
 	s32 nFound;
 	u32 first;
@@ -545,7 +545,7 @@ void Patch_RecurseAndFind()
 
 		// Symbol not found, attempt to locate on this pass. This may
 		// fail if all dependent symbols are not found
-		if (Patch_LocateFunction(g_PatchSymbols[i]))
+		if (OSHLE_LocateFunction(g_PatchSymbols[i]))
 			nFound++;
 	}
 
@@ -602,7 +602,7 @@ void Patch_RecurseAndFind()
 			}
 			// Disable certain os funcs where it causes issues in some games ex Zelda
 			//
-			if( Patch_Hacks(g_PatchSymbols[i]) )
+			if( OSHLE_Hacks(g_PatchSymbols[i]) )
 			{
 				#ifdef DAEDALUS_DEBUG_CONSOLE
 				Console_Print( "[ROS Hack : Disabling %s]", g_PatchSymbols[i]->Name);
@@ -617,7 +617,7 @@ void Patch_RecurseAndFind()
 				if (location > last)  last = location;
 
 				// Actually patch:
-				Patch_ApplyPatch(i);
+				OSHLE_ApplyPatch(i);
 				nFound++;
 			}
 		}
@@ -689,7 +689,7 @@ void Patch_RecurseAndFind()
 }
 
 // Attempt to locate this symbol.
-bool Patch_LocateFunction(PatchSymbol * ps)
+bool OSHLE_LocateFunction(PatchSymbol * ps)
 {
 	OpCode op;
 	const u32 * code_base( gu32RamBase );
@@ -710,7 +710,7 @@ bool Patch_LocateFunction(PatchSymbol * ps)
 				continue;
 
 			// See if function i exists at this location
-			if (Patch_VerifyLocation_CheckSignature(ps, psig, i))
+			if (OSHLE_VerifyLocation_CheckSignature(ps, psig, i))
 			{
 				return true;
 			}
@@ -726,7 +726,7 @@ bool Patch_LocateFunction(PatchSymbol * ps)
 
 
 // Check that the function i is located at address index
-bool Patch_VerifyLocation(PatchSymbol * ps, u32 index)
+bool OSHLE_VerifyLocation(PatchSymbol * ps, u32 index)
 {
 	// We may have already located this symbol.
 	if (ps->Found)
@@ -742,7 +742,7 @@ bool Patch_VerifyLocation(PatchSymbol * ps, u32 index)
 
 	for (u32 s = 0; s < ps->Signatures[s].NumOps; s++)
 	{
-		if (Patch_VerifyLocation_CheckSignature(ps, &ps->Signatures[s], index))
+		if (OSHLE_VerifyLocation_CheckSignature(ps, &ps->Signatures[s], index))
 		{
 			return true;
 		}
@@ -753,7 +753,7 @@ bool Patch_VerifyLocation(PatchSymbol * ps, u32 index)
 }
 
 
-bool Patch_VerifyLocation_CheckSignature(PatchSymbol * ps,
+bool OSHLE_VerifyLocation_CheckSignature(PatchSymbol * ps,
 										 PatchSignature * psig,
 										 u32 index)
 {
@@ -804,7 +804,7 @@ bool Patch_VerifyLocation_CheckSignature(PatchSymbol * ps,
 
 					// This is a jump, the jump target must match the
 					// symbol pointed to by this function. Recurse
-					if (!Patch_VerifyLocation(pcr->Symbol, TargetIndex))
+					if (!OSHLE_VerifyLocation(pcr->Symbol, TargetIndex))
 						goto fail_find;
 
 					op.target = 0;		// Mask out jump location
@@ -955,7 +955,7 @@ fail_find:
 	return false;
 }
 
-static void Patch_FlushCache()
+static void OSHLE_FlushCache()
 {
 	IO::Filename name;
 
@@ -1012,7 +1012,7 @@ static void Patch_FlushCache()
 }
 
 
-static bool Patch_GetCache()
+static bool OSHLE_GetCache()
 {
 	IO::Filename name;
 
@@ -1158,7 +1158,7 @@ extern void MemoryUpdateSPStatus( u32 flags );
 
 /////////////////////////////////////////////////////
 
-u32 Patch___osContAddressCrc()
+u32 OSHLE___osContAddressCrc()
 {
 TEST_DISABLE_FUNCS
 #ifdef DAEDALUS_DEBUG_CONSOLE
@@ -1167,13 +1167,13 @@ TEST_DISABLE_FUNCS
 	return PATCH_RET_NOT_PROCESSED;
 }
 
-u32 Patch___osPackRequestData()
+u32 OSHLE___osPackRequestData()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }
 
 // Perphaps not important for emulation? It works fine when we NOP this
-u32 Patch_osSetIntMask()
+u32 OSHLE_osSetIntMask()
 {
 /*
 //
@@ -1209,11 +1209,11 @@ u32 Patch_osSetIntMask()
 	// Do nothing for now until I can find a test case that won't work ;)
 	return PATCH_RET_JR_RA;
 }
-u32 Patch___osEepromRead_Prepare()
+u32 OSHLE___osEepromRead_Prepare()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }
-u32 Patch___osEepromWrite_Prepare()
+u32 OSHLE___osEepromWrite_Prepare()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }

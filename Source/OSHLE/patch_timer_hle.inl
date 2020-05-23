@@ -3,7 +3,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSetTimerIntr()
+u32 OSHLE___osSetTimerIntr()
 {
 TEST_DISABLE_TIMER_FUNCS
 	s64 TimeLo = (s64)gGPR[REG_a1]._s32_0;
@@ -23,7 +23,7 @@ TEST_DISABLE_TIMER_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osInsertTimer()
+u32 OSHLE___osInsertTimer()
 {
 TEST_DISABLE_TIMER_FUNCS
 	u32 NewTimer    = gGPR[REG_a0]._u32_0;
@@ -96,7 +96,7 @@ TEST_DISABLE_TIMER_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osTimerServicesInit_Mario()
+u32 OSHLE___osTimerServicesInit_Mario()
 {
 TEST_DISABLE_TIMER_FUNCS
 
@@ -135,16 +135,16 @@ TEST_DISABLE_TIMER_FUNCS
 //
 //*****************************************************************************
 // Same as above, but optimised
-u32 Patch___osTimerServicesInit_Rugrats()
+u32 OSHLE___osTimerServicesInit_Rugrats()
 {
 TEST_DISABLE_TIMER_FUNCS
-	return Patch___osTimerServicesInit_Mario();
+	return OSHLE___osTimerServicesInit_Mario();
 }
 
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osSetTime()
+u32 OSHLE_osSetTime()
 {
 TEST_DISABLE_TIMER_FUNCS
 
@@ -161,7 +161,7 @@ TEST_DISABLE_TIMER_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osGetTime()
+u32 OSHLE_osGetTime()
 {
 TEST_DISABLE_TIMER_FUNCS
 	u8 * pTimeBase = (u8 *)ReadAddress(VAR_ADDRESS(osSystemTimeHi));
@@ -187,7 +187,7 @@ TEST_DISABLE_TIMER_FUNCS
 //
 //*****************************************************************************
 //ToDo : Implement
-u32 Patch_osSetTimer()
+u32 OSHLE_osSetTimer()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }

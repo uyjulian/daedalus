@@ -3,7 +3,7 @@
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osAiGetLength()
+u32 OSHLE_osAiGetLength()
 {
 TEST_DISABLE_AI_FUNCS
 	// Hardcoding 2880 here causes Aerogauge to get 40%+ speed up, yammy!
@@ -27,7 +27,7 @@ inline bool IsAiDeviceBusy()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osAiSetNextBuffer()
+u32 OSHLE_osAiSetNextBuffer()
 {
 TEST_DISABLE_AI_FUNCS
 	u32 addr = gGPR[REG_a0]._u32_0;
@@ -56,7 +56,7 @@ TEST_DISABLE_AI_FUNCS
 //
 //*****************************************************************************
 ////// FIXME: Not implemented fully, we are missing it from the symbol table :(
-u32 Patch_osAiSetFrequency()
+u32 OSHLE_osAiSetFrequency()
 {
 TEST_DISABLE_AI_FUNCS
 	return PATCH_RET_NOT_PROCESSED;
@@ -72,7 +72,7 @@ TEST_DISABLE_AI_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osAiDeviceBusy()
+u32 OSHLE___osAiDeviceBusy()
 {
 TEST_DISABLE_AI_FUNCS
 	gGPR[REG_v0]._s64 = (s64)IsAiDeviceBusy();

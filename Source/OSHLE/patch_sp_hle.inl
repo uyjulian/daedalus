@@ -23,7 +23,7 @@ inline u32 SpGetStatus()
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSpRawStartDma()
+u32 OSHLE___osSpRawStartDma()
 {
 TEST_DISABLE_SP_FUNCS
 	u32 RWflag = gGPR[REG_a0]._u32_0;
@@ -78,7 +78,7 @@ TEST_DISABLE_SP_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSpDeviceBusy_Mario()
+u32 OSHLE___osSpDeviceBusy_Mario()
 {
 TEST_DISABLE_SP_FUNCS
 
@@ -91,7 +91,7 @@ TEST_DISABLE_SP_FUNCS
 //
 //*****************************************************************************
 // Identical, but optimised
-u32 Patch___osSpDeviceBusy_Rugrats()
+u32 OSHLE___osSpDeviceBusy_Rugrats()
 {
 TEST_DISABLE_SP_FUNCS
 
@@ -105,7 +105,7 @@ TEST_DISABLE_SP_FUNCS
 //*****************************************************************************
 // Very similar to osSpDeviceBusy,
 // Used in Pokemon Stadium 1
-u32 Patch___osSpGetStatus_Mario()
+u32 OSHLE___osSpGetStatus_Mario()
 {
 TEST_DISABLE_SP_FUNCS
 
@@ -118,7 +118,7 @@ TEST_DISABLE_SP_FUNCS
 //
 //*****************************************************************************
 // Ogre Battle uses this
-u32 Patch___osSpGetStatus_Rugrats()
+u32 OSHLE___osSpGetStatus_Rugrats()
 {
 TEST_DISABLE_SP_FUNCS
 
@@ -130,7 +130,7 @@ TEST_DISABLE_SP_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSpSetStatus_Mario()
+u32 OSHLE___osSpSetStatus_Mario()
 {
 TEST_DISABLE_SP_FUNCS
 	u32 status = gGPR[REG_a0]._u32_0;
@@ -142,7 +142,7 @@ TEST_DISABLE_SP_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSpSetStatus_Rugrats()
+u32 OSHLE___osSpSetStatus_Rugrats()
 {
 TEST_DISABLE_SP_FUNCS
 	u32 status = gGPR[REG_a0]._u32_0;
@@ -154,7 +154,7 @@ TEST_DISABLE_SP_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch___osSpSetPc()
+u32 OSHLE___osSpSetPc()
 {
 TEST_DISABLE_SP_FUNCS
 	u32 pc = gGPR[REG_a0]._u32_0;
@@ -182,7 +182,7 @@ TEST_DISABLE_SP_FUNCS
 //
 //*****************************************************************************
 // Translate task...
-u32 Patch_osSpTaskLoad()
+u32 OSHLE_osSpTaskLoad()
 {
 TEST_DISABLE_SP_FUNCS
 	u32 task = gGPR[REG_a0]._u32_0;
@@ -272,7 +272,7 @@ TEST_DISABLE_SP_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osSpTaskStartGo()
+u32 OSHLE_osSpTaskStartGo()
 {
 TEST_DISABLE_SP_FUNCS
 	DAEDALUS_ASSERT( !IsSpDeviceBusy(), "Sp Device is BUSY, Need to handle!");
@@ -299,7 +299,7 @@ TEST_DISABLE_SP_FUNCS
 // ToDo Implement me:
 // Doesn't seem to be documented, it seems its purpose is to initialize the OSTask structure members?
 // It's called quiet often, it can be worth to implement it
-u32 Patch___osSpTaskLoadInitTask()
+u32 OSHLE___osSpTaskLoadInitTask()
 {
 TEST_DISABLE_SP_FUNCS
 
@@ -313,10 +313,10 @@ TEST_DISABLE_SP_FUNCS
 //osSpTaskYield / osSpTaskYielded
 //These shouldn't be called, these are function calls to osSpTaskStartGo/osSpTaskLoad
 // Their purpose is to yield the (GFX) task and save its state so it can be restarted by the the above functions
-// Which is already handled in Patch_osSpTaskLoad :)
+// Which is already handled in OSHLE_osSpTaskLoad :)
 //Best example can be observed IN LoZ:OOT
 //
-u32 Patch_osSpTaskYield_Mario()
+u32 OSHLE_osSpTaskYield_Mario()
 {
 TEST_DISABLE_SP_FUNCS
 
@@ -327,7 +327,7 @@ TEST_DISABLE_SP_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osSpTaskYield_Rugrats()
+u32 OSHLE_osSpTaskYield_Rugrats()
 {
 TEST_DISABLE_SP_FUNCS
 
@@ -339,7 +339,7 @@ TEST_DISABLE_SP_FUNCS
 //
 //*****************************************************************************
 // Yoshi uses this
-u32 Patch_osSpTaskYielded()
+u32 OSHLE_osSpTaskYielded()
 {
 TEST_DISABLE_SP_FUNCS
 

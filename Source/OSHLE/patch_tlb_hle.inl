@@ -3,7 +3,7 @@
 //
 //*****************************************************************************
 // Todo: Implement me
-u32 Patch_osMapTLB()
+u32 OSHLE_osMapTLB()
 {
 TEST_DISABLE_TLB_FUNCS
 	//osMapTLB(s32, OSPageMask, void *, u32, u32, s32)
@@ -25,7 +25,7 @@ TEST_DISABLE_TLB_FUNCS
 //
 //*****************************************************************************
 // ENTRYHI left untouched after call
-u32 Patch___osProbeTLB()
+u32 OSHLE___osProbeTLB()
 {
 TEST_DISABLE_TLB_FUNCS
 	u32 addr = gGPR[REG_a0]._u32_0;
@@ -39,7 +39,7 @@ TEST_DISABLE_TLB_FUNCS
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 Patch_osVirtualToPhysical_Mario()
+u32 OSHLE_osVirtualToPhysical_Mario()
 {
 TEST_DISABLE_TLB_FUNCS
 	u32 addr = gGPR[REG_a0]._u32_0;
@@ -54,7 +54,7 @@ TEST_DISABLE_TLB_FUNCS
 //
 //*****************************************************************************
 // Identical - just optimised
-u32 Patch_osVirtualToPhysical_Rugrats()
+u32 OSHLE_osVirtualToPhysical_Rugrats()
 {
 TEST_DISABLE_TLB_FUNCS
 	u32 addr = gGPR[REG_a0]._u32_0;
@@ -69,7 +69,7 @@ TEST_DISABLE_TLB_FUNCS
 //
 //*****************************************************************************
 // Todo: Implement me
-u32 Patch_osMapTLBRdb()
+u32 OSHLE_osMapTLBRdb()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }
@@ -78,7 +78,7 @@ u32 Patch_osMapTLBRdb()
 //
 //*****************************************************************************
 // Todo: Implement me
-u32 Patch_osUnmapTLBAll_Mario()
+u32 OSHLE_osUnmapTLBAll_Mario()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }
@@ -87,7 +87,7 @@ u32 Patch_osUnmapTLBAll_Mario()
 //
 //*****************************************************************************
 // Identical to mario, different loop structure
-u32 Patch_osUnmapTLBAll_Rugrats()
+u32 OSHLE_osUnmapTLBAll_Rugrats()
 {
 	return PATCH_RET_NOT_PROCESSED;
 }

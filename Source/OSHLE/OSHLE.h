@@ -24,17 +24,17 @@ bool OSHLE_Initialise();
 void OSHLE_Finalise();
 
 extern u32 gNumOfOSFunctions;
-void Patch_Reset();
-void Patch_PatchAll();
+void OSHLE_Reset();
+void OSHLE_PatchAll();
 
 #ifndef DAEDALUS_SILENT
-const char * Patch_GetJumpAddressName(u32 jump);
-u32 Patch_GetSymbolAddress(const char * name);
+const char * OSHLE_GetJumpAddressName(u32 jump);
+u32 OSHLE_GetSymbolAddress(const char * name);
 #endif
 #ifdef DUMPOSFUNCTIONS
-void Patch_DumpOsThreadInfo();
-void Patch_DumpOsQueueInfo();
-void Patch_DumpOsEventInfo();
+void OSHLE_DumpOsThreadInfo();
+void OSHLE_DumpOsQueueInfo();
+void OSHLE_DumpOsEventInfo();
 #endif
 
 #endif // OSHLE_OSHLE_H_
