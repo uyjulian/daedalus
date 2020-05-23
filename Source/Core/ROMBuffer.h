@@ -44,7 +44,7 @@ class RomBuffer
 
 		/// Copy bytes of memory from the cart, with no swizzling etc
 		/// rom_start is 0-based (i.e. not a full rom address)
-		static void	GetRomBytesRaw(void * p_dst, u32 rom_start, u32 length);
+		static void	GetRomBytesRaw(void* dst, u32 rom_start, u32 length);
 
 		template< typename T >
 			T static ReadValueRaw( u32 rom_start )
@@ -59,7 +59,7 @@ class RomBuffer
 
 		static void* GetAddressRaw( u32 rom_start );
 
-		static void CopyToRam( u8* p_dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length );
+		static void CopyToRam(u8* dst, u32 dst_offset, u32 dst_size, u32 src_offset, u32 length );
 
 		static bool IsRomAddressFixed();
 		static const void* GetFixedRomBaseAddress();
