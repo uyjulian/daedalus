@@ -78,8 +78,8 @@ extern u32		gRamSize;
 extern u32		gTLBReadHit;
 extern u32		gTLBWriteHit;
 #endif
-extern void *	g_pMemoryBuffers[NUM_MEM_BUFFERS];
-extern const u32 MemoryRegionSizes[NUM_MEM_BUFFERS];
+extern void *	gMemBuffers[NUM_MEM_BUFFERS];
+extern const u32 gMemBufferSizes[NUM_MEM_BUFFERS];
 
 bool			Memory_Init();
 void			Memory_Fini();
@@ -171,18 +171,18 @@ inline void QuickWrite32Bits( u8 *p_base, u32 value )
 }
 
 // Useful defines for making code look nicer:
-#define g_pu8RamBase ((u8*)g_pMemoryBuffers[MEM_RD_RAM])
-#define g_ps8RamBase ((s8*)g_pMemoryBuffers[MEM_RD_RAM])
-#define g_pu16RamBase ((u16*)g_pMemoryBuffers[MEM_RD_RAM])
-#define g_pu32RamBase ((u32*)g_pMemoryBuffers[MEM_RD_RAM])
+#define g_pu8RamBase ((u8*)gMemBuffers[MEM_RD_RAM])
+#define g_ps8RamBase ((s8*)gMemBuffers[MEM_RD_RAM])
+#define g_pu16RamBase ((u16*)gMemBuffers[MEM_RD_RAM])
+#define g_pu32RamBase ((u32*)gMemBuffers[MEM_RD_RAM])
 
-#define g_pu8SpMemBase ((u8*)g_pMemoryBuffers[MEM_SP_MEM])
-#define g_ps8SpMemBase ((s8*)g_pMemoryBuffers[MEM_SP_MEM])
-#define g_pu16SpMemBase ((u16*)g_pMemoryBuffers[MEM_SP_MEM])
-#define g_pu32SpMemBase ((u32*)g_pMemoryBuffers[MEM_SP_MEM])
+#define g_pu8SpMemBase ((u8*)gMemBuffers[MEM_SP_MEM])
+#define g_ps8SpMemBase ((s8*)gMemBuffers[MEM_SP_MEM])
+#define g_pu16SpMemBase ((u16*)gMemBuffers[MEM_SP_MEM])
+#define g_pu32SpMemBase ((u32*)gMemBuffers[MEM_SP_MEM])
 
-#define g_pu8SpDmemBase	((u8*)g_pMemoryBuffers[MEM_SP_MEM] + SP_DMA_DMEM)
-#define g_pu8SpImemBase	((u8*)g_pMemoryBuffers[MEM_SP_MEM] + SP_DMA_IMEM)
+#define g_pu8SpDmemBase	((u8*)gMemBuffers[MEM_SP_MEM] + SP_DMA_DMEM)
+#define g_pu8SpImemBase	((u8*)gMemBuffers[MEM_SP_MEM] + SP_DMA_IMEM)
 
 #define MEMORY_SIZE_RDRAM				0x400000
 #define MEMORY_SIZE_EXRDRAM				0x400000
@@ -286,35 +286,35 @@ inline void Write8Bits_NoSwizzle( u32 address, u8 data )	{                      
 #define REGISTER_FUNCTIONS( set, base_reg, memory_buffer )								\
 	inline void Memory_##set##_SetRegister( u32 reg, u32 value )						\
 	{																					\
-		((u32 *)g_pMemoryBuffers[memory_buffer])[ (reg - base_reg) / 4 ] = value;		\
+		((u32 *)gMemBuffers[memory_buffer])[ (reg - base_reg) / 4 ] = value;		\
 	}																					\
 																						\
 	inline u32 Memory_##set##_GetRegister( u32 reg )									\
 	{																					\
-		return ((u32 *)g_pMemoryBuffers[memory_buffer])[ (reg - base_reg) / 4 ];		\
+		return ((u32 *)gMemBuffers[memory_buffer])[ (reg - base_reg) / 4 ];		\
 	}																					\
 																						\
 	inline u32 Memory_##set##_SetRegisterBits( u32 reg, u32 and_bits, u32 or_bits )		\
 	{																					\
-		u32 * p( &((u32 *)g_pMemoryBuffers[memory_buffer])[ (reg - base_reg) / 4 ] );	\
+		u32 * p( &((u32 *)gMemBuffers[memory_buffer])[ (reg - base_reg) / 4 ] );	\
 		return AtomicBitSet( p, and_bits, or_bits );									\
 	}																					\
 																						\
 	inline u32 Memory_##set##_SetRegisterBits( u32 reg, u32 value )						\
 	{																					\
-		u32 * p( &((u32 *)g_pMemoryBuffers[memory_buffer])[ (reg - base_reg) / 4 ] );	\
+		u32 * p( &((u32 *)gMemBuffers[memory_buffer])[ (reg - base_reg) / 4 ] );	\
 		return AtomicBitSet( p, 0xffffffff, value );									\
 	}																					\
 																						\
 	inline u32 Memory_##set##_ClrRegisterBits( u32 reg, u32 value )						\
 	{																					\
-		u32 * p( &((u32 *)g_pMemoryBuffers[memory_buffer])[ (reg - base_reg) / 4 ] );	\
+		u32 * p( &((u32 *)gMemBuffers[memory_buffer])[ (reg - base_reg) / 4 ] );	\
 		return AtomicBitSet( p, ~value, 0 );											\
 	}																					\
 																						\
 	inline u32 * set##_REG_ADDRESS( u32 reg )											\
 	{																					\
-		return &((u32 *)g_pMemoryBuffers[memory_buffer])[(reg - base_reg) / 4];			\
+		return &((u32 *)gMemBuffers[memory_buffer])[(reg - base_reg) / 4];			\
 	}
 
 REGISTER_FUNCTIONS( MI, MI_BASE_REG, MEM_MI_REG )

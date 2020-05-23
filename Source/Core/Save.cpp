@@ -104,7 +104,7 @@ bool Save_Reset()
 	}
 
 #ifdef DAEDALUS_ENABLE_ASSERTS
-	DAEDALUS_ASSERT( gSaveSize <= MemoryRegionSizes[MEM_SAVE], "Save size is larger than allocated memory");
+	DAEDALUS_ASSERT( gSaveSize <= gMemBufferSizes[MEM_SAVE], "Save size is larger than allocated memory");
 	#endif
 	gSaveDirty = false;
 	if (gSaveSize > 0)
@@ -119,7 +119,7 @@ bool Save_Reset()
 			#endif
 
 			u8 buffer[2048];
-			u8 * dst = (u8*)g_pMemoryBuffers[MEM_SAVE];
+			u8 * dst = (u8*)gMemBuffers[MEM_SAVE];
 
 			for (u32 d = 0; d < gSaveSize; d += sizeof(buffer))
 			{
@@ -150,7 +150,7 @@ bool Save_Reset()
 			#ifdef DAEDALUS_DEBUG_CONSOLE
 			Console_Print( "Loading MemPack from [C%s]", gMempackFileName);
 			#endif
-			fread(g_pMemoryBuffers[MEM_MEMPACK], MemoryRegionSizes[MEM_MEMPACK], 1, fp);
+			fread(gMemBuffers[MEM_MEMPACK], gMemBufferSizes[MEM_MEMPACK], 1, fp);
 			fclose(fp);
 			gMempackDirty = false;
 		}
@@ -195,7 +195,7 @@ void Save_Flush(bool force)
 		if (fp != nullptr)
 		{
 			u8 buffer[2048];
-			u8 * src = (u8*)g_pMemoryBuffers[MEM_SAVE];
+			u8 * src = (u8*)gMemBuffers[MEM_SAVE];
 
 			for (u32 d = 0; d < gSaveSize; d += sizeof(buffer))
 			{
@@ -219,7 +219,7 @@ void Save_Flush(bool force)
 		FILE * fp = fopen(gMempackFileName, "wb");
 		if (fp != nullptr)
 		{
-			fwrite(g_pMemoryBuffers[MEM_MEMPACK], MemoryRegionSizes[MEM_MEMPACK], 1, fp);
+			fwrite(gMemBuffers[MEM_MEMPACK], gMemBufferSizes[MEM_MEMPACK], 1, fp);
 			fclose(fp);
 		}
 		gMempackDirty = false;
@@ -254,9 +254,9 @@ static const u8 gMempackInitialize[] =
 
 static void InitMempackContent()
 {
-	for (size_t dst_off = 0; dst_off < MemoryRegionSizes[MEM_MEMPACK]; dst_off += 32 * 1024)
+	for (size_t dst_off = 0; dst_off < gMemBufferSizes[MEM_MEMPACK]; dst_off += 32 * 1024)
 	{
-		u8 * mempack = (u8*)g_pMemoryBuffers[MEM_MEMPACK] + dst_off;
+		u8 * mempack = (u8*)gMemBuffers[MEM_MEMPACK] + dst_off;
 
 		memcpy(mempack, gMempackInitialize, 272);
 
@@ -267,8 +267,8 @@ static void InitMempackContent()
 		}
 
 #ifdef DAEDALUS_ENABLE_ASSERTS
-		DAEDALUS_ASSERT(dst_off + 0x8000 <= MemoryRegionSizes[MEM_MEMPACK], "Buffer overflow");
-		DAEDALUS_ASSERT(dst_off + sizeof(gMempackInitialize) <= MemoryRegionSizes[MEM_MEMPACK], "Buffer overflow");
+		DAEDALUS_ASSERT(dst_off + 0x8000 <= gMemBufferSizes[MEM_MEMPACK], "Buffer overflow");
+		DAEDALUS_ASSERT(dst_off + sizeof(gMempackInitialize) <= gMemBufferSizes[MEM_MEMPACK], "Buffer overflow");
 #endif
 	}
 }

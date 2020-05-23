@@ -60,7 +60,7 @@ static void MemoryUpdatePIF();
 
 static void Memory_InitTables();
 
-const u32 MemoryRegionSizes[NUM_MEM_BUFFERS] =
+const u32 gMemBufferSizes[NUM_MEM_BUFFERS] =
 {
 	0x04,				// This seems enough (Salvy)
 	kMaximumMemSize,	// RD_RAM
@@ -106,7 +106,7 @@ u8 * g_pu8RamBase_8000 = nullptr;
 
 MemFuncRead  	g_MemoryLookupTableRead[0x4000];
 MemFuncWrite 	g_MemoryLookupTableWrite[0x4000];
-void * 			g_pMemoryBuffers[NUM_MEM_BUFFERS];
+void * 			gMemBuffers[NUM_MEM_BUFFERS];
 
 
 #include "Memory_Read.inl"
@@ -129,58 +129,58 @@ bool Memory_Init()
 
 	uintptr_t base = reinterpret_cast<uintptr_t>(gMemBase);
 
-	g_pMemoryBuffers[ MEM_RD_RAM    ] = (u8*)VirtualAlloc( (void*)(base+0x00000000),	8*1024*1024,MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_SP_MEM    ] = (u8*)VirtualAlloc( (void*)(base+0x04000000),	0x2000,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_RD_REG0   ] = (u8*)VirtualAlloc( (void*)(base+0x03F00000),	0x30,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_SP_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04040000),	0x20,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_SP_PC_REG ] = (u8*)VirtualAlloc( (void*)(base+0x04080000),	0x08,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_DPC_REG   ] = (u8*)VirtualAlloc( (void*)(base+0x04100000),	0x20,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_MI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04300000),	0x10,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_VI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04400000),	0x38,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_AI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04500000),	0x18,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_PI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04600000),	0x34,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_RI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04700000),	0x20,		MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_SI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04800000),	0x1C,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_RD_RAM    ] = (u8*)VirtualAlloc( (void*)(base+0x00000000),	8*1024*1024,MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_SP_MEM    ] = (u8*)VirtualAlloc( (void*)(base+0x04000000),	0x2000,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_RD_REG0   ] = (u8*)VirtualAlloc( (void*)(base+0x03F00000),	0x30,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_SP_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04040000),	0x20,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_SP_PC_REG ] = (u8*)VirtualAlloc( (void*)(base+0x04080000),	0x08,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_DPC_REG   ] = (u8*)VirtualAlloc( (void*)(base+0x04100000),	0x20,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_MI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04300000),	0x10,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_VI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04400000),	0x38,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_AI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04500000),	0x18,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_PI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04600000),	0x34,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_RI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04700000),	0x20,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_SI_REG    ] = (u8*)VirtualAlloc( (void*)(base+0x04800000),	0x1C,		MEM_COMMIT, PAGE_READWRITE );
 	//cartDom2                        = (u8*)VirtualAlloc( (void*)(base+0x05000000),	0x10000,	MEM_COMMIT, PAGE_READWRITE );
 	//cartDom1                        = (u8*)VirtualAlloc( (void*)(base+0x06000000),	0x10000,	MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_SAVE      ] = (u8*)VirtualAlloc( (void*)(base+0x08000000),	0x20000,	MEM_COMMIT, PAGE_READWRITE );
-	//g_pMemoryBuffers[MEM_CARTROM  ] = (u8*)VirtualAlloc( (void*)(base+0x10000000),	cart_size,	MEM_COMMIT, PAGE_READWRITE);
-	g_pMemoryBuffers[ MEM_PIF_RAM   ] = (u8*)VirtualAlloc( (void*)(base+0x1FC00000),	0x40,		MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_SAVE      ] = (u8*)VirtualAlloc( (void*)(base+0x08000000),	0x20000,	MEM_COMMIT, PAGE_READWRITE );
+	//gMemBuffers[MEM_CARTROM  ] = (u8*)VirtualAlloc( (void*)(base+0x10000000),	cart_size,	MEM_COMMIT, PAGE_READWRITE);
+	gMemBuffers[ MEM_PIF_RAM   ] = (u8*)VirtualAlloc( (void*)(base+0x1FC00000),	0x40,		MEM_COMMIT, PAGE_READWRITE );
 	//cartDom4                        = (u8*)VirtualAlloc( (void*)(base+0x1FD00000),	0x10000,	MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_MEMPACK   ] = (u8*)VirtualAlloc( nullptr,						0x20000,	MEM_COMMIT, PAGE_READWRITE );
-	g_pMemoryBuffers[ MEM_UNUSED    ] = new u8[ MemoryRegionSizes[MEM_UNUSED] ];
+	gMemBuffers[ MEM_MEMPACK   ] = (u8*)VirtualAlloc( nullptr,						0x20000,	MEM_COMMIT, PAGE_READWRITE );
+	gMemBuffers[ MEM_UNUSED    ] = new u8[ gMemBufferSizes[MEM_UNUSED] ];
 
 #else
 	//u32 count = 0;
 	for (u32 m = 0; m < NUM_MEM_BUFFERS; m++)
 	{
-		u32 region_size = MemoryRegionSizes[m];
+		u32 region_size = gMemBufferSizes[m];
 		// Skip zero sized areas. An example of this is the cart rom
 		if (region_size > 0)
 		{
 			//count+=region_size;
-			g_pMemoryBuffers[m] = new u8[region_size];
-			//g_pMemoryBuffers[m] = Memory_AllocRegion(region_size);
+			gMemBuffers[m] = new u8[region_size];
+			//gMemBuffers[m] = Memory_AllocRegion(region_size);
 
-			if (g_pMemoryBuffers[m] == nullptr)
+			if (gMemBuffers[m] == nullptr)
 			{
 				return false;
 			}
 
 			// Necessary?
-			memset(g_pMemoryBuffers[m], 0, region_size);
+			memset(gMemBuffers[m], 0, region_size);
 			/*if (region_size < 0x100) // dirty, check if this is a I/O range
 			{
-				g_pMemoryBuffers[m] = MAKE_UNCACHED_PTR(g_pMemoryBuffers[m]);
+				gMemBuffers[m] = MAKE_UNCACHED_PTR(gMemBuffers[m]);
 			}*/
 		}
 	}
 	//printf("%d bytes used of memory\n",count);
 #endif
 
-	g_pu8RamBase_8000 = ((u8*)g_pMemoryBuffers[MEM_RD_RAM]) - 0x80000000;
-	//g_pu8RamBase_A000 = ((u8*)g_pMemoryBuffers[MEM_RD_RAM]) - 0xa0000000;
-	//g_pu8RamBase_A000 = ((u8*)MAKE_UNCACHED_PTR(g_pMemoryBuffers[MEM_RD_RAM])) - 0xa0000000;
+	g_pu8RamBase_8000 = ((u8*)gMemBuffers[MEM_RD_RAM]) - 0x80000000;
+	//g_pu8RamBase_A000 = ((u8*)gMemBuffers[MEM_RD_RAM]) - 0xa0000000;
+	//g_pu8RamBase_A000 = ((u8*)MAKE_UNCACHED_PTR(gMemBuffers[MEM_RD_RAM])) - 0xa0000000;
 
 	g_RomWritten = false;
 
@@ -200,10 +200,10 @@ void Memory_Fini(void)
 	//
 	//	We have to free this buffer separately
 	//
-	if (g_pMemoryBuffers[MEM_UNUSED])
+	if (gMemBuffers[MEM_UNUSED])
 	{
-		delete [] reinterpret_cast< u8 * >( g_pMemoryBuffers[MEM_UNUSED] );
-		g_pMemoryBuffers[MEM_UNUSED] = nullptr;
+		delete [] reinterpret_cast< u8 * >( gMemBuffers[MEM_UNUSED] );
+		gMemBuffers[MEM_UNUSED] = nullptr;
 	}
 
 	VirtualFree( gMemBase, 0, MEM_RELEASE );
@@ -212,10 +212,10 @@ void Memory_Fini(void)
 #else
 	for (u32 m = 0; m < NUM_MEM_BUFFERS; m++)
 	{
-		if (g_pMemoryBuffers[m] != nullptr)
+		if (gMemBuffers[m] != nullptr)
 		{
-			delete [] (u8*)(g_pMemoryBuffers[m]);
-			g_pMemoryBuffers[m] = nullptr;
+			delete [] (u8*)(gMemBuffers[m]);
+			gMemBuffers[m] = nullptr;
 		}
 	}
 #endif
@@ -223,7 +223,7 @@ void Memory_Fini(void)
 	g_pu8RamBase_8000 = nullptr;
 	//g_pu8RamBase_A000 = nullptr;
 
-	memset( g_pMemoryBuffers, 0, sizeof( g_pMemoryBuffers ) );
+	memset( gMemBuffers, 0, sizeof( gMemBuffers ) );
 }
 
 bool Memory_Reset()
@@ -251,9 +251,9 @@ bool Memory_Reset()
 	// Clear memory
 	for (u32 i = 0; i < NUM_MEM_BUFFERS; i++)
 	{
-		if (g_pMemoryBuffers[i])
+		if (gMemBuffers[i])
 		{
-			memset(g_pMemoryBuffers[i], 0, MemoryRegionSizes[i]);
+			memset(gMemBuffers[i], 0, gMemBufferSizes[i]);
 		}
 	}
 
@@ -294,7 +294,7 @@ static void Memory_Tlb_Hack()
 	   }
 	}
 
-	g_MemoryLookupTableRead[0x70000000 >> 18].pRead = (u8*)(reinterpret_cast< uintptr_t >( g_pMemoryBuffers[MEM_RD_RAM]) - 0x70000000);
+	g_MemoryLookupTableRead[0x70000000 >> 18].pRead = (u8*)(reinterpret_cast< uintptr_t >( gMemBuffers[MEM_RD_RAM]) - 0x70000000);
 }
 
 static void Memory_InitFunc(u32 start, u32 size,
@@ -314,14 +314,14 @@ static void Memory_InitFunc(u32 start, u32 size,
 
 		if (read_region)
 		{
-			g_MemoryLookupTableRead[start_addr|(0x8000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[read_region]) - (((start>>16)|0x8000) << 16));
-			g_MemoryLookupTableRead[start_addr|(0xA000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[read_region]) - (((start>>16)|0xA000) << 16));
+			g_MemoryLookupTableRead[start_addr|(0x8000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[read_region]) - (((start>>16)|0x8000) << 16));
+			g_MemoryLookupTableRead[start_addr|(0xA000>>2)].pRead = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[read_region]) - (((start>>16)|0xA000) << 16));
 		}
 
 		if (write_region)
 		{
-			g_MemoryLookupTableWrite[start_addr|(0x8000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[write_region]) - (((start>>16)|0x8000) << 16));
-			g_MemoryLookupTableWrite[start_addr|(0xA000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(g_pMemoryBuffers[write_region]) - (((start>>16)|0xA000) << 16));
+			g_MemoryLookupTableWrite[start_addr|(0x8000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[write_region]) - (((start>>16)|0x8000) << 16));
+			g_MemoryLookupTableWrite[start_addr|(0xA000>>2)].pWrite = (u8*)(reinterpret_cast< uintptr_t >(gMemBuffers[write_region]) - (((start>>16)|0xA000) << 16));
 		}
 
 
@@ -370,221 +370,40 @@ void Memory_InitTables()
 	#endif
 	// Init RDRAM
 	// By default we init with EPAK (8Mb)
-	Memory_InitFunc
-	(
-		MEMORY_START_RDRAM,
-		MEMORY_SIZE_RDRAM_DEFAULT,
-		MEM_RD_RAM,
-		MEM_RD_RAM,
-		Read_8000_807F,
-		WriteValue_8000_807F
-	);
+	Memory_InitFunc( MEMORY_START_RDRAM, MEMORY_SIZE_RDRAM_DEFAULT, MEM_RD_RAM, MEM_RD_RAM,	Read_8000_807F, WriteValue_8000_807F);
 
 	// Need to turn off the EPAK
 	if (ram_size != MEMORY_8_MEG)
 	{
-		Memory_InitFunc
-		(
-			MEMORY_START_EXRDRAM,
-			MEMORY_SIZE_EXRDRAM,
-			MEM_UNUSED,
-			MEM_UNUSED,
-			ReadInvalid,
-			WriteValueInvalid
-		);
+		Memory_InitFunc(MEMORY_START_EXRDRAM, MEMORY_SIZE_EXRDRAM, MEM_UNUSED, MEM_UNUSED, ReadInvalid,	WriteValueInvalid);
 	}
 
-	// RDRAM Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_RAMREGS0,
-		MEMORY_SIZE_RAMREGS0,
-		MEM_RD_REG0,
-		MEM_RD_REG0,
-		Read_83F0_83F0,
-		WriteValue_83F0_83F0
-	);
 
-
-	// DMEM/IMEM
-	Memory_InitFunc
-	(
-		MEMORY_START_SPMEM,
-		MEMORY_SIZE_SPMEM,
-		MEM_SP_MEM,
-		MEM_SP_MEM,
-		Read_8400_8400,
-		WriteValue_8400_8400
-	);
-
-	// SP Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_SPREG_1,
-		MEMORY_SIZE_SPREG_1,
-		MEM_SP_REG,
-		MEM_UNUSED,
-		Read_8404_8404,
-		WriteValue_8404_8404
-	);
-
-	// SP PC/OBOST
-	Memory_InitFunc
-	(
-		MEMORY_START_SPREG_2,
-		MEMORY_SIZE_SPREG_2,
-		MEM_SP_PC_REG,
-		MEM_SP_PC_REG,
-		Read_8408_8408,
-		WriteValue_8408_8408
-	);
-	// DPC Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_DPC,
-		MEMORY_SIZE_DPC,
-		MEM_DPC_REG,
-		MEM_UNUSED,
-		Read_8410_841F,
-		WriteValue_8410_841F
-	);
-
-	// DPS Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_DPS,
-		MEMORY_SIZE_DPS,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		Read_8420_842F,
-		WriteValue_8420_842F
-	);
-
-	// MI reg
-	Memory_InitFunc
-	(
-		MEMORY_START_MI,
-		MEMORY_SIZE_MI,
-		MEM_MI_REG,
-		MEM_UNUSED,
-		Read_8430_843F,
-		WriteValue_8430_843F
-	);
-
-	// VI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_VI,
-		MEMORY_SIZE_VI,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		Read_8440_844F,
-		WriteValue_8440_844F
-	);
-
-	// AI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_AI,
-		MEMORY_SIZE_AI,
-		MEM_AI_REG,
-		MEM_UNUSED,
-		Read_8450_845F,
-		WriteValue_8450_845F
-	);
-
-	// PI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_PI,
-		MEMORY_SIZE_PI,
-		MEM_PI_REG,
-		MEM_UNUSED,
-		Read_8460_846F,
-		WriteValue_8460_846F
-	);
-
-	// RI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_RI,
-		MEMORY_SIZE_RI,
-		MEM_RI_REG,
-		MEM_RI_REG,
-		Read_8470_847F,
-		WriteValue_8470_847F
-	);
-
-	// SI Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_SI,
-		MEMORY_SIZE_SI,
-		MEM_SI_REG,
-		MEM_UNUSED,
-		Read_8480_848F,
-		WriteValue_8480_848F
-	);
+	Memory_InitFunc(MEMORY_START_RAMREGS0, MEMORY_SIZE_RAMREGS0, MEM_RD_REG0, MEM_RD_REG0, Read_83F0_83F0, WriteValue_83F0_83F0); //RDRAM
+	Memory_InitFunc(MEMORY_START_SPMEM,MEMORY_SIZE_SPMEM, MEM_SP_MEM, MEM_SP_MEM,	Read_8400_8400, WriteValue_8400_8400);	// DMEM/IMEM
+	Memory_InitFunc(MEMORY_START_SPREG_1, MEMORY_SIZE_SPREG_1, MEM_SP_REG, MEM_UNUSED, Read_8404_8404, WriteValue_8404_8404); 	// SP Reg
+	Memory_InitFunc(MEMORY_START_SPREG_2,	MEMORY_SIZE_SPREG_2, MEM_SP_PC_REG, MEM_SP_PC_REG, Read_8408_8408, WriteValue_8408_8408);  // SP PC/OBOST
+	Memory_InitFunc(MEMORY_START_DPC, MEMORY_SIZE_DPC, MEM_DPC_REG,	MEM_UNUSED, Read_8410_841F, WriteValue_8410_841F);	// DPC Reg
+	Memory_InitFunc(MEMORY_START_DPS, MEMORY_SIZE_DPS, MEM_UNUSED, MEM_UNUSED, Read_8420_842F, WriteValue_8420_842F);	// DPS Reg
+	Memory_InitFunc(MEMORY_START_MI, MEMORY_SIZE_MI, MEM_MI_REG, MEM_UNUSED, Read_8430_843F, WriteValue_8430_843F);	// MI reg
+	Memory_InitFunc(MEMORY_START_VI, MEMORY_SIZE_VI, MEM_UNUSED, MEM_UNUSED, Read_8440_844F, WriteValue_8440_844F);	// VI Reg
+	Memory_InitFunc(MEMORY_START_AI, MEMORY_SIZE_AI, MEM_AI_REG, MEM_UNUSED, Read_8450_845F, WriteValue_8450_845F);	// AI Reg
+	Memory_InitFunc(MEMORY_START_PI, MEMORY_SIZE_PI, MEM_PI_REG, MEM_UNUSED, Read_8460_846F, WriteValue_8460_846F);	// PI Reg
+	Memory_InitFunc(MEMORY_START_RI, MEMORY_SIZE_RI, MEM_RI_REG, MEM_RI_REG, Read_8470_847F, WriteValue_8470_847F); 	// RI Reg
+	Memory_InitFunc(MEMORY_START_SI, MEMORY_SIZE_SI, MEM_SI_REG, MEM_UNUSED, Read_8480_848F, WriteValue_8480_848F);	// SI Reg
 
 	// Ignore C1A1 and C2A1
 	// As a matter of fact handling C2A1 breaks Pokemon Stadium 1 and F-Zero U
-
-	// Cartridge Domain 2 Address 1 (SRAM)
-	/*Memory_InitFunc
-	(
-		MEMORY_START_C2A1,
-		MEMORY_SIZE_C2A1,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		ReadInvalid,
-		WriteValueInvalid
-	);*/
-
-	// Cartridge Domain 1 Address 1 (SRAM)
-	/*Memory_InitFunc
-	(
-		MEMORY_START_C1A1,
-		MEMORY_SIZE_C1A1,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		ReadInvalid,
-		WriteValueInvalid
-	);*/
-
-	// PIF Reg
-	Memory_InitFunc
-	(
-		MEMORY_START_PIF,
-		MEMORY_SIZE_PIF,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		Read_9FC0_9FCF,
-		WriteValue_9FC0_9FCF
-	);
-
+	//Memory_InitFunc(MEMORY_START_C2A1, MEMORY_SIZE_C2A1, MEM_UNUSED, MEM_UNUSED, ReadInvalid, WriteValueInvalid ;	// Cartridge Domain 2 Address 1 (SRAM)
+  //Memory_InitFunc(MEMORY_START_C1A1, MEMORY_SIZE_C1A1, MEM_UNUSED, MEM_UNUSED, ReadInvalid, WriteValueInvalid); 	// Cartridge Domain 1 Address 1 (SRAM)
+ Memory_InitFunc( MEMORY_START_PIF, MEMORY_SIZE_PIF, MEM_UNUSED, MEM_UNUSED, Read_9FC0_9FCF, WriteValue_9FC0_9FCF); 	// PIF Reg
 	// Cartridge Domain 2 Address 2 (FlashRam)
 	// FlashRam Read is at 0x800, and FlashRam Write at 0x801
 	// BUT since we shift off the insignificant bits, we can't do that, so is handled in the functions itself
-	Memory_InitFunc
-	(
-		MEMORY_START_C2A2,
-		MEMORY_SIZE_C2A2,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		ReadFlashRam,
-		WriteValue_FlashRam
-	);
+	Memory_InitFunc( MEMORY_START_C2A2, MEMORY_SIZE_C2A2, MEM_UNUSED, MEM_UNUSED, ReadFlashRam, WriteValue_FlashRam);
 
 	// Cartridge Domain 1 Address 2 (Rom)
-	Memory_InitFunc
-	(
-		MEMORY_START_ROM_IMAGE,
-		rom_size,
-		MEM_UNUSED,
-		MEM_UNUSED,
-		ReadROM,
-		WriteValue_ROM
-	);
+	Memory_InitFunc( MEMORY_START_ROM_IMAGE, rom_size, MEM_UNUSED, MEM_UNUSED, ReadROM,WriteValue_ROM);
 
 	// Hack the TLB Map per game
 	if (g_ROM.GameHacks == GOLDEN_EYE)
@@ -854,7 +673,7 @@ void MemoryUpdatePI( u32 value )
 // The PIF control byte has been written to - process this command
 void MemoryUpdatePIF()
 {
-	u8 * pPIFRam = (u8 *)g_pMemoryBuffers[MEM_PIF_RAM];
+	u8 * pPIFRam = (u8 *)gMemBuffers[MEM_PIF_RAM];
 	u8 command = pPIFRam[ 0x3F ^ U8_TWIDDLE];
 	if (command == 0x08)
 	{
