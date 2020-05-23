@@ -341,7 +341,7 @@ inline float pspFpuSqrt(float fs)
 #if 1	//0=fast, 1=original //Corn
 inline float pspFpuAbs(float fs)
 {
-	register float fd;
+ float fd;
 	asm (
 		"abs.s %0, %1\n"
 		: "=f"(fd)
@@ -393,14 +393,14 @@ inline int pspFpuRound(float fs)
 /*
 inline float pspFpuMax(float fs1, float fs2)
 {
-	register float fd;
+float fd;
 	fd = (fs1 > fs2) ? fs1 : fs2;
 	return (fd);
 }
 
 inline float pspFpuMin(float fs1, float fs2)
 {
-	register float fd;
+ float fd;
 	fd = (fs1 < fs2) ? fs1 : fs2;
 	return (fd);
 }
