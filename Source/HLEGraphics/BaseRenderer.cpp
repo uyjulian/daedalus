@@ -441,7 +441,7 @@ bool BaseRenderer::AddTri(u32 v0, u32 v1, u32 v2)
 	}
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-	DL_PF("    Tri: %d,%d,%d (Rendered)", v0, v1, v2);
+	DL_PF("    Tri: %d,%d,%d (Rendered)", v0, v1, v2);yeah
 	++mNumTrisRendered;
 #endif
 
@@ -1923,10 +1923,14 @@ void BaseRenderer::PrepareTexRectUVs(TexCoord * puv0, TexCoord * puv1)
 CRefPtr<CNativeTexture> BaseRenderer::LoadTextureDirectly( const TextureInfo & ti )
 {
 	CRefPtr<CNativeTexture> texture = CTextureCache::Get()->GetOrCreateTexture( ti );
-	#ifdef DAEDALUS_ENABLE_ASSERTS
-	DAEDALUS_ASSERT( texture, "texture is NULL" );
-#endif
-	texture->InstallTexture();
+	if (texture)
+	{
+		texture->InstallTexture();
+	}
+	else
+	{
+		DAEDALUS_ERROR("Texture is null");
+	}
 
 	mBoundTexture[0] = texture;
 	mBoundTextureInfo[0] = ti;
