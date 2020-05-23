@@ -1,8 +1,8 @@
 #include "Base/Daedalus.h"
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-#include "WebDebug.h"
-#include "WebDebugTemplate.h"
+#include "Debug/WebDebug.h"
+#include "Debug/WebDebugTemplate.h"
 #include "third_party/webby/webby.h"
 
 #ifdef DAEDALUS_W32

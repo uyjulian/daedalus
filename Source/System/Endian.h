@@ -17,12 +17,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
-
-#include "Base/Types.h"
 
 #ifndef SYSTEM_ENDIAN_H_
 #define SYSTEM_ENDIAN_H_
+
+#include "Base/Types.h"
 
 #if (DAEDALUS_ENDIAN_MODE == DAEDALUS_ENDIAN_BIG)
 

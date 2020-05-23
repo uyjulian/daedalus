@@ -17,10 +17,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
 
-#ifndef SYSPSP_UTILITY_PATHSPOSIX_H_
-#define SYSPSP_UTILITY_PATHSPOSIX_H_
+
+#ifndef SYSPOSIX_UTILITY_PATHSPOSIX_H_
+#define SYSPOSIX_UTILITY_PATHSPOSIX_H_
 
 #define DAEDALUS_POSIX_PATH(p)				p
 

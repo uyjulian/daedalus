@@ -18,9 +18,6 @@
 
 */
 
-
-#pragma once
-
 #ifndef HLEGRAPHICS_RDP_H_
 #define HLEGRAPHICS_RDP_H_
 

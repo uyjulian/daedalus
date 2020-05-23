@@ -18,7 +18,7 @@
 
 */
 
-#pragma once
+
 
 #ifndef BASE_ASSERT_H_
 #define BASE_ASSERT_H_

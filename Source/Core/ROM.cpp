@@ -18,35 +18,34 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-#include "ROM.h"
+#include "Base/Macros.h"
+#include "Base/MathUtil.h"
 
 #include <stdio.h>
 
 #include "Core/Cheats.h"
 #include "Core/CPU.h"
+#include "Core/FramerateLimiter.h"
 #include "Core/PIF.h"		// CController
 #include "Core/R4300.h"
+#include "Core/ROM.h"
 #include "Core/ROMBuffer.h"
 #include "Core/ROMImage.h"
 #include "Core/RomSettings.h"
-
 #include "Config/ConfigOptions.h"
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
-#include "Interface/RomDB.h"
-#include "Base/MathUtil.h"
-#include "OSHLE/OSHLE.h"			// OSHLE_ApplyPatches
-#include "Ultra/ultra_os.h"		// System type
-#include "Ultra/ultra_R4300.h"
 #include "HLEAudio/AudioPlugin.h"
 #include "HLEGraphics/GraphicsPlugin.h"
-#include "Utility/CRC.h"
-#include "Core/FramerateLimiter.h"
-#include "System/IO.h"
-#include "Base/Macros.h"
 #include "Interface/Preferences.h"
+#include "Interface/RomDB.h"
+#include "OSHLE/OSHLE.h"			// OSHLE_ApplyPatches
 #include "RomFile/RomFile.h"
+#include "System/IO.h"
+#include "Ultra/ultra_os.h"		// System type
+#include "Ultra/ultra_R4300.h"
+#include "Utility/CRC.h"
 #include "Utility/Stream.h"
 
 

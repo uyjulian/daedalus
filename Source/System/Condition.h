@@ -1,4 +1,4 @@
-#pragma once
+
 
 #ifndef SYSTEM_CONDITION_H_
 #define SYSTEM_CONDITION_H_

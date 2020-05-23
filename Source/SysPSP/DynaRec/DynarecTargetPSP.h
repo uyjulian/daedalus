@@ -17,7 +17,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
+
 
 #ifndef SYSPSP_DYNAREC_DYNARECTARGETPSP_H_
 #define SYSPSP_DYNAREC_DYNARECTARGETPSP_H_

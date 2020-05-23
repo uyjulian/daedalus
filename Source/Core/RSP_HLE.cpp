@@ -16,15 +16,15 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-
-#include "Base/Daedalus.h"
-
-#include "Core/RSP_HLE.h"
-
 #include <vector>
 #include <algorithm>
 
+
+#include "Base/Daedalus.h"
+
 #include "Core/Interrupt.h"
+#include "Core/PrintOpCode.h"
+#include "Core/RSP_HLE.h"
 #include "Core/Memory.h"
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
@@ -35,7 +35,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_sptask.h"
 #include "HLEAudio/AudioPlugin.h"
 #include "System/IO.h"
-#include "Core/PrintOpCode.h"
 #include "Utility/Profiler.h"
 
 

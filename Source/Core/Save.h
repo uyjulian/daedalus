@@ -17,7 +17,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
+#ifndef CORE_SAVE_H_
+#define CORE_SAVE_H_
+
 
 void Save_GetDirectory(char* rootdir, const char* rom_filename, const char* extension);
 
@@ -28,3 +30,5 @@ void Save_MarkSaveDirty();
 void Save_MarkMempackDirty();
 
 void Save_Flush(bool force = false);
+
+#endif // CORE_SAVE_H_

@@ -18,7 +18,7 @@
  *
  ******************************************************************************/
 
-#pragma once
+
 
 #ifndef UTILITY_INIFILE_H_
 #define UTILITY_INIFILE_H_

@@ -17,7 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
+#ifndef CORE_TLB_H
+#define CORE_TLB_H
 
 #include "Base/Alignment.h"
 #include "Base/Types.h"
@@ -46,3 +47,5 @@ public:
 };
 
 ALIGNED_EXTERN(TLBEntry, g_TLBs[32], CACHE_ALIGN);
+
+#endif //CORE_TLB_H

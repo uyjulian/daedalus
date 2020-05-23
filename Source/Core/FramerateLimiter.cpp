@@ -18,13 +18,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-#include "Core/FramerateLimiter.h"
 
+#include "Core/FramerateLimiter.h"
+#include "Core/Memory.h"
+#include "Core/ROM.h"
 #include "System/Timing.h"
 #include "System/Thread.h"
 
-#include "Core/Memory.h"
-#include "Core/ROM.h"
 
 static u32				gTicksBetweenVbls = 0;			// How many ticks we want to delay between vertical blanks
 static u32				gTicksPerSecond = 0;			// How many ticks there are per second

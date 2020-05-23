@@ -18,12 +18,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-#include "Core/Disassemble.h"
+
 
 #include <ctype.h>
 #include <stdio.h>
 
 #include "Core/CPU.h"
+#include "Core/Disassemble.h"
 #include "Core/Memory.h"
 #include "Core/PrintOpCode.h"
 #include "Core/ROMBuffer.h"

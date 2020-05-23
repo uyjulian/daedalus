@@ -86,19 +86,16 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 // Stuff to handle controllers
 
 #include "Base/Daedalus.h"
+#include "Base/MathUtil.h"
 
 #include "Core/PIF.h"
 #include "Core/CPU.h"
 #include "Core/Memory.h"
 #include "Core/ROM.h"
 #include "Core/Save.h"
-
-#include "Base/MathUtil.h"
-#include "Interface/Preferences.h"
-
 #include "Debug/Console.h"
 #include "Input/InputManager.h"
-
+#include "Interface/Preferences.h"
 #include "Ultra/ultra_os.h"
 
 #include <time.h>

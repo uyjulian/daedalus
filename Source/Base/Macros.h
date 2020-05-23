@@ -1,4 +1,4 @@
-#pragma once
+
 
 #ifndef BASE_MACROS_H_
 #define BASE_MACROS_H_

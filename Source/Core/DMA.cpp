@@ -21,22 +21,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Daedalus.h"
 
-#include "Core/DMA.h"
+
 
 #include <vector>
-#include "Core/Memory.h"
-#include "Core/RSP_HLE.h"
+
 #include "Core/CPU.h"
+#include "Core/DMA.h"
+#include "Core/Interrupt.h"
+#include "Core/Memory.h"
+#include "Core/Save.h"
+#include "Core/PIF.h"
 #include "Core/ROM.h"
 #include "Core/ROMBuffer.h"
-#include "Core/PIF.h"
-#include "Core/Interrupt.h"
-#include "Core/Save.h"
-
+#include "Core/RSP_HLE.h"
+#include "Debug/Console.h"
+#include "Debug/DebugLog.h"
 #include "Utility/FastMemcpy.h"
 
-#include "Debug/DebugLog.h"
-#include "Debug/Console.h"
+
 #include <algorithm>
 
 static std::vector<DMAEventHandler*> gDMAEventHandlers;

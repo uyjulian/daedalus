@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Various stuff to map an address onto the correct memory region
 
 #include "Base/Daedalus.h"
-#include "Core/Memory.h"
+
 
 #include <vector>
 #include <algorithm>
@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/DMA.h"
 #include "Core/FlashMem.h"
 #include "Core/Interrupt.h"
+#include "Core/Memory.h"
 #include "Core/ROM.h"
 #include "Core/ROMBuffer.h"
 #include "Debug/Console.h"

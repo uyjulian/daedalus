@@ -17,7 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#pragma once
 
 #ifndef DYNAREC_WINDOWS_X86_ASSEMBLYWRITERX86_H_
 #define DYNAREC_WINDOWS_X86_ASSEMBLYWRITERX86_H_

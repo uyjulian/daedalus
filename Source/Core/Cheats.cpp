@@ -18,19 +18,18 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include "Base/Daedalus.h"
-#include "Cheats.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Memory.h"
-#include "ROM.h"
-#include "Config/ConfigOptions.h"
+#include "Base/Daedalus.h"
 
-#include "Ultra/ultra_R4300.h"
+#include "Core/Cheats.h"
+#include "Config/ConfigOptions.h"
+#include "Core/Memory.h"
+#include "Core/ROM.h"
 #include "System/Paths.h"
 #include "System/IO.h"
+#include "Ultra/ultra_R4300.h"
 #include "Utility/StringUtil.h"
 #include "Utility/VolatileMem.h"
 

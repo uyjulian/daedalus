@@ -17,20 +17,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-#include "R4300.h"
-
-#include "CPU.h"
-#include "Interrupt.h"
-#include "ROM.h"
+#include "Base/Macros.h"
 
 #include "Config/ConfigOptions.h"
+#include "Core/Interrupt.h"
+#include "Core/CPU.h"
+#include "Core/R4300.h"
 #include "Core/Registers.h"			// For REG_?? defines
+#include "Core/ROM.h"
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
 #include "DynaRec/TraceRecorder.h"
 #include "Math/Math.h"	// VFPU Math
 #include "Ultra/ultra_R4300.h"
-#include "Base/Macros.h"
 
 #ifdef DAEDALUS_PSP
 #include <pspfpu.h>

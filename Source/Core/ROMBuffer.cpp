@@ -18,25 +18,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-#include "ROMBuffer.h"
+#include "Base/MathUtil.h"
 
-#include "ROM.h"
-#include "DMA.h"
+#include "Core/DMA.h"
+#include "Core/ROM.h"
+#include "Core/ROMBuffer.h"
+#include "Debug/Console.h"
+#include "Interface/Preferences.h"
+#include "RomFile/RomFile.h"
+#include "RomFile/RomFileCache.h"
+#include "Utility/Stream.h"
+#include "System/IO.h"
 
 #ifdef DAEDALUS_PSP
 #include "Graphics/GraphicsContext.h"
 #include "SysPSP/Graphics/intraFont/intraFont.h"
 #endif
 
-#include "Base/MathUtil.h"
-
-#include "Debug/Console.h"
-
-#include "Interface/Preferences.h"
-#include "RomFile/RomFile.h"
-#include "RomFile/RomFileCache.h"
-#include "Utility/Stream.h"
-#include "System/IO.h"
 
 #ifdef DAEDALUS_PSP
 

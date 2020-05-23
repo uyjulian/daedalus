@@ -18,21 +18,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "Base/Daedalus.h"
-#include "RomSettings.h"
-
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <set>
 #include <map>
 
+
+#include "Base/Daedalus.h"
+
 #include "Core/ROM.h"
+#include "Core/RomSettings.h"
 #include "Debug/Console.h"
 #include "Interface/RomDB.h"
 #include "System/Paths.h"
-#include "Utility/IniFile.h"
+
 #include "System/IO.h"
+#include "Utility/IniFile.h"
 
 namespace
 {

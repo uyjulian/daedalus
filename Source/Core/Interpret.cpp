@@ -17,8 +17,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-// Stuff to handle Processor
 #include "Base/Daedalus.h"
+#include "Base/Macros.h"
+#include "Config/ConfigOptions.h"
 
 #include "Core/CPU.h"
 #include "Core/Registers.h"					// For REG_?? defines
@@ -26,15 +27,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/Interrupt.h"
 #include "Core/R4300.h"
 #include "Core/Interpret.h"
-
-#include "Config/ConfigOptions.h"
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
+#include "Debug/Synchroniser.h"
 #include "OSHLE/OSHLE.h"
 #include "Ultra/ultra_R4300.h"
-#include "Base/Macros.h"
 #include "Utility/Profiler.h"
-#include "Debug/Synchroniser.h"
+
 
 //*****************************************************************************
 //	Execute a single MIPS op. The conditionals for the templated arguments
@@ -48,7 +47,7 @@ template< bool TranslateOp > DAEDALUS_FORCEINLINE void CPU_EXECUTE_OP()
 	const u8 * p_Instruction;
 
 	CPU_FETCH_INSTRUCTION( p_Instruction, gCPUState.CurrentPC );
-	OpCode op_code = *(const OpCode*)p_Instruction; 
+	OpCode op_code = *(const OpCode*)p_Instruction;
 
 	// Cache instruction base pointer (used for SpeedHack() @ R4300.0)
 	gLastAddress = p_Instruction;

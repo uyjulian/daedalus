@@ -18,12 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "Base/Daedalus.h"
-
-#include "ROM.h"
-#include "Memory.h"
-#include "Save.h"
-
 #include "Config/ConfigOptions.h"
+#include "Core/ROM.h"
+#include "Core/Memory.h"
+#include "Core/Save.h"
 #include "Debug/Console.h"
 #include "Debug/Dump.h"
 #include "System/IO.h"

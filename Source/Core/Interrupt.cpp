@@ -20,15 +20,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Handle interrupts etc
 #include "Base/Daedalus.h"
 
+#include "Core/CPU.h"
+#include "Core/Interrupt.h"
+#include "Core/R4300.h"
+#include "Debug/Console.h"
 #include "Debug/DebugLog.h"
-
-#include "CPU.h"
-#include "Interrupt.h"
 #include "Ultra/ultra_rcp.h"
 #include "Ultra/ultra_R4300.h"
-#include "R4300.h"
 
-#include "Debug/Console.h"
 
 inline void SET_EXCEPTION(u32 mask, u32 exception)
 {

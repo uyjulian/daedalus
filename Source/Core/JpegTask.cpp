@@ -35,7 +35,7 @@
 #include <string.h>
 
 #include "Debug/Console.h"
-#include "Memory.h"
+#include "Core/Memory.h"
 #include "Ultra/ultra_sptask.h"
 
 #define SUBBLOCK_SIZE 64
@@ -256,7 +256,7 @@ void jpeg_decode_OB(OSTask *task)
             RShiftSubBlock(qtable, DEFAULT_QTABLE, -qscale);
         }
     }
-	
+
     for (u32 mb = 0; mb < macroblock_count; ++mb)
     {
         s16 macroblock[6 * SUBBLOCK_SIZE];
