@@ -44,6 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysGL/Interface/UI.h"
 #endif
 
+#include "OSHLE/OSHLE.h"
 #include "Core/FramerateLimiter.h"
 #include "Debug/Synchroniser.h"
 #include "Base/Macros.h"
