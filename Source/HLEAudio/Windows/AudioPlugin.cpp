@@ -62,11 +62,11 @@ public:
 	virtual ~CAudioPluginW32() {}
 	virtual void			StopEmulation();
 
-	virtual void			DacrateChanged( int SystemType );
+	virtual void			DacrateChanged( ESystemType SystemType );
 	virtual void			LenChanged();
 	virtual u32				ReadLength();
 	virtual EProcessResult	ProcessAList();
-	virtual void			Update( bool wait );
+	virtual void			UpdateOnVbl( bool wait );
 private:
 	u32 Frequency, Dacrate, Snd1Len, SpaceLeft, SndBuffer[3], Playing;
 	u8 *Snd1ReadPos;

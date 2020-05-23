@@ -74,7 +74,7 @@ public:
 	virtual ~AudioPluginPSP();
 	virtual void			StopEmulation();
 
-	virtual void			DacrateChanged( int system_type );
+	virtual void			DacrateChanged( ESystemType SystemType );
 	virtual void			LenChanged();
 	virtual u32				ReadLength() {return 0;}
 	virtual EProcessResult	ProcessAList();
@@ -82,6 +82,7 @@ public:
 	//virtual void SetFrequency(u32 frequency);
 	virtual void AddBuffer( u8 * start, u32 length);
 	virtual void FillBuffer( Sample * buffer, u32 num_samples);
+  	virtual void			UpdateOnVbl( bool wait ) {};
 
 	virtual void StopAudio();
 	virtual void StartAudio();
@@ -216,9 +217,9 @@ void	AudioPluginPSP::StopEmulation()
 
 }
 
-void	AudioPluginPSP::DacrateChanged( int system_type )
+void	AudioPluginPSP::DacrateChanged( ESystemType SystemType )
 {
-u32 clock = (system_type == ST_NTSC) ? VI_NTSC_CLOCK : VI_PAL_CLOCK;
+u32 clock = (SystemType == ST_NTSC) ? VI_NTSC_CLOCK : VI_PAL_CLOCK;
 u32 dacrate = Memory_AI_GetRegister(AI_DACRATE_REG);
 u32 frequency = clock / (dacrate + 1);
 

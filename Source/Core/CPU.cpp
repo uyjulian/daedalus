@@ -44,6 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
+#include "HLEAudio/AudioPlugin.h"
 #include "Interface/SaveState.h"
 #include "Ultra/ultra_R4300.h"
 #include "Main/SystemInit.h"
@@ -53,9 +54,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Hash.h"
 
 
-#ifdef DAEDALUS_W32
-#include "HLEAudio/AudioPlugin.h"
-#endif
 
 extern void R4300_Init();
 
@@ -670,10 +668,12 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 			gVerticalInterrupts++;
 
 			FramerateLimiter_Limit();
-#ifdef DAEDALUS_W32
-			if (gAudioPlugin != nullptr)
-				gAudioPlugin->Update(false);
-#endif
+
+			if (gAudioPlugin != NULL)
+			{
+				gAudioPlugin->UpdateOnVbl(false);
+			}
+
 			Memory_MI_SetRegisterBits(MI_INTR_REG, MI_INTR_VI);
 			R4300_Interrupt_UpdateCause3();
 
