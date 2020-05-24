@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/NativeTexture.h"
 #include "HLEGraphics/DLDebug.h"
+#include "HLEGraphics/DaedalusVtx.h"
 #include "HLEGraphics/RDPStateManager.h"
 #include "HLEGraphics/TextureCache.h"
 #include "Interface/GlobalPreferences.h"
@@ -45,28 +46,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 struct TempVerts
 {
 	TempVerts()
-	:	Verts(NULL)
+	:	Verts(nullptr)
 	,	Count(0)
 	{
 	}
 
 	~TempVerts()
 	{
-#ifdef DAEDALUS_GL
-		free(Verts);
-#endif
+		delete [] Verts;
 	}
 
 	DaedalusVtx * Alloc(u32 count)
 	{
-		u32 bytes = count * sizeof(DaedalusVtx);
-#ifdef DAEDALUS_PSP
-		Verts = static_cast<DaedalusVtx*>(sceGuGetMemory(bytes));
-#endif
-#ifdef DAEDALUS_GL
-		Verts = static_cast<DaedalusVtx*>(malloc(bytes));
-#endif
-
+		Verts = new DaedalusVtx[count];
 		Count = count;
 		return Verts;
 	}
@@ -93,11 +85,6 @@ void	_ConvertVerticesIndexed( DaedalusVtx * dest, const DaedalusVtx4 * source, u
 u32		_ClipToHyperPlane( DaedalusVtx4 * dest, const DaedalusVtx4 * source, const v4 * plane, u32 num_verts );
 }
 
-#define GL_TRUE                           1
-#define GL_FALSE                          0
-
-#undef min
-#undef max
 
 extern bool gRumblePakActive;
 extern u32 gAuxAddr;
@@ -108,12 +95,6 @@ u32 uViWidth = 320;
 u32 uViHeight = 240;
 
 f32 gZoomX=1.0;	//Default is 1.0f
-
-#ifdef DAEDALUS_DEBUG_DISPLAYLIST
-// General purpose variable used for debugging
-f32 TEST_VARX = 0.0f;
-f32 TEST_VARY = 0.0f;
-#endif
 
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 
@@ -572,17 +553,6 @@ u32 clip_tri_to_frustum( DaedalusVtx4 * v0, DaedalusVtx4 * v1 )
 
 #else	// FPU/CPU(slower)
 
-
-//CPU interpolate line parameters
-
-void DaedalusVtx4::Interpolate( const DaedalusVtx4 & lhs, const DaedalusVtx4 & rhs, float factor )
-{
-	ProjectedPos = lhs.ProjectedPos + (rhs.ProjectedPos - lhs.ProjectedPos) * factor;
-	TransformedPos = lhs.TransformedPos + (rhs.TransformedPos - lhs.TransformedPos) * factor;
-	Colour = lhs.Colour + (rhs.Colour - lhs.Colour) * factor;
-	Texture = lhs.Texture + (rhs.Texture - lhs.Texture) * factor;
-	ClipFlags = 0;
-}
 
 
 //CPU line clip to plane
@@ -1892,6 +1862,16 @@ inline void FixUV(u32 * wrap, s16 * c0_, s16 * c1_, s16 offset, u32 size)
 	*c1_ = c1;
 }
 
+inline s16 ApplyShift(s16 c, u8 shift)
+{
+	if (shift <= 10)
+	{
+		return c << shift;
+	}
+
+	return c >> (16 - shift);
+}
+
 // puv0, puv1 are in/out arguments.
 void BaseRenderer::PrepareTexRectUVs(TexCoord * puv0, TexCoord * puv1)
 {
@@ -1979,7 +1959,7 @@ void BaseRenderer::SetScissor( u32 x0, u32 y0, u32 x1, u32 y1 )
 
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 
-void BaseRenderer::SetProjection(const u32 address, bool bReplace)
+void BaseRenderer::SetProjection(u32 address, bool bReplace)
 {
 	// Projection
 	if (bReplace)
@@ -2019,7 +1999,7 @@ void BaseRenderer::SetProjection(const u32 address, bool bReplace)
 }
 
 
-void BaseRenderer::SetDKRMat(const u32 address, bool mul, u32 idx)
+void BaseRenderer::SetDKRMat(u32 address, bool mul, u32 idx)
 {
 	mDKRMatIdx = idx;
 	mWPmodified = true;
@@ -2049,7 +2029,7 @@ void BaseRenderer::SetDKRMat(const u32 address, bool mul, u32 idx)
 #endif
 }
 
-void BaseRenderer::SetWorldView(const u32 address, bool bPush, bool bReplace)
+void BaseRenderer::SetWorldView(u32 address, bool bPush, bool bReplace)
 {
 	// ModelView
 	if (bPush && (mModelViewTop < mMatStackSize))
@@ -2201,7 +2181,7 @@ void BaseRenderer::InsertMatrix(u32 w0, u32 w1)
 
 //Replaces the WorldProject matrix //Corn
 
-void BaseRenderer::ForceMatrix(const u32 address)
+void BaseRenderer::ForceMatrix(u32 address)
 {
 	mWorldProjectValid = true;
 	mWPmodified = true;	//Signal that Worldproject matrix is changed
