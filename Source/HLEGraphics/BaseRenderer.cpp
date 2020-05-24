@@ -89,26 +89,27 @@ u32		_ClipToHyperPlane( DaedalusVtx4 * dest, const DaedalusVtx4 * source, const 
 extern bool gRumblePakActive;
 extern u32 gAuxAddr;
 
-static f32 fViWidth = 320.0f;
+f32 gZoomX	  			 = 1.0f;	//Default is 1.0f
+static f32 fViWidth  = 320.0f;
 static f32 fViHeight = 240.0f;
-u32 uViWidth = 320;
-u32 uViHeight = 240;
+u32 			 uViWidth  = 320;
+u32 			 uViHeight = 240;
 
-f32 gZoomX=1.0;	//Default is 1.0f
+
 
 extern void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address );
 
 BaseRenderer::BaseRenderer()
-:	mN64ToScreenScale( 2.0f, 2.0f )
-,	mN64ToScreenTranslate( 0.0f, 0.0f )
-,	mMux( 0 )
+:	mN64ToScreenScale(2.0f, 2.0f)
+,	mN64ToScreenTranslate(0.0f, 0.0f)
+,	mMux(0)
 
 ,	mTextureTile(0)
 
-,	mPrimDepth( 0.0f )
-,	mPrimLODFraction( 0.f )
+,	mPrimDepth(0.0f)
+,	mPrimLODFraction(0.f)
 
-,	mFogColour(0x00ffffff)			// NB top bits not set. Intentional?
+,	mFogColour(0x00ffffff) // NB top bits not set. Intentional?
 ,	mPrimitiveColour(0xffffffff)
 ,	mEnvColour(0xffffffff)
 ,	mBlendColour(255, 255, 255, 0)
@@ -123,12 +124,12 @@ BaseRenderer::BaseRenderer()
 ,	mScreenHeight(0.f)
 
 ,	mNumIndices(0)
-,	mVtxClipFlagsUnion( 0 )
+,	mVtxClipFlagsUnion(0)
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
-,	mNumTrisRendered( 0 )
-,	mNumTrisClipped( 0 )
-,	mNumRect( 0 )
+,	mNumTrisRendered(0)
+,	mNumTrisClipped(0)
+,	mNumRect(0)
 ,	mNastyTexture(false)
 #endif
 {
@@ -1617,10 +1618,16 @@ inline void BaseRenderer::SetVtxXY( u32 vert, float x, float y )
 void BaseRenderer::ResetMatrices(u32 size)
 {
 	//Tigger's Honey Hunt
-	if(size == 0)
-		size = MATRIX_STACK_SIZE;
+	if (size == 0)
+	{
+		size = kMatrixStackSize;
+	}
+	else if (size > kMatrixStackSize)
+	{
+		size = kMatrixStackSize;
+	}
 
-	mMatStackSize = (size > MATRIX_STACK_SIZE) ? MATRIX_STACK_SIZE : size;
+	mMatStackSize = size;
 	mModelViewTop = 0;
 	mProjectionMat = mModelViewStack[0] = gMatrixIdentity;
 	mWorldProjectValid = false;

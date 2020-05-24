@@ -241,8 +241,8 @@ public:
 #else
 	inline void			SetPrimitiveDepth( u32 z )				{ mPrimDepth = (f32)(z - 0x4000) / (f32)0x4000;}
 #endif
-	inline void			SetPrimitiveLODFraction( f32 f )		{ mPrimLODFraction = f; }
-	inline void			SetPrimitiveColour( c32 colour )		{ mPrimitiveColour = colour; }
+	inline void			SetPrimitiveLODFraction( f32 f )	{ mPrimLODFraction = f; }
+	inline void			SetPrimitiveColour( c32 colour )	{ mPrimitiveColour = colour; }
 	inline void			SetEnvColour( c32 colour )				{ mEnvColour = colour; }
 	inline void			SetBlendColour( c32 colour )			{ mBlendColour = colour; }
 	inline void			SetFillColour( u32 colour )				{ mFillColour = colour; }
@@ -424,12 +424,12 @@ protected:
 
 	//Max is 18 according to the manual //Corn
 	//I think we should make this more deep to avoid any issues //Salvy
-	static const u32 MATRIX_STACK_SIZE = 20;
+	static const u32 kMatrixStackSize = 20;
 
 	mutable Matrix4x4	mWorldProject;
 	Matrix4x4				  mTempMat;
 	Matrix4x4			 		mProjectionMat;
-	Matrix4x4					mModelViewStack[MATRIX_STACK_SIZE];	//DKR reuses these and need at least 4 //Corn
+	Matrix4x4					mModelViewStack[kMatrixStackSize];	//DKR reuses these and need at least 4 //Corn
 	u32								mModelViewTop;
 	u32								mMatStackSize;
 	mutable bool			mWorldProjectValid;
