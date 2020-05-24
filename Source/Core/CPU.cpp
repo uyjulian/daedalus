@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Console.h"
 #include "Debug/DebugLog.h"
 #include "Debug/Synchroniser.h"
-#include "HLEAudio/AudioPlugin.h"
+#include "HLEAudio/HLEAudio.h"
 #include "Interface/SaveState.h"
 #include "Ultra/ultra_R4300.h"
 #include "Main/SystemInit.h"
@@ -669,7 +669,7 @@ void CPU_HANDLE_COUNT_INTERRUPT()
 
 			FramerateLimiter_Limit();
 
-				gAudioPlugin->UpdateOnVbl(false);
+				gHLEAudio->UpdateOnVbl(false);
 
 			Memory_MI_SetRegisterBits(MI_INTR_REG, MI_INTR_VI);
 			R4300_Interrupt_UpdateCause3();

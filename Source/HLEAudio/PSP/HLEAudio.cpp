@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <pspaudiolib.h>
 #include <pspaudio.h>
 
-#include "HLEAudio/AudioPlugin.h"
+#include "HLEAudio/HLEAudio.h"
 #include "HLEAudio/audiohle.h"
 
 #include "Config/ConfigOptions.h"
@@ -47,7 +47,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/FramerateLimiter.h"
 #include "System/Thread.h"
 
-CAudioPlugin* gAudioPlugin = nullptr;
+CAudioPlugin* gHLEAudio = nullptr;
 EAudioMode gAudioMode( AM_DISABLED );
 
 #define RSP_AUDIO_INTR_CYCLES     1
@@ -133,8 +133,8 @@ private:
 
 bool CreateAudioPlugin()
 {
-	DAEDALUS_ASSERT(gAudioPlugin == nullptr, "Why is there already an audio plugin?");
-	gAudioPlugin = new AudioPluginPSP();
+	DAEDALUS_ASSERT(gHLEAudio == nullptr, "Why is there already an audio plugin?");
+	gHLEAudio = new AudioPluginPSP();
 	return true;
 }
 
@@ -144,8 +144,8 @@ void DestroyAudioPlugin()
 	// This stops other threads from trying to access the plugin
 	// while we're in the process of shutting it down.
 	// TODO(strmnnrmn): Still looks racey.
-	AudioPluginPSP* plugin = static_cast<AudioPluginPSP*>(gAudioPlugin);
-	gAudioPlugin = nullptr;
+	AudioPluginPSP* plugin = static_cast<AudioPluginPSP*>(gHLEAudio);
+	gHLEAudio = nullptr;
 	if (plugin != nullptr)
 	{
 		plugin->Stop();

@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_mbi.h"
 #include "Ultra/ultra_rcp.h"
 #include "Ultra/ultra_sptask.h"
-#include "HLEAudio/AudioPlugin.h"
+#include "HLEAudio/HLEAudio.h"
 #include "System/IO.h"
 #include "Utility/Profiler.h"
 
@@ -214,7 +214,7 @@ static EProcessResult ProcessGfxTask()
 static EProcessResult ProcessAudTask()
 {
 	DAEDALUS_PROFILE( "HLE: Audio" );
-		return gAudioPlugin->ProcessAList();
+		return gHLEAudio->ProcessAList();
 }
 
 // ProcessJpegTask and RSP_HLE_CICX105 were borrowed from Mupen64plus

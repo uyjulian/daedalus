@@ -49,6 +49,6 @@ public:
 bool CreateAudioPlugin();
 void DestroyAudioPlugin();
 
-extern CAudioPlugin *	gAudioPlugin;
+extern CAudioPlugin *	gHLEAudio;
 
 #endif // PLUGINS_AUDIOPLUGIN_H_

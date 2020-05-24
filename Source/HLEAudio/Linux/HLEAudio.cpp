@@ -1,8 +1,8 @@
 #include "Base/Daedalus.h"
-#include "HLEAudio/AudioPlugin.h"
+#include "HLEAudio/HLEAudio.h"
 #include "Config/ConfigOptions.h"
 
-CAudioPlugin* gAudioPlugin = nullptr;
+CAudioPlugin* gHLEAudio = nullptr;
 EAudioMode gAudioMode = AM_DISABLED;
 
 

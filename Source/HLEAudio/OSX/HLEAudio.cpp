@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
 #include "stdafx.h"
-#include "Plugins/AudioPlugin.h"
+#include "Plugins/HLEAudio.h"
 
 #include <stdio.h>
 
@@ -42,8 +42,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Thread.h"
 #include "Utility/Timing.h"
 
-CAudioPlugin* gAudioPlugin = nullptr;
-EAudioPluginMode gAudioPluginEnabled = APM_DISABLED;
+CAudioPlugin* gHLEAudio = nullptr;
+EAudioPluginMode gHLEAudioEnabled = APM_DISABLED;
 
 #define DEBUG_AUDIO  0
 
@@ -101,8 +101,8 @@ private:
 
 bool CreateAudioPlugin()
 {
-	DAEDALUS_ASSERT(gAudioPlugin == nullptr, "Why is there already an audio plugin?");
-	gAudioPlugin = new AudioPluginOSX();
+	DAEDALUS_ASSERT(gHLEAudio == nullptr, "Why is there already an audio plugin?");
+	gHLEAudio = new AudioPluginOSX();
 	return true;
 }
 
@@ -112,8 +112,8 @@ void DestroyAudioPlugin()
 	// This stops other threads from trying to access the plugin
 	// while we're in the process of shutting it down.
 	// TODO(strmnnrmn): Still looks racey.
-		AudioPluginOSX* plugin = static_cast<AudioPluginOSX*>(gAudioPlugin);
-	gAudioPlugin = nullptr;
+		AudioPluginOSX* plugin = static_cast<AudioPluginOSX*>(gHLEAudio);
+	gHLEAudio = nullptr;
 	if (plugin != nullptr)
 	{
 		plugin->Stop();
@@ -154,7 +154,7 @@ void AudioPluginOSX::DacrateChanged(ESystemType system_type)
 
 void AudioPluginOSX::LenChanged()
 {
-	if (gAudioPluginEnabled > APM_DISABLED)
+	if (gHLEAudioEnabled > APM_DISABLED)
 	{
 		u32	address = Memory_AI_GetRegister(AI_DRAM_ADDR_REG) & 0xFFFFFF;
 		u32	length  = Memory_AI_GetRegister(AI_LEN_REG);
@@ -173,7 +173,7 @@ EProcessResult AudioPluginOSX::ProcessAList()
 
 	EProcessResult result = PR_NOT_STARTED;
 
-	switch (gAudioPluginEnabled)
+	switch (gHLEAudioEnabled)
 	{
 		case APM_DISABLED:
 			result = PR_COMPLETED;

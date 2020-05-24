@@ -39,7 +39,7 @@ project (DaedalusX64)
 				set (PSP_DVEMGR_FILES SysPSP/PRX/DveMgr/pspDveManager.S)
 				set (PSP_DYNAREC_FILES SysPSP/DynaRec/AssemblyWriterPSP.cpp SysPSP/DynaRec/AssemblyUtilsPSP.cpp SysPSP/DynaRec/CodeBufferManagerPSP.cpp SysPSP/DynaRec/CodeGeneratorPSP.cpp SysPSP/DynaRec/DynaRecStubs.S SysPSP/DynaRec/N64RegisterCachePSP.cpp)
 				set (PSP_GRAPHICS_FILES SysPSP/Graphics/DrawText.cpp Graphics/PSP/GraphicsContext.cpp SysPSP/Graphics/NativeTexturePSP.cpp SysPSP/Graphics/VideoMemoryManager.cpp SysPSP/Graphics/intraFont/intraFont.c SysPSP/Graphics/intraFont/libccc.c)
-				set (PSP_HLEAUDIO_FILES HLEAudio/PSP/AudioPlugin.cpp)
+				set (PSP_HLEAUDIO_FILES HLEAudio/PSP/HLEAudio.cpp)
 				set (PSP_HLEGRAPHICS_FILES SysPSP/HLEGraphics/Blender.cpp SysPSP/HLEGraphics/BlendModes.cpp SysPSP/HLEGraphics/ColourAdjuster.cpp SysPSP/HLEGraphics/ConvertVertices.S SysPSP/HLEGraphics/DisplayListDebugger.cpp HLEGraphics/PSP/GraphicsPlugin.cpp SysPSP/HLEGraphics/RendererPSP.cpp SysPSP/HLEGraphics/Combiner/BlendConstant.cpp SysPSP/HLEGraphics/Combiner/CombinerExpression.cpp SysPSP/HLEGraphics/Combiner/CombinerTree.cpp SysPSP/HLEGraphics/Combiner/RenderSettings.cpp SysPSP/HLEGraphics/TnLVFPU.S SysPSP/HLEGraphics/VectorClipping.S)
 				set (PSP_INPUTMANAGER_FILES SysPSP/Input/InputManagerPSP.cpp)
 				set (PSP_KERNELBUTTON_FILES SysPSP/PRX/KernelButtons/imposectrl.S)
@@ -77,7 +77,7 @@ project (DaedalusX64)
 				set (SYSGL_BUILD ${SYSGL_GRAPHICS} ${SYSGL_HLEGRAPHICS} ${SYSGL_INPUT} ${SYSGL_INTERFACE} ${PLUGIN_FILES})
 
 				#Windows -- Not sure if it works yet
-				set (WIN_AUDIO HLEAudio/Windows/AudioPlugin.cpp)
+				set (WIN_AUDIO HLEAudio/Windows/HLEAudio.cpp)
 				set (WIN_DEBUG SysW32/Debug/DaedalusAssertW32.cpp SysW32/Debug/DebugConsoleW32.cpp)
 				set (WIN_DYNAREC DynaRec/Windows/x86/AssemblyUtilsX86.cpp DynaRec/Windows/x86/AssemblyWriterX86.cpp DynaRec/Windows/x86/CodeBufferManagerX86.cpp DynaRec/Windows/x86/CodeGeneratorX86.cpp)
 				set (WIN_MAIN System/Platform/Windows/main.cpp)
@@ -96,8 +96,8 @@ project (DaedalusX64)
 				set (POSIX_DEFINES -DDAEDALUS_POSIX  -DDAEDALUS_ACCURATE_TMEM -DDAEDALUS_COMPRESSED_ROM_SUPPORT -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_GL -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE)
 
 				# These will remain separate for now..
-				set (LINUX_AUDIO HLEAudio/Linux/AudioPlugin.cpp)
-				set (MAC_AUDIO HLEAudio/OSX/AudioPluginOSX.cpp)
+				set (LINUX_AUDIO HLEAudio/Linux/HLEAudio.cpp)
+				set (MAC_AUDIO HLEAudio/OSX/HLEAudio.cpp)
 
 
 if (PSP_RELEASE)
