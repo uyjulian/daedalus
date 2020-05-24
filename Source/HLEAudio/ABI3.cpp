@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string.h>
 
-#include "audiohle.h"
+#include "HLEAudioInternal.h"
 #include "AudioHLEProcessor.h"
 
 // Disables the command because it's not used?

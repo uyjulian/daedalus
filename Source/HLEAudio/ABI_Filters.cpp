@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include "audiohle.h"
+#include "HLEAudioInternal.h"
 #include "AudioHLEProcessor.h"
 
 #include "Core/Memory.h"
