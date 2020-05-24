@@ -190,7 +190,7 @@ static void DaedalusVitaCheck()
 }
 
 
-extern bool InitialiseJobManager();
+extern bool InitialiseMediaEngine();
 //*************************************************************************************
 //
 //*************************************************************************************
@@ -216,7 +216,7 @@ static bool	Initialize()
 
 	// Initiate MediaEngine
 	//Note: Media Engine is not available for Vita
-	bool bMeStarted = InitialiseJobManager();
+	bool bMeStarted = InitialiseMediaEngine();
 
 // Disable for profiling
 //	srand(time(0));
