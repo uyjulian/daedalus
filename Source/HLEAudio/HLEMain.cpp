@@ -74,47 +74,36 @@ extern AudioHLEInstruction ABI3[0x20];
 // Below functions were updated
 //
 
+AudioHLEInstruction *gABI = ABIUnknown;
+bool gAudioChanged = false;
 
-AudioHLEInstruction *ABI = ABIUnknown;
-bool bAudioChanged = false;
+// From ABI2.cpp
 extern bool isMKABI;
 extern bool isZeldaABI;
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void Audio_Reset()
 {
-	bAudioChanged = false;
+	gAudioChanged = false;
 	isMKABI		  = false;
 	isZeldaABI	  = false;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 inline void Audio_Ucode_Detect(OSTask * pTask)
 {
 	u8* p_base = gu8RamBase + (uintptr_t)pTask->t.ucode_data;
 	if (*(u32*)(p_base + 0) != 0x01)
 	{
-		if (*(u32*)(p_base + 0x10) == 0x00000001)
-			ABI = ABIUnknown;
-		else
-			ABI = ABI3;
+		gABI = (*(u32*)(p_base + 0x10) == 0x00000001) ? ABIUnknown : ABI3;
 	}
 	else
 	{
-		if (*(u32*)(p_base + 0x30) == 0xF0000F00)
-			ABI = ABI1;
-		else
-			ABI = ABI2;
+	gABI = (*(u32*)(p_base + 0x30) == 0xF0000F00) ? ABI1 : ABI2;
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void Audio_Ucode()
 {
 	#ifdef DAEDALUS_PROFILE
@@ -123,9 +112,9 @@ void Audio_Ucode()
 	OSTask * pTask = (OSTask *)(gu8SpMemBase + 0x0FC0);
 
 	// Only detect ABI once per game
-	if ( !bAudioChanged )
+	if ( !gAudioChanged )
 	{
-		bAudioChanged = true;
+		gAudioChanged = true;
 		Audio_Ucode_Detect( pTask );
 	}
 
@@ -141,7 +130,7 @@ void Audio_Ucode()
 		command.cmd0 = *p_alist++;
 		command.cmd1 = *p_alist++;
 
-		ABI[command.cmd](command);
+		gABI[command.cmd](command);
 
 		--ucode_size;
 
