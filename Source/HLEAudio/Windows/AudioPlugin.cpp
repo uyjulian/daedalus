@@ -64,7 +64,6 @@ public:
 
 	virtual void			DacrateChanged( ESystemType SystemType );
 	virtual void			LenChanged();
-	virtual u32				ReadLength();
 	virtual EProcessResult	ProcessAList();
 	virtual void			UpdateOnVbl( bool wait );
 private:

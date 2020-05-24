@@ -76,7 +76,6 @@ public:
 
 	virtual void			DacrateChanged( ESystemType SystemType );
 	virtual void			LenChanged();
-	virtual u32				ReadLength() {return 0;}
 	virtual EProcessResult	ProcessAList();
 
 	//virtual void SetFrequency(u32 frequency);
