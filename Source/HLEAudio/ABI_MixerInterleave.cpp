@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "HLEAudioInternal.h"
-#include "AudioHLEProcessor.h"
+#include "HLEAudioState.h"
 
 #include "Core/Memory.h"
 #include "Base/MathUtil.h"

@@ -23,8 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //	and modified by StrmnNrmn to work with Daedalus PSP. Thanks Azimer!
 //	Drop me a line if you get chance :)
 //
-#ifndef HLEAUDIO_AUDIOHLEPROCESSOR_H_
-#define HLEAUDIO_AUDIOHLEPROCESSOR_H_
+#ifndef HLEAUDIO_HLEAudioState_H_
+#define HLEAUDIO_HLEAudioState_H_
 
 #include "Base/Alignment.h"
 #include "Base/Types.h"
@@ -64,7 +64,7 @@ private:
 
 
 public:
-	ALIGNED_TYPE(u8, Buffer[0x10000], 16);	// Seems excesively large? 0x1000 should be enough, but will require to make many changes, ex update the bitfields 
+	ALIGNED_TYPE(u8, Buffer[0x10000], 16);	// Seems excesively large? 0x1000 should be enough, but will require to make many changes, ex update the bitfields
 	u16		ADPCMTable[0x88];
 
 	//u32		Segments[16];		// 0x0320
@@ -95,4 +95,4 @@ public:
 
 extern AudioHLEState gAudioHLEState;
 
-#endif // HLEAUDIO_AUDIOHLEPROCESSOR_H_
+#endif // HLEAUDIO_HLEAudioState_H_

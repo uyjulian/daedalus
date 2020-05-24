@@ -26,8 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Base/Daedalus.h"
 
-#include "HLEAudioInternal.h"
-#include "AudioHLEProcessor.h"
+#include "HLEAudio/HLEAudioInternal.h"
+#include "HLEAudio/HLEAudioState.h"
 
 #include "Base/MathUtil.h"
 

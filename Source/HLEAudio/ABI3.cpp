@@ -27,8 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string.h>
 
-#include "HLEAudioInternal.h"
-#include "AudioHLEProcessor.h"
+#include "HLEAudio/HLEAudioInternal.h"
+#include "HLEAudio/HLEAudioState.h"
 
 // Disables the command because it's not used?
 static void DISABLE (AudioHLECommand command) {}
