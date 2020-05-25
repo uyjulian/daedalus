@@ -41,9 +41,9 @@ class CAssemblyWriterPS2
 		CAssemblyBuffer *	GetAssemblyBuffer() const		{ return mpCurrentBuffer; }
 		void				Finalise()
 		{
-			mpCurrentBuffer = nullptr;
-			mpAssemblyBufferA = nullptr;
-			mpAssemblyBufferB = nullptr;
+			mpCurrentBuffer = (CAssemblyBuffer *)nullptr;
+			mpAssemblyBufferA = (CAssemblyBuffer*)nullptr;
+			mpAssemblyBufferB = (CAssemblyBuffer*)nullptr;
 		}
 
 		void		SetBufferA()

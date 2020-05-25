@@ -47,6 +47,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <ctype.h>
 #include "PS2Menu.h"
 
 #include <gsKit.h>
@@ -243,7 +244,7 @@ IRomSelectorComponent::IRomSelectorComponent( CUIContext * p_context, CFunctor1<
 {
 	for( u32 i = 0; i < ARRAYSIZE( gRomsDirectories ); ++i )
 	{
-		AddRomDirectory( gRomsDirectories[ i ], mRomsList );
+		AddRomDirectory(DAEDALUS_PS2_PATH((char*)gRomsDirectories[ i ]), mRomsList );
 	}
 
 	stable_sort( mRomsList.begin(), mRomsList.end(), SortByGameName );
@@ -297,7 +298,7 @@ void	IRomSelectorComponent::UpdateROMList()
 
 	for( u32 i = 0; i < ARRAYSIZE( gRomsDirectories ); ++i )
 	{
-		AddRomDirectory( gRomsDirectories[ i ], mRomsList );
+		AddRomDirectory(DAEDALUS_PS2_PATH((char *)gRomsDirectories[i]), mRomsList );
 	}
 
 	stable_sort( mRomsList.begin(), mRomsList.end(), SortByGameName );

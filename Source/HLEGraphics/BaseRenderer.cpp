@@ -54,6 +54,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern void gsViewport(int x, int y, int width, int height);
 extern void gsKit_scissor(int x0, int x1, int y0, int y1);
 
+//#undef DAEDALUS_PS2_USE_VU0
+
 #endif
 
 // Vertex allocation.

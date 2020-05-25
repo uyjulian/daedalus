@@ -55,6 +55,8 @@ static const u32	MAX_OUTPUT_FREQUENCY = kOutputFrequency * 4;
 // Large kAudioBufferSize creates huge delay on sound //Corn
 static const u32	kAudioBufferSize = 1024 * 4; // OSX uses a circular buffer length, 1024 * 1024
 
+static bool audio_inited = false;
+
 class AudioPluginPS2 : public CAudioPlugin
 {
 public:
@@ -109,7 +111,7 @@ AudioPluginPS2::~AudioPluginPS2()
 		ReleaseThreadHandle(mAudioThread);
 		mAudioThread = kInvalidThreadHandle;
 		SignalSema(mSemaphore);
-		audsrv_quit();
+		//audsrv_quit();
 	}
 	
 	mAudioBuffer.~CAudioBuffer();
@@ -219,15 +221,21 @@ void AudioPluginPS2::StartAudio()
 	if (mKeepRunning)
 		return;
 
-	mKeepRunning = true;
+	mKeepRunning = false;
 
-	ret = audsrv_init();
+	if (!audio_inited)
+	{
+		ret = audsrv_init();
 
-	if (ret != 0) {
-		printf("AudioPluginPS2: Failed to initialize audsrv: %s\n", audsrv_get_error_string());
-		mKeepRunning = false;
-		return;
+		if (ret != 0) {
+			printf("AudioPluginPS2: Failed to initialize audsrv: %s\n", audsrv_get_error_string());
+			mKeepRunning = false;
+			return;
+		}
+		audio_inited = true;
 	}
+
+	mKeepRunning = true;
 
 	format.bits = 16;
 	format.freq = kOutputFrequency;

@@ -23,6 +23,11 @@
 #define	TNL_TRICULL			(1<<6)
 #define	TNL_CULLBACK		(1<<7)
 #define	TNL_POINTLIGHT		(1<<8)
+
+.data
+.align 4
+F001:
+.word	0x3f000000, 0x3e800000, 0x30000000, 0x3ec00000 //0.5 0.25 ? 0.375
 	
 .text
 .set		push
@@ -40,8 +45,8 @@
 #	t1 - params
 
 # Lighting calculation
-# M000: World Matrix
-# M100: Projection Matrix
+# vf1-vf4: World Matrix
+# vf5-vf8: Projection Matrix
 # vf9: Material normal 
 # vf10: Accumulated colour
 # vf11: ?
@@ -62,6 +67,9 @@
 # v0 = TnLFlags
 
 _TnLVU0:
+	la			$t2, F001
+	lqc2		vf31, 0($t2)
+
 	lqc2		vf1, 0($a0)				// Load mat world
 	lqc2		vf2, 16($a0)
 	lqc2		vf3, 32($a0)
@@ -72,14 +80,8 @@ _TnLVU0:
 	lqc2		vf7, 32($a1)
 	lqc2		vf8, 48($a1)
 	
-	lqc2		vf19, PARAMS_FLAGS_NLIGHT_TXSCAL($t1)	// Load params [Flags, Num_lights, tscale_x, tscale_y]
-	#vmov.p		vf19zw, vf19zw[y,x]				// Swizzle texture X&Y scale
-	vmr32.y		vf22, vf19						// [?, tscale_x, ?, ?]
-	vmr32.x		vf22, vf22						// [tscale_x, ?, ?, ?]
-	vmr32.z		vf19, vf19						// [?, ?, tscale_y, ?]
-	vmr32.w		vf19, vf22						// [?, ?, tscale_y, tscale_x]
-	#mfv		$t7, vf19y					// Num_lights
-	qmfc2		$t7, vf19
+	lqc2		vf19, PARAMS_FLAGS_NLIGHT_TXSCAL($t1)	// Load params [Flags, Num_lights, tscale_x, tscale_y]		
+	qmfc2		$t7, vf19								// Num_lights
 	dsrl32 		$t7, $t7, 0
 
 # Calculate the last light index
@@ -90,44 +92,38 @@ _TnLVU0:
 	
 	sll			$t0, $t0, 4					// count = count * 16
 	addu		$t0, $a2, $t0				// end_ptr = start_ptr + count * 16
-	
+	qmfc2		$v0, vf19					// TnL flags
 	beq			$a2, $t0, finished_
-	#mfv		$v0, vf19x					// TnL flags
-	qmfc2		$v0, vf19
+	pextlw		$v0, $zero, $v0
 
-	#lv.s		vf19x, FOGPARAM($t1)		// Load fog param [FogMult]
-	#lv.s		vf19y, FOGPARAM+4($t1)		// Load fog param [FogOffs]
-	ld			$t2, FOGPARAM($t1)
+	lw			$t2, FOGPARAM($t1)			// Load fog param [FogMult]
+	lw			$t3, FOGPARAM+4($t1)		// Load fog param [FogOffs]
+	pextlw		$t2, $t3, $t2
+
 	qmtc2		$t2, vf22
 	vmove.xy	vf19, vf22
 
 next_vertex_:
 # Load and transform this vertex position
- 	#lv.s		vf9x, 0($a2)				// load word [y,x,?,z]
- 	#lv.s		vf9y, 4($a2)				// ulqc2 is buggy on PHAT
-	#vs2i.p		vf9, vf9					// vf9 = [?,z,y,x] [0xAABBCCDD] [0x11223344] -> [0xCCDD0000] [0xAABB0000] [0x33440000] [0x11220000]
-	ld			$t2, 0($a2)					// [y,x,?,z]
-	pextlh		$t2, $t2, $zero
-	qmtc2		$t2, vf22
-	vmove.xyzw	vf9, vf22
-	#vi2f.q		vf9, vf9, 16				// int -> float
-	vitof15.xyzw	vf9, vf9
-	lui			$t2, 0x3f00				// 0.5
-	qmtc2		$t2, vf22
-	vmulx.xyzw  vf9, vf9, vf22x
+	lw			$t2, 0($a2)					// [y,x]
+	lw			$t3, 4($a2)					// [?,z]
+	pextlw		$t2, $t3, $t2
 
-	#vmov.q		vf20, vf9[y,x,w,1]			// unfiddle and save for point lighting
-	vmove.w		vf20, vf0
+	pextlh		$t2, $t2, $zero				// [y,x,?,z]
+	qmtc2		$t2, vf9
+	vitof15.xyzw	vf9, vf9				// int -> float
+	vmulx.xyzw  vf9, vf9, vf31x
+		
+	vmove.w		vf20, vf0					// unfiddle and save for point lighting
 	vmr32.xz	vf20, vf9
 	vaddx.y		vf20, vf0, vf9x
 
-	#vtfm4.q		vf10, M000, vf20			// World transform
-	vmulax.xyzw     ACC, vf1, vf20
+	vmulax.xyzw     ACC, vf1, vf20			// World transform
     vmadday.xyzw    ACC, vf2, vf20
     vmaddaz.xyzw    ACC, vf3, vf20
     vmaddw.xyzw     vf10, vf4, vf20
-	#vtfm4.q		vf21, M100, vf20			// World*Projection transform
-	vmulax.xyzw     ACC, vf5, vf20
+
+	vmulax.xyzw     ACC, vf5, vf20			// World*Projection transform
     vmadday.xyzw    ACC, vf6, vf20
     vmaddaz.xyzw    ACC, vf7, vf20
     vmaddw.xyzw     vf21, vf8, vf20
@@ -136,25 +132,15 @@ next_vertex_:
 	sqc2		vf21, 0x10($a3)				// Store projection transform
 	
 # Compute the clip flags
-	#vcmp.q		LT, vf21, vf21[-w,-w,-w,0]	// x < -w, y < -w, z < -w
 	vclipw.xyz	vf21, vf21w
-	#lv.s		vf9x, 12($a2)				// vf9x <- load model normal or color word [w,z,y,x]/[a,b,g,r]
-	#mfvc		$t4, $131					// VU0_CC. Corresponds to X_NEG/Y_NEG/Z_NEG (will become X_POS/Y_POS/Z_POS later)
-	#vcmp.q		GT, vf21, vf21[w,w,w,0]		// x > w, y > w, z > w, w > 0
-	#andi		$t4, $t4, 0x7				// Mask out the condition codes we dont care about
-	#sll			$t4, $t4, 3					// Shift up to create X_POS/Y_POS/Z_POS	
-	#mfvc		$t5, $131					// VU0_CC. Corresponds to X_NEG/Y_NEG/Z_NEG
 	vnop
 	vnop
 	vnop
 	vnop
 	vnop
 	cfc2		$t5, $vi18
-	andi		$t5, 0x3F
-	#andi		$t3, $t5, 0x8				// Keep the condition w > 0 (used for fog)
-	#andi		$t5, $t5, 0x7				// Mask out the condition codes we dont care about
-	#or			$t5, $t4, $t5
-	qmfc2		$t2, vf21
+	andi		$t5, 0x3F				// Mask out the condition codes we dont care about
+	qmfc2		$t2, vf21				// Keep the condition w > 0 (used for fog)
 	pcpyud		$t2, $t2, $t2
 	blez		$t2, __wnegz
 	move		$t3, $zero
@@ -167,18 +153,14 @@ __wnegz:
 	sw			$t5, 0x38($a3)				// Store ClipFlags
 	
 #Convert the alpha in vf9 to float and pass it along to light color
-	#.word		0xd0380000 | (8<<8) | (43)	// vuc2i.s	vf12, vf9x					// vf9 = [a,z,y,x]
-	#vi2f.s		vf17w, vf12x, 31		// int -> float, vf17 = [a * 1/256]
-	lw			$t2, 12($a2)
+	lw			$t2, 12($a2)			// vf9x <- load model normal or color word [w,z,y,x]/[a,b,g,r]
 	pextlb		$t2, $t2, $t2
 	pextlh		$t2, $t2, $t2			// [a,z,y,x]
 	psrlw		$t2, $t2, 1
 	qmtc2		$t2, vf12
 	vitof0.x	vf22, vf12
-	vmr32.w		vf17, vf22
-	lui			$t2, 0x3000
-	qmtc2		$t2, vf22
-	vmulx.w		vf17, vf17, vf22x
+	vaddx.w		vf17, vf0, vf22x
+	vmulz.w		vf17, vf17, vf31z
 
 #Check if there are any lights to process
 	beq			$t6, $t7, done_lighting_	// cur_light == last_light?
@@ -187,9 +169,7 @@ __wnegz:
 	or			$t4, $t6, $0				// cur_light = p_lights
 
 # Convert the model normal in vf9 to floats and transform
-	#.word		0xd0398080 | (8<<8) | (40)	// vc2i.s		vf9, vf9x					// vf9 = [a,z,y,x]
-	#vi2f.q		vf12, vf9[w,z,y,x], 0		// int -> float, Unfiddle & store vertice normal temporary for env map later (obliterates world transform)
-	lw			$t2, 12($a2)
+	lw			$t2, 12($a2)			// vf9x <- load model normal or color word [w,z,y,x]/[a,b,g,r]
 	pextlb		$t2, $t2, $zero
 	pextlh		$t2, $t2, $zero			// [a,z,y,x]
 	qmtc2		$t2, vf12
@@ -197,17 +177,14 @@ __wnegz:
 	vmr32.xyzw	vf12, vf12				// [z,y,x,a]
 	vmr32.xyzw	vf22, vf12				// [y,x,a,z]
 	vmr32.xz	vf12, vf22				// [x,y,z,a]
-	#vtfm3.t	vf9, M000, vf12			// Transform with world matrix (only need 3x3)//Corn
-	vmulax.xyz  ACC, vf1, vf12
+	vmulax.xyz  ACC, vf1, vf12			// Transform with world matrix (only need 3x3)//Corn
     vmadday.xyz ACC, vf2, vf12
     vmaddz.xyz  vf9, vf3, vf12
-	#vdot.t		vf11x, vf9, vf9			// vf11x = x*x + y*y + z*z
-	vmul.xyz	vf11, vf9, vf9
+	vmul.xyz	vf11, vf9, vf9			// vf11x = x*x + y*y + z*z
 	vaddy.x		vf11, vf11, vf11y
 	vaddz.x		vf11, vf11, vf11z
-	#vrsq.s		vf11x, vf11x			// vf11x = 1/sqrt(x*x + y*y + z*z)
 #if 1
-	vrsqrt		Q, vf0w, vf11x
+	vrsqrt		Q, vf0w, vf11x			// vf11x = 1/sqrt(x*x + y*y + z*z)
 #else
 	vsqrt		Q, vf11x
 	vwaitq
@@ -215,28 +192,23 @@ __wnegz:
 	vdiv		Q, vf0w, vf11x
 #endif
 	vwaitq
-	#vscl.t		vf9, vf9, vf11x			// vf9x = v.normalise().
-	vmulq.xyz   vf9, vf9, Q
+	vmulq.xyz   vf9, vf9, Q			// vf9x = v.normalise().
 
 next_light_:
 	lqc2		vf14, LIGHTDIR($t4)			// Load Light normal
-	#vdot.t		vf16x[0:1], vf9, vf14		// x = clamp(dot(normal,(x,y,z)),0,1)
-	vmul.xyz	vf16, vf9, vf14
+	vmul.xyz	vf16, vf9, vf14				// x = clamp(dot(normal,(x,y,z)),0,1)
 	vaddy.x		vf16, vf16, vf16y
 	vaddz.x		vf16, vf16, vf16z
 	vminiw.x	vf16, vf16, vf0w
 	vmaxx.x		vf16, vf16, vf0x
 	lqc2		vf15, LIGHTCOL($t4)			// Load Light colour
 	addiu		$t4, $t4, (1<<LIGHTSZ)		// Skip to the next light
-	#vscl.t		vf16, vf15, vf16x			// r,g,b = r*x, g*x, b*x
-	vmulx.xyz   vf16, vf15, vf16x
+	vmulx.xyz   vf16, vf15, vf16x			// r,g,b = r*x, g*x, b*x
 	bne			$t4, $t7, next_light_
-	#vadd.t		vf10, vf10, vf16			// col += r,g,b
-	vadd.xyz	vf10, vf10, vf16
+	vadd.xyz	vf10, vf10, vf16			// col += r,g,b
 
 done_lighting_:
-	#vmov.t		vf17[0:1,0:1,0:1], vf10		// Clamp 0..1 and merge with vertex alpha in vf17w
-	vmove.xyz	vf17, vf10
+	vmove.xyz	vf17, vf10					// Clamp 0..1 and merge with vertex alpha in vf17w
 	vminiw.xyz	vf17, vf17, vf0w
 	vmaxx.xyz	vf17, vf17, vf0x
 
@@ -245,17 +217,14 @@ done_lighting_:
 	nop
 
 # We use worldproject matrix to calc normals it gives a nicer effect (model view result is in vf9) //Corn
-	#vtfm3.t	vf9, M100, vf12			// Transform with projworld matrix, looks nicer (only need 3x3)
-	vmulax.xyz  ACC, vf5, vf12
+	vmulax.xyz  ACC, vf5, vf12			// Transform with projworld matrix, looks nicer (only need 3x3)
     vmadday.xyz ACC, vf6, vf12
     vmaddz.xyz  vf9, vf7, vf12
-	#vdot.t		vf10x, vf9, vf9			// vf10x = x*x + y*y + z*z
-	vmul.xyz	vf10, vf9, vf9
+	vmul.xyz	vf10, vf9, vf9			// vf10x = x*x + y*y + z*z
 	vaddy.x		vf10, vf10, vf10y
 	vaddz.x		vf10, vf10, vf10z
-	#vrsq.s		vf10x, vf10x					// vf10x = 1/sqrt(x*x + y*y + z*z)
 #if 1
-	vrsqrt		Q, vf0w, vf10x
+	vrsqrt		Q, vf0w, vf10x					// vf10x = 1/sqrt(x*x + y*y + z*z)
 #else	
 	vsqrt		Q, vf10x
 	vwaitq
@@ -265,16 +234,11 @@ done_lighting_:
 	andi		$t4, $v0, TNL_TEXGENLIN		// if( TNL_TEXGENLIN )
 	vwaitq
 	beqz		$t4, do_texgen_
-	#vscl.p		vf9, vf9, vf10x			// vf11 = v.normalise() (x & y).
-	vmulq.xy    vf9, vf9, Q
+	vmulq.xy    vf9, vf9, Q					// vf11 = v.normalise() (x & y).
 
 # EnvMapped G_TEXTURE_GEN  t.x = 0.5 * (1.0 + n.x) t.y = 0.25 * (1.0 + n.y)
-	#vadd.p		vf9, vf9[1,1], vf9		// 1+x, 1+y
-	vaddw.xy	vf9, vf9, vf0w
-	#vmul.p		vf9, vf9[1/2,1/2], vf9	// X * 0.5, Y * 0.25
-	lui			$v1, 0x3f00				// 0.5
-	qmtc2		$v1, vf22
-	vmulx.xy    vf9, vf9, vf22x
+	vaddw.xy	vf9, vf9, vf0w			// 1+x, 1+y
+	vmulx.xy    vf9, vf9, vf31x			// X * 0.5, Y * 0.25
 	qmfc2		$t2, vf9
 	sw			$t2, 0x30($a3)				// Store Texture.x
 	dsrl32		$t2, $t2, 0
@@ -283,23 +247,13 @@ done_lighting_:
 		
 do_texgen_:
 # EnvMapped G_TEXTURE_GEN_LINEAR Cheap way to do acos(x)/PI -> 0.5f - 0.25f * absf(x) - 0.25f * absf(x) * absf(x) * absf(x) //Corn
-	#vabs.p		vf9, vf9					// absf(x), absf(y)
-	vabs.xy		vf9, vf9
-	#vmul.p		vf23, vf9[1/4,1/4], vf9	// X * 0.25, Y * 0.25
-	lui			$v1, 0x3e80				// 0.25
-	qmtc2		$v1, vf22
-	vmulx.xy	vf23, vf9, vf22x
-	#vsub.p		vf12, vf9[1/2,1/2], vf23	// result = 0.5 - X * 0.25
-	lui			$v1, 0x3f00				// 0.5
-	pextlw		$v1, $v1, $v1
-	qmtc2		$v1, vf22
+	vabs.xy		vf9, vf9					// absf(x), absf(y)
+	vmuly.xy	vf23, vf9, vf31y			// X * 0.25, Y * 0.25
+	vaddx.xy	vf22, vf0, vf31x			// result = 0.5 - X * 0.25
 	vsub.xy		vf12, vf22, vf23
-	#vmul.p		vf23, vf9, vf23			// X * X * 0.25, Y * Y * 0.25
-	vmul.xy		vf23, vf9, vf23
-	#vmul.p		vf23, vf9, vf23			// X * X * X * 0.25, Y * Y * Y * 0.25
-	vmul.xy		vf23, vf9, vf23
-	#vsub.p		vf12, vf12, vf23			// result -= X * X * X * 0.25
-	vsub.xy		vf12, vf12, vf23
+	vmul.xy		vf23, vf9, vf23			// X * X * 0.25, Y * Y * 0.25
+	vmul.xy		vf23, vf9, vf23			// X * X * X * 0.25, Y * Y * Y * 0.25
+	vsub.xy		vf12, vf12, vf23		// result -= X * X * X * 0.25
 	qmfc2		$t2, vf12
 	sw			$t2, 0x30($a3)				// Store Texture.x
 	dsrl32		$t2, $t2, 0
@@ -308,67 +262,44 @@ do_texgen_:
 		
 do_color_:
 # Normalise the RGBA colour
-	#.word		0xd0380000 | (8<<8) | (40)	// vuc2i.s	vf9, vf9x	// vf9 = [a,b,g,r]
-	lw			$t2, 12($a2)
+	lw			$t2, 12($a2)			// vf9x <- load model normal or color word [w,z,y,x]/[a,b,g,r]
 	pextlb		$t2, $t2, $t2
 	pextlh		$t2, $t2, $t2			// [a,b,g,r]
 	psrlw		$t2, $t2, 1
 	qmtc2		$t2, vf9
 	vmr32.xyzw	vf17, vf9				// [b,g,r,a]
 	vaddz.x		vf17, vf0, vf17z		// [r,g,r,a]
-	vaddy.z		vf17, vf0, vf9y			// [r,g,b,a]
-	#vi2f.q		vf17, vf9[w,z,y,x], 31		// int -> float, vf9 = [r * 1/256, g * 1/256, b * 1/256, a * 1/256]
-	vitof0.xyzw	vf17, vf17
-	lui			$t2, 0x3000
-	qmtc2		$t2, vf22
-	vmulx.xyzw	vf17, vf17, vf22x
+	vaddy.z		vf17, vf0, vf9y			// [r,g,b,a]	
+	vitof0.xyzw	vf17, vf17				// int -> float, vf9 = [r * 1/256, g * 1/256, b * 1/256, a * 1/256]
+	vmulz.xyzw	vf17, vf17, vf31z
 
 do_texture_:
 # Textured t.x = (float)v.tu * mTextureScale.x 	t.y = (float)v.tv * mTextureScale.y
-	#lv.s		vf11x, 8($a2)				// load texture word [tv,tu] (N.B. due to swizzling these are 'backwards' from what you might expect)
-	#vs2i.s		vf11, vf11x
-	lw			$t2, 8($a2)
+	lw			$t2, 8($a2)				// load texture word [tv,tu] (N.B. due to swizzling these are 'backwards' from what you might expect)
 	pextlh		$t2, $t2, $zero
 	qmtc2		$t2, vf11
-	#vi2f.p		vf11, vf11, 16				// int -> float
-	vitof15.xy	vf11, vf11
-	lui			$t2, 0x3f00				// 0.5
-	qmtc2		$t2, vf22
-	vmulx.xy    vf11, vf11, vf22x
-	#vmul.p		vf11, vf11, vf19zw			// multiply by mTextureScale
-	vmulz.y		vf11, vf11, vf19z
-	vmulw.x		vf11, vf11, vf19w
-	#sv.s		vf11y, 0x30($a3)				// Store Texture.x
-	#sv.s		vf11x, 0x34($a3)				// Store Texture.y
+	vitof15.xy	vf11, vf11				// int -> float
+	vmulx.xy    vf11, vf11, vf31x
+	vmulz.y		vf11, vf11, vf19z			// multiply tu by mTextureScale.x
+	vmulw.x		vf11, vf11, vf19w			// multiply tv by mTextureScale.y			
 	qmfc2		$t2, vf11
-	sw			$t2, 0x34($a3)
+	sw			$t2, 0x34($a3)				// Store Texture.y
 	dsrl32		$t2, $t2, 0
-	sw			$t2, 0x30($a3)
+	sw			$t2, 0x30($a3)				// Store Texture.x
 
 vtx_done_:
 	andi		$t4, $v0, TNL_FOG
 	beqz		$t4, fog_done_				// if( TNL_FOG )
 	nop
 	beqz		$t3, fog_done_				// if( proj.w > 0.0f )
-	#vzero.s	vf17w						// fog_alpha = 0.0f
-	vmr32.w		vf17, vf0
+	vmr32.w		vf17, vf0					// fog_alpha = 0.0f
 
 #Calculate fog factor and put as alpha
-	#vrcp.s		vf9x, vf21w					// 1/w
-	vnop
-	vnop
-	vnop
-	vnop
-	vnop
-	vdiv		Q, vf0w, vf21w
-
-	#vmul.s		vf10x, vf21z, vf19x			// fogmul * z			
-	#vmul.s		vf10x, vf10x, vf9x			// fogmul * z * 1/w
-	vmulz.x		vf10, vf19, vf21z
+	vdiv		Q, vf0w, vf21w				// 1/w	
+	vmulz.x		vf10, vf19, vf21z			// fogmul * z			
 	vwaitq
-	vmulq.x		vf10, vf10, Q
-	#vadd.s		vf17w[0:1], vf10x, vf19y		// fog_alpha = Clamp[0:1] fogmul * z * 1/w + fogoffs
-	vaddy.x		vf22, vf10, vf19y
+	vmulq.x		vf10, vf10, Q				// fogmul * z * 1/w	
+	vaddy.x		vf22, vf10, vf19y			// fog_alpha = Clamp[0:1] fogmul * z * 1/w + fogoffs
 	vmr32.w		vf17, vf22
 	vminiw.w	vf17, vf17, vf0w
 	vmaxx.w		vf17, vf17, vf0x

@@ -123,8 +123,8 @@ const f32				DEFAULT_MAX_DEADZONE = 1.0f;
 
 const char * const		gRomsDirectories[] =
 {
-  "ms0:/n64/",
-  DAEDALUS_PS2_PATH( "Roms/" ),
+  "n64/",
+  "Roms/",
 #ifndef DAEDALUS_SILENT
   // For ease of developing with multiple source trees, common folder for roms can be placed at host1: in usbhostfs
   "host1:/",

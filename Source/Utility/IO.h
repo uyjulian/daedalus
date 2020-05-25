@@ -24,8 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef DAEDALUS_PSP
 #include <pspiofilemgr.h>
-#elif defined( DAEDALUS_PS2 )
-#include <fileXio.h>
 #endif
 
 #include <string.h>
@@ -40,7 +38,7 @@ namespace IO
 #if defined( DAEDALUS_PSP )
 		int			Stat(const char* p_file, SceIoStat* stat);
 #elif defined( DAEDALUS_PS2 )
-		int			Stat(const char* p_file, iox_stat_t* stat);
+		//int			Stat(const char* p_file, iox_stat_t* stat);
 #endif
 
 	}
@@ -91,10 +89,8 @@ namespace IO
 	typedef SceUID FindHandleT;
 #elif defined( DAEDALUS_W32 )
 	typedef intptr_t FindHandleT;
-#elif defined( DAEDALUS_OSX ) || defined( DAEDALUS_LINUX )
+#elif defined( DAEDALUS_OSX ) || defined( DAEDALUS_LINUX ) || defined( DAEDALUS_PS2 )
 	typedef void * FindHandleT;
-#elif defined( DAEDALUS_PS2 )
-	typedef int FindHandleT;
 #else
 #error Need to define FindHandleT for this platform
 #endif

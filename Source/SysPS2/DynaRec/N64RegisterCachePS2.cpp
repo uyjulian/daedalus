@@ -50,8 +50,8 @@ void	CN64RegisterCachePS2::Reset()
 void	CN64RegisterCachePS2::ClearCachedReg( EN64Reg n64_reg )
 {
 	#ifdef DAEDALUS_ENABLE_ASSERTS
-	DAEDALUS_ASSERT( IsCached( n64_reg, lo_hi_idx ), "This register is not currently cached" );
-	DAEDALUS_ASSERT( !IsDirty( n64_reg, lo_hi_idx ), "This register is being cleared while still dirty" );
+	DAEDALUS_ASSERT( IsCached( n64_reg ), "This register is not currently cached" );
+	DAEDALUS_ASSERT( !IsDirty( n64_reg ), "This register is being cleared while still dirty" );
 #endif
 	mRegisterCacheInfo[ n64_reg ].Ps2Register = Ps2Reg_R0;
 	mRegisterCacheInfo[ n64_reg ].Valid = false;

@@ -63,7 +63,7 @@ template < class T > class CSingleton
 			DAEDALUS_ASSERT_Q(mpInstance != NULL);
 			#endif
 			delete mpInstance;
-			mpInstance = NULL;
+			mpInstance = (T*)NULL;
 		}
 
 		inline static bool IsAvailable()
@@ -83,6 +83,6 @@ template < class T > class CSingleton
 		static T * mpInstance;
 };
 
-template < class T > T * CSingleton< T >::mpInstance = NULL;
+template < class T > T * CSingleton< T >::mpInstance = (T*) NULL;
 
 #endif // UTILITY_SINGLETON_H_

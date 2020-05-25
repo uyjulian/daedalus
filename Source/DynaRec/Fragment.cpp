@@ -654,14 +654,14 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 						#ifdef DAEDALUS_DEBUG_CONSOLE
 					printf("Speedhack event (skip busy loop)\n");
 
-					char opinfo[128] {};
+					char opinfo[128];
 					SprintOpCodeInfo( opinfo, trace[i].Address, trace[i].OpCode );
 					printf("\t%p: <0x%08x> %s\n", (u32*)trace[i].Address, trace[i].OpCode._u32, opinfo);
 
 					SprintOpCodeInfo( opinfo, trace[i+1].Address, trace[i+1].OpCode );
 					printf("\t%p: <0x%08x> %s\n", (u32*)trace[i+1].Address, trace[i+1].OpCode._u32, opinfo);
 					#endif
-					p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
+					p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( (void *)CPU_SkipToNextEvent ) ) );
 					}
 					break;
 

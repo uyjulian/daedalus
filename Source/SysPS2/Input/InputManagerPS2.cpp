@@ -4,6 +4,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <ctype.h>
 
 #include <libpad.h>
 

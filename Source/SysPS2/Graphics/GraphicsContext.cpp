@@ -37,6 +37,7 @@
 #include <gsInline.h>
 #include <libvux.h>
 #include <kernel.h>
+#include <malloc.h>
 
 namespace
 {

@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <kernel.h>
 #include <stdio.h>
+#include <malloc.h>
 
 #define MAX_THREAD 5
 #define STACK_SIZE 0x12000

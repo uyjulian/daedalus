@@ -32,6 +32,7 @@ PS2_DEBUG_FILES = SysPS2/Debug/DaedalusAssertPS2.o SysPS2/Debug/DBGConsolePS2.o
 PS2_UI_FILES = SysPS2/UI/AboutComponent.o SysPS2/UI/AdjustDeadzoneScreen.o SysPS2/UI/AdvancedOptionsScreen.o SysPS2/UI/CheatOptionsScreen.o SysPS2/UI/ColourPulser.o SysPS2/UI/Dialogs.o SysPS2/UI/GlobalSettingsComponent.o SysPS2/UI/MainMenuScreen.o SysPS2/UI/PauseOptionsComponent.o SysPS2/UI/PauseScreen.o SysPS2/UI/RomPreferencesScreen.o SysPS2/UI/RomSelectorComponent.o SysPS2/UI/SavestateSelectorComponent.o SysPS2/UI/SelectedRomComponent.o SysPS2/UI/SplashScreen.o SysPS2/UI/UICommand.o SysPS2/UI/UIComponent.o SysPS2/UI/UIContext.o SysPS2/UI/UIElement.o SysPS2/UI/UIScreen.o SysPS2/UI/UISetting.o 
 
 PS2_BUILD = $(PS2_MAIN_FILES) $(PS2_INPUTMANAGER_FILES) $(PS2_UTILITY_FILES) $(PS2_HLEAUDIO_FILES) $(PS2_DYNAREC_FILES) $(PS2_GRAPHICS_FILES) $(PS2_HLEGRAPHICS_FILES) $(PS2_DEBUG_FILES) $(PS2_UI_FILES)
+IRXS = iomanX_irx.o fileXio_irx.o usbhdfsd_irx.o usbd_irx.o libsd_irx.o audsrv_irx.o poweroff_irx.o ps2dev9_irx.o ps2atad_irx.o ps2hdd_irx.o ps2fs_irx.o smscdvd_irx.o
 
 CONFIG = Release
 #CONFIG = Dev
@@ -40,11 +41,16 @@ EE_BIN 	= Daedalus.elf
 EE_INCS += -I$(PS2SDK)/ports/include -I$(PS2DEV)/gskit/include -I./SysPS2/Include -I./Config/$(CONFIG)
 EE_CXXFLAGS	= -O2 -G0 -Wall -g -fno-rtti -fno-exceptions
 EE_LDFLAGS += -L$(PS2SDK)/ports/lib -L$(PS2DEV)/gsKit/lib
-EE_LIBS += -laudsrv -lps2time -lcdvd -lpng -lz -lfileXio -lgskit -ldmakit -lvux -lpatches -lpad -lm
-EE_OBJS = $(BUILD) $(PS2_BUILD) iomanX_irx.o fileXio_irx.o usbhdfsd_irx.o usbd_irx.o libsd_irx.o audsrv_irx.o
+EE_LIBS += -laudsrv -lcdvd -lpng -lz -lfileXio -lgskit -ldmakit -lvux -lpatches -lpad -lm -lhdd
+EE_OBJS = $(BUILD) $(PS2_BUILD) $(IRXS) 
 
 all: $(EE_BIN)
 
+%_irx.o: SysPS2/Utility/SMSCDVD/%.irx
+	$(BIN2S) $^ $*_irx.s $*_irx
+	$(EE_AS) $(EE_ASFLAGS) $*_irx.s -o $@	
+SysPS2/Utility/SMSCDVD/smscdvd.irx:
+	make -C SysPS2/Utility/SMSCDVD/
 %_irx.o: $(PS2SDK)/iop/irx/%.irx
 	$(BIN2S) $^ $*_irx.s $*_irx
 	$(EE_AS) $(EE_ASFLAGS) $*_irx.s -o $@	
@@ -59,9 +65,10 @@ listen:
 strip:
 	ee-strip $(EE_BIN)
 teste:
-	ee-addr2line -e $(EE_BIN) 0101c14
+	ee-addr2line -e $(EE_BIN) 001b3f58
 clean:
 	rm -f $(EE_BIN) $(EE_OBJS) *_irx.s
+	make -C SysPS2/Utility/SMSCDVD/ clean
 
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal_cpp

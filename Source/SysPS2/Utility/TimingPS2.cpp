@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Timing.h"
 
 #include <stdio.h>
-#include <libps2time.h>
+#include <sys/time.h>
 
 namespace NTiming {
 	bool GetPreciseFrequency(u64* p_freq)
@@ -33,7 +33,7 @@ namespace NTiming {
 	bool GetPreciseTime(u64* p_time)
 	{
 		timeval		tv;
-		if (::ps2time_gettimeofday(&tv, NULL) == 0)
+		if (gettimeofday(&tv, NULL) == 0)
 		{
 			*p_time = u64(tv.tv_sec) * 1000000LL + u64(tv.tv_usec);
 			return true;

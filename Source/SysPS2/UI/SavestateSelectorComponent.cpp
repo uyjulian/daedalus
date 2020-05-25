@@ -24,8 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <libpad.h>
 #include <kernel.h>
-#include <libps2time.h>
-#include <fileXio.h>
 
 #include "UIContext.h"
 #include "UIScreen.h"
@@ -42,33 +40,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/Stream.h"
 #include "Utility/Translate.h"
 #include "PS2Menu.h"
-
-typedef struct {
-	u8	unused;
-	u8	sec;
-	u8	min;
-	u8	hour;
-	u8	day;
-	u8	month;
-	u16	year;
-} ps2time;
-
-time_t convert_time(unsigned char *data)
-{
-	struct tm temp = { 0 };
-	ps2time* ptime;
-
-	ptime = (ps2time*)data;
-
-	temp.tm_sec = ptime->sec;
-	temp.tm_min = ptime->min;
-	temp.tm_hour = ptime->hour;
-	temp.tm_mon = ptime->month - 1;
-	temp.tm_mday = ptime->day;
-	temp.tm_year = ptime->year - 1900;
-
-	return ps2time_mktime(&temp);
-}
 
 class ISavestateSelectorComponent : public CSavestateSelectorComponent
 {
@@ -238,7 +209,8 @@ void ISavestateSelectorComponent::LoadFolders(){
 
 void ISavestateSelectorComponent::LoadSlots(){
 	const char * description_text( mAccessType == AT_SAVING ? "Select the slot in which to save [X:save O:back]" : "Select the slot from which to load [X:load O:back []:delete]" );
-	iox_stat_t file_stat;
+	//iox_stat_t file_stat;
+#warning fixme
 	char date_string[30];
 	// We're using the same vector for directory names and slots, so we have to clear it
 	mElements.Clear();
@@ -257,9 +229,9 @@ void ISavestateSelectorComponent::LoadSlots(){
 		CUIElement *element;
 		if( !rom_id.Empty() && CRomSettingsDB::Get()->GetSettings( rom_id, &settings ) )
 		{
-			IO::File::Stat(filename_ss, &file_stat);
-			ps2time* ctime = (ps2time*)&file_stat.ctime;
-			sprintf(date_string, "%02d/%02d/%d %02d:%02d:%02d", ctime->month, ctime->day, ctime->year, ctime->hour, ctime->min, ctime->sec); // settings.GameName.c_str();
+			//IO::File::Stat(filename_ss, &file_stat);
+			//ps2time* ctime = (ps2time*)&file_stat.ctime;
+			//sprintf(date_string, "%02d/%02d/%d %02d:%02d:%02d", ctime->month, ctime->day, ctime->year, ctime->hour, ctime->min, ctime->sec); // settings.GameName.c_str();
 			str << date_string;
 			mSlotEmpty[ i ] = false;
 		}

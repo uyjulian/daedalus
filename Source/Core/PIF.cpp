@@ -103,10 +103,6 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 
 #include <time.h>
 
-#ifdef DAEDALUS_PS2
-#include <libps2time.h>
-#endif
-
 #ifdef _MSC_VER
 #pragma warning(default : 4002)
 #endif
@@ -746,13 +742,9 @@ void	IController::CommandReadRTC(u8 *cmd)
 	case 2:
 		time_t curtime_time;
 		struct tm curtime;
-#ifdef DAEDALUS_PS2
-		ps2time_time(&curtime_time);
-		memcpy(&curtime, ps2time_localtime(&curtime_time), sizeof(curtime)); // fd's fix
-#else
+
 		time(&curtime_time);
 		memcpy(&curtime, localtime(&curtime_time), sizeof(curtime)); // fd's fix
-#endif
 
 		cmd[4]	= Byte2Bcd(curtime.tm_sec);
 		cmd[5]	= Byte2Bcd(curtime.tm_min);

@@ -224,7 +224,7 @@ void jpeg_decode_OB(OSTask *task)
         s16 macroblock[6*SUBBLOCK_SIZE];
 
         rdram_read_many_u16((u16*)macroblock, address, 6*SUBBLOCK_SIZE);
-        DecodeMacroblock1(macroblock, &y_dc, &u_dc, &v_dc, (qscale != 0) ? qtable : nullptr);
+        DecodeMacroblock1(macroblock, &y_dc, &u_dc, &v_dc, (qscale != 0) ? qtable : (s16*)nullptr);
         EmitTilesMode2(EmitYUVTileLine, macroblock, address);
 
         address += (2*6*SUBBLOCK_SIZE);

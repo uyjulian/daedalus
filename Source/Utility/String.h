@@ -228,7 +228,7 @@ class CString
 {
 	public:
 		CString()
-		:	mpString( NULL )
+		:	mpString((char*)NULL )
 		,	mMaxLength( 0 )
 		{
 		}
@@ -313,7 +313,7 @@ class CString
 			{
 				return true;
 			}
-			else if ( string == NULL )
+			else if ( string == (char *)NULL )
 			{
 				return strlen( mpString ) == 0;
 			}
@@ -336,7 +336,7 @@ class CString
 			{
 				return true;
 			}
-			else if ( string == NULL )
+			else if ( string == (char *)NULL )
 			{
 				return strlen( mpString ) == 0;
 			}
@@ -468,7 +468,7 @@ class CString
 
 struct ConstStringRef
 {
-	ConstStringRef() : Begin(NULL), End(NULL) {}
+	ConstStringRef() : Begin((char *)NULL), End((char*)NULL) {}
 	/*explicit */ConstStringRef(const char * str) : Begin(str), End(str+strlen(str)) {}
 	explicit ConstStringRef(const char * b, const char * e) : Begin(b), End(e) {}
 

@@ -32,7 +32,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 #endif*/
 
+extern char* PathsPS2(char* p);
+
 //#define DAEDALUS_PS2_PATH(p)				"host:" p
-#define DAEDALUS_PS2_PATH(p)				"mass:" p
+#define DAEDALUS_PS2_PATH(p)				PathsPS2(p)
 
 #endif // SYSPS2_UTILITY_PATHSPS2_H_
