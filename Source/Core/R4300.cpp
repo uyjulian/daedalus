@@ -29,7 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "DynaRec/TraceRecorder.h"
 #include "Math/Math.h"	// VFPU Math
 #include "OSHLE/ultra_R4300.h"
-#include "Utility/AuxFunc.h"
 #include "Utility/Macros.h"
 
 #ifdef DAEDALUS_PSP

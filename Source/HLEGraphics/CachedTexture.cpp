@@ -38,7 +38,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Math/Math.h"
 #include "Math/MathUtil.h"
 #include "OSHLE/ultra_gbi.h"
-#include "Utility/AuxFunc.h"
 #include "Utility/IO.h"
 #include "Utility/Profiler.h"
 

@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/Memory.h"
 
 #include "Debug/DBGConsole.h"
-#include "Utility/AuxFunc.h"
+#include "Math/Math.h"
 
 // Limit cache ucode entries to 6
 // In theory we should never reach this max
