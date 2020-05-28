@@ -36,7 +36,7 @@ project (DaedalusX64)
 
 
 				#PSP Build
-				set (PSP_DEBUG_FILES Debug/PSP/Assert.cpp SysPSP/Debug/DBGConsolePSP.cpp )
+				set (PSP_DEBUG_FILES Debug/PSP/Assert.cpp Debug/PSP/DebugConsole.cpp )
 				set (PSP_DVEMGR_FILES SysPSP/PRX/DveMgr/pspDveManager.S)
 				set (PSP_DYNAREC_FILES SysPSP/DynaRec/AssemblyWriterPSP.cpp SysPSP/DynaRec/AssemblyUtilsPSP.cpp SysPSP/DynaRec/CodeBufferManagerPSP.cpp SysPSP/DynaRec/CodeGeneratorPSP.cpp SysPSP/DynaRec/DynaRecStubs.S SysPSP/DynaRec/N64RegisterCachePSP.cpp)
 				set (PSP_GRAPHICS_FILES SysPSP/Graphics/DrawText.cpp SysPSP/Graphics/GraphicsContext.cpp SysPSP/Graphics/NativeTexturePSP.cpp SysPSP/Graphics/VideoMemoryManager.cpp SysPSP/Graphics/intraFont/intraFont.c SysPSP/Graphics/intraFont/libccc.c)
@@ -78,14 +78,13 @@ project (DaedalusX64)
 
 				#Windows -- Not sure if it works yet
 				set (WIN_AUDIO HLEAudio/Windows/AudioPlugin.cpp)
-				set (WIN_DEBUG Debug/Windows/Assert.cpp SysW32/Debug/DebugConsoleW32.cpp)
+				set (WIN_DEBUG Debug/Windows/Assert.cpp)
 				set (WIN_SYSTEM System/Windows/Condition.cpp System/Windows/IO.cpp System/Windows/Thread.cpp System/Windows/Timing.cpp)
-				set (WIN_UTILITY SysW32/Utility/IOW32.cpp SysW32/Utility/ThreadW32.cpp)
-				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG} ${WIN_UTILITY})
+				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG})
 
         #Posix
 				set (POSIX_DEBUG Debug/Posix/Assert.cpp SysPosix/Debug/DebugConsolePosix.cpp Debug/WebDebug.cpp Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
-				set (POSIX_DYNAREC SysPosix/DynaRec/CodeBufferManagerPosix.cpp)
+				set (POSIX_DYNAREC SysPosix/DynaRec/CodeBufferManager.cpp)
 				set (POSIX_HLEGRAPHICS SysPosix/HLEGraphics/DisplayListDebugger.cpp)
 				set (POSIX_MAIN_FILES SysPosix/main.cpp)
 				set (POSIX_SYSTEM System/Posix/Condition.cpp System/Posix/IO.cpp System/Posix/Thread.cpp System/Posix/Timing.cpp)
