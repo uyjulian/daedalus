@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef UTILITY_MACROS_H_
 #define UTILITY_MACROS_H_
 
@@ -30,4 +28,4 @@
 
 #define DAEDALUS_USE(...)	do { (void)sizeof(__VA_ARGS__, 0); } while(0)
 
-#endif // UTILITY_MACROS_H_
+#endif // BASE_MACROS_H_

@@ -20,14 +20,14 @@
 
 #pragma once
 
-#ifndef DEBUG_DAEDALUSASSERT_H_
-#define DEBUG_DAEDALUSASSERT_H_
+#ifndef BASE_DAEDALUSASSERT_H_
+#define BASE_DAEDALUSASSERT_H_
 
 #include "Base/Macros.h"
 
 // Ideas for the ignored assert taken from Game Programming Gems I
 
-#if defined(__clang__) 
+#if defined(__clang__)
 
 #define DAEDALUS_STATIC_ASSERT( x ) static_assert((x), "Static Assert")
 
@@ -133,7 +133,7 @@ inline void SetAssertHook( DaedalusAssertHook hook )
 #define DAEDALUS_ERROR( ... )													\
 {																				\
 	static bool ignore = false;													\
-	if ( !ignore )																\
+	if ( !ignore )	DEBUG_															\
 	{																			\
 		EAssertResult ar;														\
 		if (gAssertHook != NULL)												\
@@ -159,4 +159,4 @@ inline void SetAssertHook( DaedalusAssertHook hook )
 
 #endif // DAEDALUS_ENABLE_ASSERTS
 
-#endif // DEBUG_DAEDALUSASSERT_H_
+#endif // BASE_DAEDALUSASSERT_H_
