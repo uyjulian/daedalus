@@ -47,7 +47,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Synchroniser.h"
 #include "Base/Macros.h"
 #include "Utility/Profiler.h"
-#include "Utility/Preferences.h"
+#include "Interface/Preferences.h"
 #ifdef DAEDALUS_PSP
 #include "Utility/Translate.h"
 #endif
