@@ -101,7 +101,7 @@ if (PSP_RELEASE)
 	message("PSP Release Build..")
 	add_definitions("-O2 -msingle-float -W -DNDEBUG")
 	add_definitions(-DDAEDALUS_PSP)
-	include_directories(${PROJECT_SOURCE_DIR}/Base/Release ${PROJECT_SOURCE_DIR}/Main/PSP .)
+	include_directories(${PROJECT_SOURCE_DIR}/Base/Release ${PROJECT_SOURCE_DIR}/Main/PSP Platform .)
 
 	add_library(pspkubridge STATIC IMPORTED)
 	set_property(TARGET pspkubridge PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SysPSP/Include/lib/libpspkubridge.a)
