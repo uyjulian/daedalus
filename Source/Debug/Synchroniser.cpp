@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/Dump.h"
 #include "Base/MathUtil.h"
 #include "System/IO.h"
-#include "Utility/ZlibWrapper.h"
+#include "System/CompressedStream.h"
 
 
 //*****************************************************************************
