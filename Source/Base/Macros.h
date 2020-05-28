@@ -1,13 +1,70 @@
 #ifndef UTILITY_MACROS_H_
 #define UTILITY_MACROS_H_
 
+// Branch prediction
 #ifdef _MSC_VER
+
 #define DAEDALUS_FORCEINLINE __forceinline
+#define DAEDALUS_EXPECT_LIKELY(c) (c)
+#define DAEDALUS_EXPECT_UNLIKELY(c) (c)
+#define DAEDALUS_ATTRIBUTE_NOINLINE
+
 #else
+
 #define DAEDALUS_FORCEINLINE inline __attribute__((always_inline))
+#define DAEDALUS_EXPECT_LIKELY(c) __builtin_expect((c), 1)
+#define DAEDALUS_EXPECT_UNLIKELY(c) __builtin_expect((c), 0)
+#define DAEDALUS_ATTRIBUTE_NOINLINE __attribute__((noinline))
+
 #endif
 
+
+
+// Calling conventions
+#ifdef _MSC_VER
+
+// Thread functions need to be __stdcall to work with the W32 api
+#define DAEDALUS_THREAD_CALL_TYPE			__stdcall
+// Vararg functions need to be __cdecl
+#define DAEDALUS_VARARG_CALL_TYPE			__cdecl
+// Zlib is compiled as __cdecl
+#define	DAEDALUS_ZLIB_CALL_TYPE				__cdecl
+
+#else
+
+#define DAEDALUS_THREAD_CALL_TYPE
+#define DAEDALUS_VARARG_CALL_TYPE
+#define DAEDALUS_ZLIB_CALL_TYPE
+
+#endif
+
+
 #ifdef DAEDALUS_ENABLE_ASSERTS
+
+// Breakpoints.
+#ifdef _MSC_VER
+#define DAEDALUS_HALT __debugbreak()
+#elif DAEDALUS_PSP
+#define DAEDALUS_HALT			__asm__ __volatile__ ( "break" )
+#else
+#define DAEDALUS_HALT __builtin_trap()
+#endif
+
+
+// Function name introspection.
+#ifdef _MSC_VER
+#define DAEDALUS_FUNCTION_NAME __FUNCTION__
+#else
+#define DAEDALUS_FUNCTION_NAME __PRETTY_FUNCTION__
+#endif
+
+// Feature detection.
+#ifdef _MSC_VER
+#define DAEDALUS_COMPILER_HAS_FEATURE(x) 0
+#else
+#define DAEDALUS_COMPILER_HAS_FEATURE(x) __has_feature(x)
+#endif
+
 
 #ifdef DAEDALUS_DEBUG_CONSOLE
 #define NODEFAULT		DAEDALUS_ERROR( "No default - we shouldn't be here" )

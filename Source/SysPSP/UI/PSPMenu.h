@@ -1,8 +1,20 @@
 #ifndef SYSPSP_UI_PSPMENU_H_
 #define SYSPSP_UI_PSPMENU_H_
 
+
 #include "Base/Types.h"
 #include "SysPSP/Utility/PathsPSP.h"
+
+enum PspModel
+{
+    PSP_MODEL_STANDARD = 0,
+    PSP_MODEL_SLIM_AND_LITE = 1,
+    PSP_MODEL_BRITE = 8,
+    PSP_MODEL_GO = 4,
+    PSP_MODEL_STREET = 10
+};
+
+
 
 // User Interface Variables
 const s16 SCREEN_WIDTH {480};
