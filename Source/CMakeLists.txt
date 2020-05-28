@@ -84,7 +84,7 @@ project (DaedalusX64)
 				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG} ${WIN_UTILITY})
 
         #Posix
-				set (POSIX_DEBUG Debug/Posix/Assert.cpp SysPosix/Debug/DebugConsolePosix.cpp SysPosix/Debug/WebDebug.cpp SysPosix/Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
+				set (POSIX_DEBUG Debug/Posix/Assert.cpp SysPosix/Debug/DebugConsolePosix.cpp Debug/WebDebug.cpp Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
 				set (POSIX_DYNAREC SysPosix/DynaRec/CodeBufferManagerPosix.cpp)
 				set (POSIX_HLEGRAPHICS SysPosix/HLEGraphics/DisplayListDebugger.cpp)
 				set (POSIX_MAIN_FILES SysPosix/main.cpp)
