@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/TextureCache.h"
 #include "HLEGraphics/RDP.h"
 #include "HLEGraphics/RDPStateManager.h"
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 #include "OSHLE/ultra_gbi.h"
 #include "OSHLE/ultra_rcp.h"
 #include "OSHLE/ultra_sptask.h"
@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Test/BatchTest.h"
 #include "uCodes/UcodeDefs.h"
 #include "uCodes/Ucode.h"
-#include "Utility/IO.h"
+#include "System/IO.h"
 #include "Utility/Profiler.h"
 
 

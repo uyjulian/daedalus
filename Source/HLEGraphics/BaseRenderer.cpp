@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/RDPStateManager.h"
 #include "HLEGraphics/DLDebug.h"
 #include "Math/Math.h"			// VFPU Math
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 #include "OSHLE/ultra_gbi.h"
 #include "Utility/Profiler.h"
 

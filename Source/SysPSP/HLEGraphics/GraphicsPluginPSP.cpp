@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Plugins/GraphicsPlugin.h"
 
 #include "Utility/Profiler.h"
-#include "Utility/FramerateLimiter.h"
+#include "Core/FramerateLimiter.h"
 #include "Utility/Preferences.h"
 #include "Utility/Timing.h"
 

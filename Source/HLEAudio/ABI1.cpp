@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "HLEAudio/audiohle.h"
 #include "HLEAudio/AudioHLEProcessor.h"
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 
 AudioHLEInstruction ABI1[0x20] =
 {

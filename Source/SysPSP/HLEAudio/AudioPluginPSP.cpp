@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysPSP/Utility/JobManager.h"
 #include "SysPSP/Utility/CacheUtil.h"
 #include "SysPSP/Utility/JobManager.h"
-#include "Utility/FramerateLimiter.h"
+#include "Core/FramerateLimiter.h"
 #include "Utility/Thread.h"
 
 #define RSP_AUDIO_INTR_CYCLES     1

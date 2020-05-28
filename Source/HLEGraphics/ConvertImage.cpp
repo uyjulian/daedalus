@@ -27,7 +27,7 @@ Copyright (C) 2001 StrmnNrmn
 #include "HLEGraphics/N64PixelFormat.h"
 #include "HLEGraphics/RDP.h"
 #include "HLEGraphics/TextureInfo.h"
-#include "Math/MathUtil.h"
+#include "Base/MathUtil.h"
 #include "OSHLE/ultra_gbi.h"
 
 uint32_t ConvertYUV16ToRGBA8888(int Y, int U, int V)

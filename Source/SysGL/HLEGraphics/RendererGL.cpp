@@ -16,8 +16,8 @@
 #include "SysGL/HLEGraphics/RendererGL.h"
 
 #include "System/Paths.h"
-#include "Utility/IO.h"
-#include "Utility/Macros.h"
+#include "System/IO.h"
+#include "Base/Macros.h"
 #include "Utility/Profiler.h"
 
 BaseRenderer * gRenderer   = NULL;

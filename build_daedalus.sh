@@ -58,17 +58,19 @@ function buildPSP() {
 
   make -j8
   #No point continuing if the elf file doesn't exist
-  if [ -f "$PWD/daedalus.elf" ]; then
+#  if [ -f "$PWD/daedalus.elf" ]; then
     #Pack PBP
-  psp-fixup-imports daedalus.elf
-  mksfoex -d MEMSIZE=1 DaedalusX64 PARAM.SFO
-  psp-prxgen daedalus.elf daedalus.prx
-  cp ../Source/SysPSP/Resources/eboot_icons/* "$PWD"
-  pack-pbp EBOOT.PBP PARAM.SFO icon0.png NULL NULL pic1.png NULL daedalus.prx NULL
+# # psp-strip daedalus.elf -O daedalus.prx
+#mksfoex -d MEMSIZE=1 DaedalusX64 PARAM.SFO
+# psp-prxgen daedalus.elf daedalus.prx
+#   psp-fixup-imports daedalus.prx
+
+#  cp ../Source/SysPSP/Resources/eboot_icons/* "$PWD"
+  #pack-pbp EBOOT.PBP PARAM.SFO icon0.png NULL NULL pic1.png NULL daedalus.prx NULL
   finalPrep
 
 
-fi
+#fi
     }
 
 ## Main loop
@@ -78,7 +80,7 @@ if [ "$1" = "PSP_RELEASE" ] || [ "$1" = "PSP_DEBUG" ]; then
   pre_prep
     mkdir "$PWD/daedbuild"
     cd "$PWD/daedbuild"
-cmake -DCMAKE_TOOLCHAIN_FILE=../Tools/psptoolchain.cmake -D"$1=1" ../Source
+cmake -DCMAKE_TOOLCHAIN_FILE="$PSPDEV/psp/share/cmake/PSP.cmake" -DCMAKE_BUILD_TYPE=Release -D"$1=1" ../Source
 buildPSP
 
 elif [ "$1" = "LINUX_RELEASE" ] || [ "$1" = "MAC_RELEASE" ] || [ "$1" = "LINUX_DEBUG" ] || [ "$1" = "MAC_DEBUG" ]; then

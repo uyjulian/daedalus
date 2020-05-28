@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Utility/ROMFileCompressed.h"
 #include "Utility/ROMFileUncompressed.h"
 #include "Utility/Stream.h"
-#include "Utility/IO.h"
+#include "System/IO.h"
 
 #include <algorithm>
 #include <string.h>

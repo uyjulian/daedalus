@@ -38,9 +38,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysPSP/Utility/Buttons.h"
 #include "SysPSP/Utility/PathsPSP.h"
 #include "Utility/Thread.h"
-#include "Utility/FramerateLimiter.h"
+#include "Core/FramerateLimiter.h"
 #include "Utility/Preferences.h"
-#include "Utility/IO.h"
+#include "System/IO.h"
 #include "Utility/Translate.h"
 
 #include "Input/InputManager.h"
