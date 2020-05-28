@@ -49,6 +49,15 @@
 #define DAEDALUS_HALT __builtin_trap()
 #endif
 
+
+// Function name introspection.
+#ifdef _MSC_VER
+#define DAEDALUS_FUNCTION_NAME __FUNCTION__
+#else
+#define DAEDALUS_FUNCTION_NAME __PRETTY_FUNCTION__
+#endif
+
+
 #ifdef DAEDALUS_DEBUG_CONSOLE
 #define NODEFAULT		DAEDALUS_ERROR( "No default - we shouldn't be here" )
 #endif

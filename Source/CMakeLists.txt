@@ -84,6 +84,7 @@ project (DaedalusX64)
 				set (WIN_SYSTEM System/Windows/Condition.cpp System/Windows/IO.cpp System/Windows/Thread.cpp System/Windows/Timing.cpp)
 				set (WIN_MAIN_FILES Main/Windows/main.cpp)
 				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG})
+				set (WIN_DEFINES -DDAEDALUS_W32 -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_GL -DDAEDALUS_ACCURATE_TMEM)
 
         #Posix
 				set (POSIX_DEBUG Debug/Posix/Assert.cpp Debug/Posix/DebugConsole.cpp Debug/WebDebug.cpp Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
