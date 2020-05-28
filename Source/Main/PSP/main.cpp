@@ -54,11 +54,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysPSP/UI/UIContext.h"
 #include "SysPSP/Utility/Buttons.h"
 #include "SysPSP/Utility/PathsPSP.h"
+#include "SysPSP/Utility/ModulePSP.h"
 #include "System/Paths.h"
 #include "System/SystemInit.h"
 #include "Test/BatchTest.h"
 #include "System/IO.h"
-#include "Utility/ModulePSP.h"
+
 #include "Interface/Preferences.h"
 #include "Utility/Profiler.h"
 #include "System/Thread.h"
