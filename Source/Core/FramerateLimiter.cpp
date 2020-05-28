@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "FramerateLimiter.h"
 
 #include "Utility/Timing.h"
-#include "Utility/Thread.h"
+#include "System/Thread.h"
 
 #include "Core/Memory.h"
 #include "Core/ROM.h"

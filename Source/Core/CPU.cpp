@@ -49,7 +49,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Base/Macros.h"
 #include "Core/PrintOpCode.h"
 #include "Debug/Synchroniser.h"
-#include "Utility/Thread.h"
+#include "System/Thread.h"
 #include "Utility/Mutex.h"
 
 #ifdef DAEDALUS_W32
