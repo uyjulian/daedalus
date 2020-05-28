@@ -109,7 +109,7 @@ void Dump_GetSaveDirectory(char * rootdir, const char * rom_filename, const char
 
 	// Form the filename from the file spec (i.e. strip path and replace the extension)
 	IO::Filename file_name;
-	IO::Path::Assign(file_name, rom_filename);
+	IO::Path::Assign(file_name, IO::Path::FindFileName(rom_filename));
 	IO::Path::SetExtension(file_name, extension);
 
 	IO::Path::Combine(rootdir, g_DaedalusConfig.mSaveDir, file_name);
@@ -131,7 +131,11 @@ void Dump_GetSaveDirectory(char * rootdir, const char * rom_filename, const char
 
 	// Form the filename from the file spec (i.e. strip path and replace the extension)
 	IO::Filename file_name;
+	#ifdef DAEDALUS_PSP // For some reason this doesn't work on Posix so we swap it out
+	IO::Path::Assign(file_name, IO::Path::FindFileName(rom_filename));
+	#else
 	IO::Path::Assign(file_name, rom_filename);
+	#endif
 	IO::Path::SetExtension(file_name, extension);
 
 	IO::Path::Combine(rootdir, g_DaedalusConfig.mCacheDir, file_name);

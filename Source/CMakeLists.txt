@@ -33,15 +33,15 @@ project (DaedalusX64)
 				set (UNKNOWN_FILES Utility/FastMemcpy_test.cpp Utility/MemoryPool.cpp)
 				set (DEBUG_ONLY Core/Registers.cpp)
 				set (BUILD ${BASE} ${CONFIG} ${CORE_FILES} ${DEBUG_FILES} ${DYNAREC_FILES} ${GRAPHICS_FILES} ${HLEAUDIO_FILES} ${HLEGRAPHICS_FILES} ${INTERFACE_FILES} ${MATH_FILES} ${OSHLE_FILES} ${PLUGIN_FILES} ${ROMFILES} ${SYSTEM_FILES} ${TEST_FILES} ${UTILITY_FILES})
-
+				set (BASE_DEFINES -DDAEDALUS_ENABLE_DYNAREC -DDAEDALUS_ENABLE_OS_HOOKS)
 
 				#PSP Build
 				set (PSP_DEBUG_FILES Debug/PSP/Assert.cpp Debug/PSP/DebugConsole.cpp )
 				set (PSP_DVEMGR_FILES SysPSP/PRX/DveMgr/pspDveManager.S)
-				set (PSP_DYNAREC_FILES SysPSP/DynaRec/AssemblyWriterPSP.cpp SysPSP/DynaRec/AssemblyUtilsPSP.cpp SysPSP/DynaRec/CodeBufferManagerPSP.cpp SysPSP/DynaRec/CodeGeneratorPSP.cpp SysPSP/DynaRec/DynaRecStubs.S SysPSP/DynaRec/N64RegisterCachePSP.cpp)
+				set (PSP_DYNAREC_FILES DynaRec/PSP/AssemblyWriterPSP.cpp DynaRec/PSP/AssemblyUtilsPSP.cpp DynaRec/PSP/CodeBufferManagerPSP.cpp DynaRec/PSP/CodeGeneratorPSP.cpp DynaRec/PSP/DynaRecStubs.S DynaRec/PSP/N64RegisterCachePSP.cpp)
 				set (PSP_GRAPHICS_FILES SysPSP/Graphics/DrawText.cpp SysPSP/Graphics/GraphicsContext.cpp SysPSP/Graphics/NativeTexturePSP.cpp SysPSP/Graphics/VideoMemoryManager.cpp SysPSP/Graphics/intraFont/intraFont.c SysPSP/Graphics/intraFont/libccc.c)
 				set (PSP_HLEAUDIO_FILES HLEAudio/PSP/AudioPlugin.cpp)
-				set (PSP_HLEGRAPHICS_FILES SysPSP/HLEGraphics/Blender.cpp SysPSP/HLEGraphics/BlendModes.cpp SysPSP/HLEGraphics/ColourAdjuster.cpp SysPSP/HLEGraphics/ConvertVertices.S SysPSP/HLEGraphics/DisplayListDebugger.cpp SysPSP/HLEGraphics/GraphicsPluginPSP.cpp SysPSP/HLEGraphics/RendererPSP.cpp SysPSP/HLEGraphics/Combiner/BlendConstant.cpp SysPSP/HLEGraphics/Combiner/CombinerExpression.cpp SysPSP/HLEGraphics/Combiner/CombinerTree.cpp SysPSP/HLEGraphics/Combiner/RenderSettings.cpp SysPSP/HLEGraphics/TnLVFPU.S SysPSP/HLEGraphics/VectorClipping.S)
+				set (PSP_HLEGRAPHICS_FILES SysPSP/HLEGraphics/Blender.cpp SysPSP/HLEGraphics/BlendModes.cpp SysPSP/HLEGraphics/ColourAdjuster.cpp SysPSP/HLEGraphics/ConvertVertices.S HLEGraphics/PSP/DisplayListDebugger.cpp SysPSP/HLEGraphics/GraphicsPluginPSP.cpp SysPSP/HLEGraphics/RendererPSP.cpp SysPSP/HLEGraphics/Combiner/BlendConstant.cpp SysPSP/HLEGraphics/Combiner/CombinerExpression.cpp SysPSP/HLEGraphics/Combiner/CombinerTree.cpp SysPSP/HLEGraphics/Combiner/RenderSettings.cpp SysPSP/HLEGraphics/TnLVFPU.S SysPSP/HLEGraphics/VectorClipping.S)
 				set (PSP_INPUTMANAGER_FILES SysPSP/Input/InputManagerPSP.cpp)
 				set (PSP_KERNELBUTTON_FILES SysPSP/PRX/KernelButtons/imposectrl.S)
         set (PSP_MEDIAENGINEFILES SysPSP/PRX/MediaEngine/me.c SysPSP/PRX/MediaEngine/MediaEngine.S )
@@ -49,16 +49,16 @@ project (DaedalusX64)
 				set (PSP_SYSTEM System/PSP/IO.cpp System/PSP/Thread.cpp System/PSP/Timing.cpp)
 				set (PSP_UTILITY_FILES SysPSP/Utility/AtomicPrimitives.S SysPSP/Utility/BatteryPSP.cpp SysPSP/Utility/Buttons.cpp SysPSP/Utility/DebugMemory.cpp SysPSP/Utility/DisableFPUExceptions.S SysPSP/Utility/exception.cpp SysPSP/Utility/FastMemcpyPSP.cpp SysPSP/Utility/JobManager.cpp SysPSP/Utility/ModulePSP.cpp SysPSP/Utility/VolatileMemPSP.cpp)
 				set (GPROF_SRCS SysPSP/Debug/prof.c SysPSP/Debug/mcount.S )
-				set (PSP_MAIN_FILES SysPSP/main.cpp)
+				set (PSP_MAIN_FILES Main/PSP/main.cpp)
 
 
 				set (PSP_BUILD ${PSP_DEBUG_FILES} ${PSP_DVEMGR_FILES} ${PSP_DYNAREC_FILES} ${PSP_GRAPHICS_FILES} ${PSP_HLEAUDIO_FILES} ${PSP_HLEGRAPHICS_FILES} ${PSP_INPUTMANAGER_FILES} ${PSP_KERNELBUTTON_FILES} ${PSP_MEDIAENGINEFILES} ${PSP_SYSTEM} ${PSP_UI_FILES} ${PSP_UTILITY_FILES})
-				Set(PSPSDK_LIBS -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpsplibc -lpsputility -lpspuser -lpspkernel -lpspaudiolib)
-
+				set(PSPSDK_LIBS -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpsplibc -lpsputility -lpspuser -lpspkernel -lpspaudiolib)
+				set (PSP_DEFINES ${BASE_DEFINES} -DDAEDALUS_PSP -DDAEDALUS_PSP_USE_ME -DDAEDALUS_PSP_USE_VFPU -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE)
 
 				#Handle .S files - Probably a better way to do this
 				set_property(SOURCE SysPSP/HLEGraphics/ConvertVertices.S PROPERTY LANGUAGE C)
-				set_property(SOURCE SysPSP/DynaRec/DynaRecStubs.S PROPERTY LANGUAGE C)
+				set_property(SOURCE DynaRec/PSP/DynaRecStubs.S PROPERTY LANGUAGE C)
 				set_property(SOURCE SysPSP/HLEGraphics/TnLVFPU.S PROPERTY LANGUAGE C)
 				set_property(SOURCE SysPSP/HLEGraphics/VectorClipping.S PROPERTY LANGUAGE C)
 				set_property(SOURCE SysPSP/Utility/AtomicPrimitives.S PROPERTY LANGUAGE C)
@@ -79,37 +79,38 @@ project (DaedalusX64)
 				#Windows -- Not sure if it works yet
 				set (WIN_AUDIO HLEAudio/Windows/AudioPlugin.cpp)
 				set (WIN_DEBUG Debug/Windows/Assert.cpp)
+				set (WIN_DYNAREC DynaRec/Windows/x86/AssemblyUtilsX86.cpp DynaRec/Windows/x86/AssemblyWriterX86.cpp DynaRec/Windows/x86/CodeBufferManagerX86.cpp DynaRec/Windows/x86/CodeGeneratorX86.cpp DynaRec/Windows/DISASM86.cpp)
+				set (WIN_HLEGRAPHICS HLEGraphics/Posix/DisplayListDebugger.cpp)
 				set (WIN_SYSTEM System/Windows/Condition.cpp System/Windows/IO.cpp System/Windows/Thread.cpp System/Windows/Timing.cpp)
+				set (WIN_MAIN_FILES Main/Windows/main.cpp)
 				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG})
+				set (WIN_DEFINES -DDAEDALUS_W32 -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_GL -DDAEDALUS_ACCURATE_TMEM -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE)
 
         #Posix
-				set (POSIX_DEBUG Debug/Posix/Assert.cpp SysPosix/Debug/DebugConsolePosix.cpp Debug/WebDebug.cpp Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
+				set (POSIX_DEBUG Debug/Posix/Assert.cpp Debug/Posix/DebugConsole.cpp Debug/WebDebug.cpp Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
 				set (POSIX_DYNAREC SysPosix/DynaRec/CodeBufferManager.cpp)
-				set (POSIX_HLEGRAPHICS SysPosix/HLEGraphics/DisplayListDebugger.cpp)
-				set (POSIX_MAIN_FILES SysPosix/main.cpp)
+				set (POSIX_HLEGRAPHICS HLEGraphics/Posix/DisplayListDebugger.cpp)
+				set (POSIX_MAIN_FILES Main/Posix/main.cpp)
 				set (POSIX_SYSTEM System/Posix/Condition.cpp System/Posix/IO.cpp System/Posix/Thread.cpp System/Posix/Timing.cpp)
 				set (POSIX_BUILD ${POSIX_DEBUG} ${POSIX_DYNAREC} ${POSIX_SYSTEM} ${POSIX_HLEGRAPHICS} ${POSIX_UTILITY})
-
+				set (POSIX_DEFINES -DDAEDALUS_POSIX -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE -DDAEDALUS_ENABLE_OS_HOOKS -DDAEDALUS_ACCURATE_TMEM )
 				# These will remain separate for now..
 				set (LINUX_AUDIO HLEAudio/Linux/AudioPlugin.cpp)
 				set (MAC_AUDIO HLEAudio/macOS/AudioPlugin.cpp)
 
-
 if (PSP_RELEASE)
 	message("PSP Release Build..")
 	add_definitions("-O2 -msingle-float -W -DNDEBUG")
-	add_definitions(-DDAEDALUS_PSP)
+	add_definitions(${PSP_DEFINES} -DDAEDALUS_CONFIG_RELEASE)
 	include_directories(${PROJECT_SOURCE_DIR}/Base/Release .)
 	add_library(pspkubridge STATIC IMPORTED)
 	set_property(TARGET pspkubridge PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SysPSP/Include/lib/libpspkubridge.a)
-	include_directories(BEFORE ${PROJECT_SOURCE_DIR}/SysPSP/Include)
+	include_directories(BEFORE ${PROJECT_SOURCE_DIR}/SysPSP/Include/)
 	add_library(daedaluslib STATIC ${BUILD} ${PSP_BUILD})
 	add_executable(daedalus ${PSP_MAIN_FILES})
 	target_link_libraries(daedalus daedaluslib -lstdc++ -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lpsprtc -lpng -lz -lc -lg -lm -lpspfpu pspkubridge ${PSP_LIBRARIES})
-	create_pbp_file(TARGET daedalus) ## Bork
+	create_pbp_file(TARGET daedalus TITLE DaedalusX64 ICON_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/icon0.png BACKGROUND_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/pic1.png) ## Bork
 endif (PSP_RELEASE)
-
-
 
 #Only difference between PSP Release and Debug is the definitions and Config Dev File - Try and merge
 
@@ -118,10 +119,10 @@ if (PSP_DEBUG)
 	message("PSP Debug Build..")
 	include_directories(${PROJECT_SOURCE_DIR}/Base/Dev .)
 	add_definitions("-g -O2 -fno-omit-frame-pointer -G0 -D_DEBUG -MD -Wall")
-	add_definitions(-DDAEDALUS_PSP )
+	add_definitions(${PSP_DEFINES} -DDAEDALUS_CONFIG_DEBUG)
 	add_library(pspkubridge STATIC IMPORTED)
 set_property(TARGET pspkubridge PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SysPSP/Include/lib/libpspkubridge.a)
-	include_directories(BEFORE ${PROJECT_SOURCE_DIR}/SysPSP/Include)
+	include_directories(BEFORE ${PROJECT_SOURCE_DIR}/Main/PSP ${PROJECT_SOURCE_DIR}/SysPSP/Include/)
 	add_library(daedalus STATIC ${BUILD} ${PSP_BUILD} ${DEBUG_ONLY})
 	add_executable(daedalus.elf ${PSP_MAIN_FILES})
 	set_target_properties(daedalus.elf PROPERTIES LINK_FLAGS "-specs=${PSPSDK}/lib/prxspecs -Wl,-q,-T${PSPSDK}/lib/linkfile.prx ${PSPSDK}/lib/prxexports.o -L${PSPSDK}/lib")
@@ -132,20 +133,18 @@ endif (PSP_DEBUG)
 if (MAC_RELEASE OR LINUX_RELEASE)
 
 add_definitions("-DNDEBUG -O3 -DDAEDALUS_POSIX")
-	add_definitions(-DDAEDALUS_POSIX)
-		include_directories(${PROJECT_SOURCE_DIR}/Base/Release)
+	add_definitions(${POSIX_DEFINES} -DDAEDALUS_CONFIG_RELEASE -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE)
 include_directories(${PROJECT_SOURCE_DIR/HLEGraphics})
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/SysPosix/Include)
+include_directories(${PROJECT_SOURCE_DIR})
 
 endif (MAC_RELEASE OR LINUX_RELEASE)
 
 if (MAC_DEBUG OR LINUX_DEBUG)
 
 add_definitions("-D_DEBUG -g -DDAEDALUS_POSIX")
-	add_definitions(-DDAEDALUS_POSIX)
-		include_directories(${PROJECT_SOURCE_DIR}/Base/Dev)
+	add_definitions(${POSIX_DEFINES} -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE)
 include_directories(${PROJECT_SOURCE_DIR/HLEGraphics})
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/SysPosix/Include)
+include_directories(${PROJECT_SOURCE_DIR})
 
 endif (MAC_DEBUG OR LINUX_DEBUG)
 
