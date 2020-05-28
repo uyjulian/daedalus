@@ -40,7 +40,7 @@ project (DaedalusX64)
 				set (PSP_DVEMGR_FILES SysPSP/PRX/DveMgr/pspDveManager.S)
 				set (PSP_DYNAREC_FILES SysPSP/DynaRec/AssemblyWriterPSP.cpp SysPSP/DynaRec/AssemblyUtilsPSP.cpp SysPSP/DynaRec/CodeBufferManagerPSP.cpp SysPSP/DynaRec/CodeGeneratorPSP.cpp SysPSP/DynaRec/DynaRecStubs.S SysPSP/DynaRec/N64RegisterCachePSP.cpp)
 				set (PSP_GRAPHICS_FILES SysPSP/Graphics/DrawText.cpp SysPSP/Graphics/GraphicsContext.cpp SysPSP/Graphics/NativeTexturePSP.cpp SysPSP/Graphics/VideoMemoryManager.cpp SysPSP/Graphics/intraFont/intraFont.c SysPSP/Graphics/intraFont/libccc.c)
-				set (PSP_HLEAUDIO_FILES SysPSP/HLEAudio/AudioPluginPSP.cpp)
+				set (PSP_HLEAUDIO_FILES HLEAudio/PSP/AudioPlugin.cpp)
 				set (PSP_HLEGRAPHICS_FILES SysPSP/HLEGraphics/Blender.cpp SysPSP/HLEGraphics/BlendModes.cpp SysPSP/HLEGraphics/ColourAdjuster.cpp SysPSP/HLEGraphics/ConvertVertices.S SysPSP/HLEGraphics/DisplayListDebugger.cpp SysPSP/HLEGraphics/GraphicsPluginPSP.cpp SysPSP/HLEGraphics/RendererPSP.cpp SysPSP/HLEGraphics/Combiner/BlendConstant.cpp SysPSP/HLEGraphics/Combiner/CombinerExpression.cpp SysPSP/HLEGraphics/Combiner/CombinerTree.cpp SysPSP/HLEGraphics/Combiner/RenderSettings.cpp SysPSP/HLEGraphics/TnLVFPU.S SysPSP/HLEGraphics/VectorClipping.S)
 				set (PSP_INPUTMANAGER_FILES SysPSP/Input/InputManagerPSP.cpp)
 				set (PSP_KERNELBUTTON_FILES SysPSP/PRX/KernelButtons/imposectrl.S)
@@ -77,7 +77,7 @@ project (DaedalusX64)
 				set (SYSGL_BUILD ${SYSGL_GRAPHICS} ${SYSGL_HLEGRAPHICS} ${SYSGL_INPUT} ${SYSGL_INTERFACE} ${PLUGIN_FILES})
 
 				#Windows -- Not sure if it works yet
-				set (WIN_AUDIO SysW32/HLEAudio/AudioPluginW32.cpp)
+				set (WIN_AUDIO HLEAudio/Windows/AudioPlugin.cpp)
 				set (WIN_DEBUG Debug/Windows/Assert.cpp SysW32/Debug/DebugConsoleW32.cpp)
 				set (WIN_SYSTEM System/Windows/Condition.cpp System/Windows/IO.cpp System/Windows/Thread.cpp System/Windows/Timing.cpp)
 				set (WIN_UTILITY SysW32/Utility/IOW32.cpp SysW32/Utility/ThreadW32.cpp)
@@ -92,8 +92,8 @@ project (DaedalusX64)
 				set (POSIX_BUILD ${POSIX_DEBUG} ${POSIX_DYNAREC} ${POSIX_SYSTEM} ${POSIX_HLEGRAPHICS} ${POSIX_UTILITY})
 
 				# These will remain separate for now..
-				set (LINUX_AUDIO SysPosix/HLEAudio/AudioPluginLinux.cpp)
-				set (MAC_AUDIO SysPosix/HLEAudio/AudioPluginOSX.cpp)
+				set (LINUX_AUDIO HLEAudio/Linux/AudioPlugin.cpp)
+				set (MAC_AUDIO HLEAudio/macOS/AudioPlugin.cpp)
 
 
 if (PSP_RELEASE)
