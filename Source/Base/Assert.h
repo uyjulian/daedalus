@@ -133,7 +133,7 @@ inline void SetAssertHook( DaedalusAssertHook hook )
 #define DAEDALUS_ERROR( ... )													\
 {																				\
 	static bool ignore = false;													\
-	if ( !ignore )	DEBUG_															\
+	if ( !ignore ) \
 	{																			\
 		EAssertResult ar;														\
 		if (gAssertHook != NULL)												\
