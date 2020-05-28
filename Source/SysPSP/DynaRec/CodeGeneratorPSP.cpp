@@ -38,7 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SysPSP/DynaRec/CodeGeneratorPSP.h"
 #include "SysPSP/DynaRec/N64RegisterCachePSP.h"
 #include "Base/Macros.h"
-#include "Utility/PrintOpCode.h"
+#include "Core/PrintOpCode.h"
 #include "Utility/Profiler.h"
 
 using namespace AssemblyUtils;

@@ -47,8 +47,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/FramerateLimiter.h"
 #include "Utility/Hash.h"
 #include "Base/Macros.h"
-#include "Utility/PrintOpCode.h"
-#include "Utility/Synchroniser.h"
+#include "Core/PrintOpCode.h"
+#include "Debug/Synchroniser.h"
 #include "Utility/Thread.h"
 #include "Utility/Mutex.h"
 
