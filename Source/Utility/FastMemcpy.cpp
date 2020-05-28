@@ -11,7 +11,7 @@ homepage: http://wordpress.fx-world.org
 
 
 #include "Base/Types.h"
-#include "Utility/Endian.h"
+#include "System/Endian.h"
 #include "Utility/FastMemcpy.h"
 #include "Utility/Timing.h"
 
