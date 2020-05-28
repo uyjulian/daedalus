@@ -101,8 +101,7 @@ if (PSP_RELEASE)
 	message("PSP Release Build..")
 	add_definitions("-O2 -msingle-float -W -DNDEBUG")
 	add_definitions(-DDAEDALUS_PSP)
-	include_directories(${PROJECT_SOURCE_DIR}/Base/Release ${PROJECT_SOURCE_DIR}/Main/PSP Platform .)
-
+	include_directories(${PROJECT_SOURCE_DIR}/Base/Release ${PROJECT_SOURCE_DIR}/Main/PSP .)
 	add_library(pspkubridge STATIC IMPORTED)
 	set_property(TARGET pspkubridge PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SysPSP/Include/lib/libpspkubridge.a)
 	include_directories(BEFORE ${PROJECT_SOURCE_DIR}/SysPSP/Include/)
@@ -111,8 +110,6 @@ if (PSP_RELEASE)
 	target_link_libraries(daedalus daedaluslib -lstdc++ -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lpsprtc -lpng -lz -lc -lg -lm -lpspfpu pspkubridge ${PSP_LIBRARIES})
 	create_pbp_file(TARGET daedalus TITLE DaedalusX64 ICON_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/icon0.png BACKGROUND_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/pic1.png) ## Bork
 endif (PSP_RELEASE)
-
-
 
 #Only difference between PSP Release and Debug is the definitions and Config Dev File - Try and merge
 
