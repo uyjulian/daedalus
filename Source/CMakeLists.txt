@@ -33,7 +33,7 @@ project (DaedalusX64)
 				set (UNKNOWN_FILES Utility/FastMemcpy_test.cpp Utility/MemoryPool.cpp)
 				set (DEBUG_ONLY Core/Registers.cpp)
 				set (BUILD ${BASE} ${CONFIG} ${CORE_FILES} ${DEBUG_FILES} ${DYNAREC_FILES} ${GRAPHICS_FILES} ${HLEAUDIO_FILES} ${HLEGRAPHICS_FILES} ${INTERFACE_FILES} ${MATH_FILES} ${OSHLE_FILES} ${PLUGIN_FILES} ${ROMFILES} ${SYSTEM_FILES} ${TEST_FILES} ${UTILITY_FILES})
-
+				set (BASE_DEFINES -DDAEDALUS_ENABLE_DYNAREC -DDAEDALUS_ENABLE_OS_HOOKS)
 
 				#PSP Build
 				set (PSP_DEBUG_FILES Debug/PSP/Assert.cpp Debug/PSP/DebugConsole.cpp )
@@ -53,8 +53,8 @@ project (DaedalusX64)
 
 
 				set (PSP_BUILD ${PSP_DEBUG_FILES} ${PSP_DVEMGR_FILES} ${PSP_DYNAREC_FILES} ${PSP_GRAPHICS_FILES} ${PSP_HLEAUDIO_FILES} ${PSP_HLEGRAPHICS_FILES} ${PSP_INPUTMANAGER_FILES} ${PSP_KERNELBUTTON_FILES} ${PSP_MEDIAENGINEFILES} ${PSP_SYSTEM} ${PSP_UI_FILES} ${PSP_UTILITY_FILES})
-				Set(PSPSDK_LIBS -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpsplibc -lpsputility -lpspuser -lpspkernel -lpspaudiolib)
-
+				set(PSPSDK_LIBS -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpsplibc -lpsputility -lpspuser -lpspkernel -lpspaudiolib)
+				set (PSP_DEFINES ${BASE_DEFINES} -DDAEDALUS_PSP -DDAEDALUS_PSP_USE_ME -DDAEDALUS_PSP_USE_VFPU)
 
 				#Handle .S files - Probably a better way to do this
 				set_property(SOURCE SysPSP/HLEGraphics/ConvertVertices.S PROPERTY LANGUAGE C)
@@ -79,14 +79,14 @@ project (DaedalusX64)
 				#Windows -- Not sure if it works yet
 				set (WIN_AUDIO HLEAudio/Windows/AudioPlugin.cpp)
 				set (WIN_DEBUG Debug/Windows/Assert.cpp)
-				set (WIN_DYNAREC DynaRec/Windows/x86/AssemblyUtilsX86.cpp DynaRec/Windows/x86/AssemblyWriterX86.cpp DynaRec/Windows/x86/CodeBufferManagerX86.cpp DynaRec/Windows/x86/CodeGeneratorX86.cpp)
+				set (WIN_DYNAREC DynaRec/Windows/x86/AssemblyUtilsX86.cpp DynaRec/Windows/x86/AssemblyWriterX86.cpp DynaRec/Windows/x86/CodeBufferManagerX86.cpp DynaRec/Windows/x86/CodeGeneratorX86.cpp DynaRec/Windows/DISASM86.cpp)
 				set (WIN_HLEGRAPHICS HLEGraphics/Posix/DisplayListDebugger.cpp)
 				set (WIN_SYSTEM System/Windows/Condition.cpp System/Windows/IO.cpp System/Windows/Thread.cpp System/Windows/Timing.cpp)
 				set (WIN_MAIN_FILES Main/Windows/main.cpp)
 				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG})
 
         #Posix
-				set (POSIX_DEBUG Debug/Posix/Assert.cpp SysPosix/Debug/DebugConsolePosix.cpp Debug/WebDebug.cpp Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
+				set (POSIX_DEBUG Debug/Posix/Assert.cpp Debug/Posix/DebugConsole.cpp Debug/WebDebug.cpp Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
 				set (POSIX_DYNAREC SysPosix/DynaRec/CodeBufferManager.cpp)
 				set (POSIX_HLEGRAPHICS HLEGraphics/Posix/DisplayListDebugger.cpp)
 				set (POSIX_MAIN_FILES Main/Posix/main.cpp)
@@ -97,12 +97,11 @@ project (DaedalusX64)
 				set (LINUX_AUDIO HLEAudio/Linux/AudioPlugin.cpp)
 				set (MAC_AUDIO HLEAudio/macOS/AudioPlugin.cpp)
 
-
 if (PSP_RELEASE)
 	message("PSP Release Build..")
 	add_definitions("-O2 -msingle-float -W -DNDEBUG")
-	add_definitions(-DDAEDALUS_PSP)
-	include_directories(${PROJECT_SOURCE_DIR}/Base/Release ${PROJECT_SOURCE_DIR}/Main/PSP .)
+	add_definitions(${PSP_DEFINES})
+	include_directories(${PROJECT_SOURCE_DIR}/Base/Release ${PROJECT_SOURCE_DIR}/Platform/PSP .)
 	add_library(pspkubridge STATIC IMPORTED)
 	set_property(TARGET pspkubridge PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SysPSP/Include/lib/libpspkubridge.a)
 	include_directories(BEFORE ${PROJECT_SOURCE_DIR}/SysPSP/Include/)
@@ -117,9 +116,9 @@ endif (PSP_RELEASE)
 if (PSP_DEBUG)
 	CMAKE_BUILD_TYPE(DEBUG)
 	message("PSP Debug Build..")
-	include_directories(${PROJECT_SOURCE_DIR}/Base/Dev .)
+	include_directories(${PROJECT_SOURCE_DIR}/Base/Dev . ${PROJECT_SOURCE_DIR}/Platform/PSP)
 	add_definitions("-g -O2 -fno-omit-frame-pointer -G0 -D_DEBUG -MD -Wall")
-	add_definitions(-DDAEDALUS_PSP )
+	add_definitions(${PSP_DEFINES})
 	add_library(pspkubridge STATIC IMPORTED)
 set_property(TARGET pspkubridge PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SysPSP/Include/lib/libpspkubridge.a)
 	include_directories(BEFORE ${PROJECT_SOURCE_DIR}/Main/PSP ${PROJECT_SOURCE_DIR}/SysPSP/Include/)
@@ -136,7 +135,7 @@ add_definitions("-DNDEBUG -O3 -DDAEDALUS_POSIX")
 	add_definitions(-DDAEDALUS_POSIX)
 		include_directories(${PROJECT_SOURCE_DIR}/Base/Release)
 include_directories(${PROJECT_SOURCE_DIR/HLEGraphics})
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/SysPosix/Include)
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/Platform/Posix)
 
 endif (MAC_RELEASE OR LINUX_RELEASE)
 
@@ -146,7 +145,7 @@ add_definitions("-D_DEBUG -g -DDAEDALUS_POSIX")
 	add_definitions(-DDAEDALUS_POSIX)
 		include_directories(${PROJECT_SOURCE_DIR}/Base/Dev)
 include_directories(${PROJECT_SOURCE_DIR/HLEGraphics})
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/SysPosix/Include)
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/Platform/Posix)
 
 endif (MAC_DEBUG OR LINUX_DEBUG)
 

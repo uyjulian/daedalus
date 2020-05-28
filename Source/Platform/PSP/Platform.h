@@ -31,28 +31,9 @@ enum PspModel
     PSP_MODEL_GO = 4,
     PSP_MODEL_STREET = 10
 };
-//
-//	Make sure this platform is defined correctly
-//
-#ifndef DAEDALUS_PSP
-#define DAEDALUS_PSP
-#endif
 
-#define DAEDALUS_ENABLE_DYNAREC
-#define DAEDALUS_PSP_USE_ME
-#define DAEDALUS_ENABLE_OS_HOOKS
 
 #define DAEDALUS_ENDIAN_MODE DAEDALUS_ENDIAN_LITTLE
-
-// We have a VFPU :)
-#define DAEDALUS_PSP_USE_VFPU
-
-#define DAEDALUS_EXPECT_LIKELY(c) __builtin_expect((c),1)
-#define DAEDALUS_EXPECT_UNLIKELY(c) __builtin_expect((c),0)
-
-#define DAEDALUS_ATTRIBUTE_NOINLINE __attribute__((noinline))
-
-#define DAEDALUS_HALT			__asm__ __volatile__ ( "break" )
 
 #define DAEDALUS_DYNAREC_HALT	SW(PspReg_R0, PspReg_R0, 0)
 

@@ -19,30 +19,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#ifndef SYSPOSIX_INCLUDE_PLATFORM_H_
-#define SYSPOSIX_INCLUDE_PLATFORM_H_
+#ifndef PLATFORM_WINDOWS_PLATFORM_H_
+#define PLATFORM_WINDOWS_PLATFORM_H_
 
 //
 //	Make sure this platform is defined correctly
 //
-#ifndef DAEDALUS_POSIX
-#define DAEDALUS_POSIX
+#ifndef DAEDALUS_W32
+#define DAEDALUS_W32
 #endif
 
-#define DAEDALUS_COMPRESSED_ROM_SUPPORT
-//#define DAEDALUS_ENABLE_OS_HOOKS
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#define _DO_NOT_DECLARE_INTERLOCKED_INTRINSICS_IN_MEMORY
+#define __has_feature(x) 0
+
+// TODO(strmnnrmn): Fix dynarec.
+//#define DAEDALUS_ENABLE_DYNAREC
+#undef DAEDALUS_BREAKPOINTS_ENABLED
+#define DAEDALUS_ENABLE_OS_HOOKS
+#define DAEDALUS_GL
+#define DAEDALUS_ACCURATE_TMEM
 
 #define DAEDALUS_ENDIAN_MODE DAEDALUS_ENDIAN_LITTLE
 
-#ifdef __GNUC__
-#define DAEDALUS_EXPECT_LIKELY(c) __builtin_expect((c),1)
-#define DAEDALUS_EXPECT_UNLIKELY(c) __builtin_expect((c),0)
-
-#define DAEDALUS_ATTRIBUTE_NOINLINE __attribute__((noinline))
-#endif
-
-#define DAEDALUS_HALT			__builtin_trap()
-//#define DAEDALUS_HALT			__builtin_debugger()
+// Zlib is compiled as __cdecl
+#define	DAEDALUS_ZLIB_CALL_TYPE				__cdecl
 
 
-#endif // SYSPOSIX_INCLUDE_PLATFORM_H_
+#endif // PLATFORM_WINDOWS_PLATFORM_H_

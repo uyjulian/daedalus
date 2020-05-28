@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/SystemInit.h"
 #include "Test/BatchTest.h"
 #include "System/IO.h"
-#include "Utility/PathsPosix.h"
+#include "SysPosix/Utility/PathsPosix.h"
 #include "Config/ConfigOptions.h"
 
 #include <SDL2/SDL.h>
