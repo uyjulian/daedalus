@@ -107,7 +107,7 @@ if (PSP_RELEASE)
 	add_library(daedaluslib STATIC ${BUILD} ${PSP_BUILD})
 	add_executable(daedalus ${PSP_MAIN_FILES})
 	target_link_libraries(daedalus daedaluslib -lstdc++ -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lpsprtc -lpng -lz -lc -lg -lm -lpspfpu pspkubridge ${PSP_LIBRARIES})
-	create_pbp_file(TARGET daedalus) ## Bork
+	create_pbp_file(TARGET daedalus TITLE DaedalusX64 ICON_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/icon0.png BACKGROUND_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/pic1.png) ## Bork
 endif (PSP_RELEASE)
 
 
