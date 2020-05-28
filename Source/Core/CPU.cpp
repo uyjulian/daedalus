@@ -42,7 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 #include "OSHLE/ultra_R4300.h"
-#include "System/System.h"
+#include "System/SystemInit.h"
 #include "Utility/AtomicPrimitives.h"
 #include "Core/FramerateLimiter.h"
 #include "Utility/Hash.h"

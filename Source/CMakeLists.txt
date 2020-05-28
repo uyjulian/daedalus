@@ -14,8 +14,8 @@ set(CMAKE_CXX_STANDARD 14)
 project (DaedalusX64)
 
 				#Default Files for build
-				set (BASE_FILES StdAfx.cpp)
-				set (CONFIG_FILES Config/ConfigOptions.cpp)
+				set (BASE StdAfx.cpp)
+				set (CONFIG Config/ConfigOptions.cpp)
 				set (CORE_FILES Core/HvqmTask.cpp Core/RDRam.cpp Core/Cheats.cpp Core/CPU.cpp Core/DMA.cpp Core/Dynamo.cpp Core/FlashMem.cpp  Core/FramerateLimiter.cpp Core/Interpret.cpp Core/Interrupts.cpp Core/JpegTask.cpp Core/Memory.cpp Core/PIF.cpp Core/PrintOpCode.cpp Core/R4300.cpp Core/Registers.cpp Core/ROM.cpp Core/ROMBuffer.cpp Core/ROMImage.cpp Core/RomSettings.cpp Core/RSP_HLE.cpp Core/Save.cpp Core/SaveState.cpp Core/TLB.cpp)
 				set (DEBUG_FILES Debug/DebugConsoleImpl.cpp Debug/DebugLog.cpp Debug/Dump.cpp Debug/Synchroniser.cpp )
 				set (DYNAREC_FILES DynaRec/BranchType.cpp DynaRec/DynaRecProfile.cpp DynaRec/Fragment.cpp DynaRec/FragmentCache.cpp DynaRec/IndirectExitMap.cpp DynaRec/StaticAnalysis.cpp DynaRec/TraceRecorder.cpp)
@@ -27,16 +27,16 @@ project (DaedalusX64)
 				set (OSHLE_FILES OSHLE/OS.cpp OSHLE/patch.cpp)
 				set (ROMFILES RomFile/RomFile.cpp RomFile/RomFileCache.cpp RomFile/RomFileCompressed.cpp RomFile/RomFileMemory.cpp RomFile/RomFileUncompressed.cpp)
 				set (PLUGIN_FILES Plugins/GraphicsPlugin.cpp)
-				set (SYSTEM_FILES System/CompressedStream.cpp System/DataSink.cpp System/Paths.cpp System/System.cpp)
+				set (SYSTEM_FILES System/CompressedStream.cpp System/DataSink.cpp System/Paths.cpp System/SystemInit.cpp)
 				set (TEST_FILES Test/BatchTest.cpp)
 				set (UTILITY_FILES Utility/CRC.cpp  Utility/FastMemcpy.cpp Utility/Hash.cpp Utility/IniFile.cpp Utility/MemoryHeap.cpp Utility/Profiler.cpp Utility/Stream.cpp Utility/StringUtil.cpp Utility/Timer.cpp  Utility/Translate.cpp)
 				set (UNKNOWN_FILES Utility/FastMemcpy_test.cpp Utility/MemoryPool.cpp)
 				set (DEBUG_ONLY Core/Registers.cpp)
-				set (BUILD ${BASE_FILES} ${CONFIG_FILES} ${CORE_FILES} ${DEBUG_FILES} ${DYNAREC_FILES} ${GRAPHICS_FILES} ${HLEAUDIO_FILES} ${HLEGRAPHICS_FILES} ${INTERFACE_FILES} ${MATH_FILES} ${OSHLE_FILES} ${PLUGIN_FILES} ${ROMFILE} ${SYSTEM_FILES} ${TEST_FILES} ${UTILITY_FILES})
+				set (BUILD ${BASE} ${CONFIG} ${CORE_FILES} ${DEBUG_FILES} ${DYNAREC_FILES} ${GRAPHICS_FILES} ${HLEAUDIO_FILES} ${HLEGRAPHICS_FILES} ${INTERFACE_FILES} ${MATH_FILES} ${OSHLE_FILES} ${PLUGIN_FILES} ${ROMFILES} ${SYSTEM_FILES} ${TEST_FILES} ${UTILITY_FILES})
 
 
 				#PSP Build
-				set (PSP_DEBUG_FILES SysPSP/Debug/DaedalusAssertPSP.cpp SysPSP/Debug/DBGConsolePSP.cpp )
+				set (PSP_DEBUG_FILES Debug/PSP/Assert.cpp SysPSP/Debug/DBGConsolePSP.cpp )
 				set (PSP_DVEMGR_FILES SysPSP/PRX/DveMgr/pspDveManager.S)
 				set (PSP_DYNAREC_FILES SysPSP/DynaRec/AssemblyWriterPSP.cpp SysPSP/DynaRec/AssemblyUtilsPSP.cpp SysPSP/DynaRec/CodeBufferManagerPSP.cpp SysPSP/DynaRec/CodeGeneratorPSP.cpp SysPSP/DynaRec/DynaRecStubs.S SysPSP/DynaRec/N64RegisterCachePSP.cpp)
 				set (PSP_GRAPHICS_FILES SysPSP/Graphics/DrawText.cpp SysPSP/Graphics/GraphicsContext.cpp SysPSP/Graphics/NativeTexturePSP.cpp SysPSP/Graphics/VideoMemoryManager.cpp SysPSP/Graphics/intraFont/intraFont.c SysPSP/Graphics/intraFont/libccc.c)
@@ -44,14 +44,15 @@ project (DaedalusX64)
 				set (PSP_HLEGRAPHICS_FILES SysPSP/HLEGraphics/Blender.cpp SysPSP/HLEGraphics/BlendModes.cpp SysPSP/HLEGraphics/ColourAdjuster.cpp SysPSP/HLEGraphics/ConvertVertices.S SysPSP/HLEGraphics/DisplayListDebugger.cpp SysPSP/HLEGraphics/GraphicsPluginPSP.cpp SysPSP/HLEGraphics/RendererPSP.cpp SysPSP/HLEGraphics/Combiner/BlendConstant.cpp SysPSP/HLEGraphics/Combiner/CombinerExpression.cpp SysPSP/HLEGraphics/Combiner/CombinerTree.cpp SysPSP/HLEGraphics/Combiner/RenderSettings.cpp SysPSP/HLEGraphics/TnLVFPU.S SysPSP/HLEGraphics/VectorClipping.S)
 				set (PSP_INPUTMANAGER_FILES SysPSP/Input/InputManagerPSP.cpp)
 				set (PSP_KERNELBUTTON_FILES SysPSP/PRX/KernelButtons/imposectrl.S)
-                set (PSP_MEDIAENGINEFILES SysPSP/PRX/MediaEngine/me.c SysPSP/PRX/MediaEngine/MediaEngine.S )
+        set (PSP_MEDIAENGINEFILES SysPSP/PRX/MediaEngine/me.c SysPSP/PRX/MediaEngine/MediaEngine.S )
 				set (PSP_UI_FILES SysPSP/UI/AboutComponent.cpp SysPSP/UI/AdjustDeadzoneScreen.cpp SysPSP/UI/AdvancedOptionsScreen.cpp SysPSP/UI/CheatOptionsScreen.cpp SysPSP/UI/ColourPulser.cpp SysPSP/UI/Dialogs.cpp SysPSP/UI/GlobalSettingsComponent.cpp SysPSP/UI/MainMenuScreen.cpp SysPSP/UI/PauseOptionsComponent.cpp SysPSP/UI/PauseScreen.cpp SysPSP/UI/RomPreferencesScreen.cpp SysPSP/UI/RomSelectorComponent.cpp SysPSP/UI/SavestateSelectorComponent.cpp SysPSP/UI/SelectedRomComponent.cpp SysPSP/UI/SplashScreen.cpp SysPSP/UI/UICommand.cpp SysPSP/UI/UIComponent.cpp SysPSP/UI/UIContext.cpp SysPSP/UI/UIElement.cpp SysPSP/UI/UIScreen.cpp SysPSP/UI/UISetting.cpp)
-				set (PSP_UTILITY_FILES SysPSP/Utility/AtomicPrimitives.S SysPSP/Utility/BatteryPSP.cpp SysPSP/Utility/Buttons.cpp SysPSP/Utility/DebugMemory.cpp SysPSP/Utility/DisableFPUExceptions.S SysPSP/Utility/exception.cpp SysPSP/Utility/FastMemcpyPSP.cpp SysPSP/Utility/IOPSP.cpp SysPSP/Utility/JobManager.cpp SysPSP/Utility/ModulePSP.cpp SysPSP/Utility/ThreadPSP.cpp SysPSP/Utility/TimingPSP.cpp SysPSP/Utility/VolatileMemPSP.cpp)
+				set (PSP_SYSTEM System/PSP/IO.cpp)
+				set (PSP_UTILITY_FILES SysPSP/Utility/AtomicPrimitives.S SysPSP/Utility/BatteryPSP.cpp SysPSP/Utility/Buttons.cpp SysPSP/Utility/DebugMemory.cpp SysPSP/Utility/DisableFPUExceptions.S SysPSP/Utility/exception.cpp SysPSP/Utility/FastMemcpyPSP.cpp SysPSP/Utility/JobManager.cpp SysPSP/Utility/ModulePSP.cpp SysPSP/Utility/ThreadPSP.cpp SysPSP/Utility/TimingPSP.cpp SysPSP/Utility/VolatileMemPSP.cpp)
 				set (GPROF_SRCS SysPSP/Debug/prof.c SysPSP/Debug/mcount.S )
 				set (PSP_MAIN_FILES SysPSP/main.cpp)
 
 
-				set (PSP_BUILD ${PSP_DEBUG_FILES} ${PSP_DVEMGR_FILES} ${PSP_DYNAREC_FILES} ${PSP_GRAPHICS_FILES} ${PSP_HLEAUDIO_FILES} ${PSP_HLEGRAPHICS_FILES} ${PSP_INPUTMANAGER_FILES} ${PSP_KERNELBUTTON_FILES} ${PSP_MEDIAENGINEFILES} ${PSP_UI_FILES} ${PSP_UTILITY_FILES})
+				set (PSP_BUILD ${PSP_DEBUG_FILES} ${PSP_DVEMGR_FILES} ${PSP_DYNAREC_FILES} ${PSP_GRAPHICS_FILES} ${PSP_HLEAUDIO_FILES} ${PSP_HLEGRAPHICS_FILES} ${PSP_INPUTMANAGER_FILES} ${PSP_KERNELBUTTON_FILES} ${PSP_MEDIAENGINEFILES} ${PSP_SYSTEM} ${PSP_UI_FILES} ${PSP_UTILITY_FILES})
 				Set(PSPSDK_LIBS -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpsplibc -lpsputility -lpspuser -lpspkernel -lpspaudiolib)
 
 
@@ -77,17 +78,19 @@ project (DaedalusX64)
 
 				#Windows -- Not sure if it works yet
 				set (WIN_AUDIO SysW32/HLEAudio/AudioPluginW32.cpp)
-				set (WIN_DEBUG SysW32/Debug/DaedalusAssertW32.cpp SysW32/Debug/DebugConsoleW32.cpp)
+				set (WIN_DEBUG Debug/Windows/Assert.cpp SysW32/Debug/DebugConsoleW32.cpp)
+				set (WIN_SYSTEM System/Windows/IO.cpp)
 				set (WIN_UTILITY SysW32/Utility/IOW32.cpp SysW32/Utility/ThreadW32.cpp SysW32/Utility/TimingW32.cpp)
 				set (WIN_BUILD ${WIN_AUDIO} ${WIN_DEBUG} ${WIN_UTILITY})
 
         #Posix
-				set (POSIX_DEBUG SysPosix/Debug/DaedalusAssertPosix.cpp SysPosix/Debug/DebugConsolePosix.cpp SysPosix/Debug/WebDebug.cpp SysPosix/Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
+				set (POSIX_DEBUG Debug/Posix/Assert.cpp SysPosix/Debug/DebugConsolePosix.cpp SysPosix/Debug/WebDebug.cpp SysPosix/Debug/WebDebugTemplate.cpp third_party/webby/webby.c)
 				set (POSIX_DYNAREC SysPosix/DynaRec/CodeBufferManagerPosix.cpp)
 				set (POSIX_HLEGRAPHICS SysPosix/HLEGraphics/DisplayListDebugger.cpp)
 				set (POSIX_MAIN_FILES SysPosix/main.cpp)
-				set (POSIX_UTILITY SysPosix/Utility/CondPosix.cpp SysPosix/Utility/IOPosix.cpp SysPosix/Utility/ThreadPosix.cpp SysPosix/Utility/TimingPosix.cpp)
-				set (POSIX_BUILD ${POSIX_DEBUG} ${POSIX_DYNAREC} ${POSIX_HLEGRAPHICS} ${POSIX_UTILITY})
+				set (POSIX_SYSTEM System/Posix/IO.cpp)
+				set (POSIX_UTILITY SysPosix/Utility/CondPosix.cpp SysPosix/Utility/ThreadPosix.cpp SysPosix/Utility/TimingPosix.cpp)
+				set (POSIX_BUILD ${POSIX_DEBUG} ${POSIX_DYNAREC} ${POSIX_SYSTEM} ${POSIX_HLEGRAPHICS} ${POSIX_UTILITY})
 
 				# These will remain separate for now..
 				set (LINUX_AUDIO SysPosix/HLEAudio/AudioPluginLinux.cpp)

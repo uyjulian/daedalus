@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DBGConsole.h"
 #include "Interface/RomDB.h"
 #include "System/Paths.h"
-#include "System/System.h"
+#include "System/SystemInit.h"
 #include "Test/BatchTest.h"
 #include "System/IO.h"
 #include "Utility/PathsPosix.h"
