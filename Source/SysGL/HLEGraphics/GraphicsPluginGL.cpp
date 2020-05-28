@@ -15,7 +15,7 @@
 
 #include "Plugins/GraphicsPlugin.h"
 
-#include "Utility/Timing.h"
+#include "System/Timing.h"
 
 #include "SysGL/GL.h"
 
