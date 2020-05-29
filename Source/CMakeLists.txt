@@ -14,7 +14,6 @@ set(CMAKE_CXX_STANDARD 14)
 project (DaedalusX64)
 
 				#Default Files for build
-				set (BASE StdAfx.cpp)
 				set (CONFIG Config/ConfigOptions.cpp)
 				set (CORE_FILES Core/HvqmTask.cpp Core/RDRam.cpp Core/Cheats.cpp Core/CPU.cpp Core/DMA.cpp Core/Dynamo.cpp Core/FlashMem.cpp  Core/FramerateLimiter.cpp Core/Interpret.cpp Core/Interrupts.cpp Core/JpegTask.cpp Core/Memory.cpp Core/PIF.cpp Core/PrintOpCode.cpp Core/R4300.cpp Core/Registers.cpp Core/ROM.cpp Core/ROMBuffer.cpp Core/ROMImage.cpp Core/RomSettings.cpp Core/RSP_HLE.cpp Core/Save.cpp Core/SaveState.cpp Core/TLB.cpp)
 				set (DEBUG_FILES Debug/DebugConsoleImpl.cpp Debug/DebugLog.cpp Debug/Dump.cpp Debug/Synchroniser.cpp )
@@ -32,7 +31,7 @@ project (DaedalusX64)
 				set (UTILITY_FILES Utility/CRC.cpp  Utility/FastMemcpy.cpp Utility/Hash.cpp Utility/IniFile.cpp Utility/MemoryHeap.cpp Utility/Profiler.cpp Utility/Stream.cpp Utility/StringUtil.cpp Utility/Timer.cpp  Utility/Translate.cpp)
 				set (UNKNOWN_FILES Utility/FastMemcpy_test.cpp Utility/MemoryPool.cpp)
 				set (DEBUG_ONLY Core/Registers.cpp)
-				set (BUILD ${BASE} ${CONFIG} ${CORE_FILES} ${DEBUG_FILES} ${DYNAREC_FILES} ${GRAPHICS_FILES} ${HLEAUDIO_FILES} ${HLEGRAPHICS_FILES} ${INTERFACE_FILES} ${MATH_FILES} ${OSHLE_FILES} ${PLUGIN_FILES} ${ROMFILES} ${SYSTEM_FILES} ${TEST_FILES} ${UTILITY_FILES})
+				set (BUILD ${CONFIG} ${CORE_FILES} ${DEBUG_FILES} ${DYNAREC_FILES} ${GRAPHICS_FILES} ${HLEAUDIO_FILES} ${HLEGRAPHICS_FILES} ${INTERFACE_FILES} ${MATH_FILES} ${OSHLE_FILES} ${PLUGIN_FILES} ${ROMFILES} ${SYSTEM_FILES} ${TEST_FILES} ${UTILITY_FILES})
 				set (BASE_DEFINES -DDAEDALUS_ENABLE_DYNAREC -DDAEDALUS_ENABLE_OS_HOOKS)
 
 				#PSP Build
@@ -100,7 +99,7 @@ project (DaedalusX64)
 
 if (PSP_RELEASE)
 	message("PSP Release Build..")
-	add_definitions("-O2 -msingle-float -W -DNDEBUG")
+	add_definitions("-O2 -W -DNDEBUG")
 	add_definitions(${PSP_DEFINES} -DDAEDALUS_CONFIG_RELEASE)
 	include_directories(${PROJECT_SOURCE_DIR}/Base/Release .)
 	add_library(pspkubridge STATIC IMPORTED)
