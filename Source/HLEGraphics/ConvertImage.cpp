@@ -17,7 +17,7 @@ Copyright (C) 2001 StrmnNrmn
 
 */
 
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 
 #include "DLDebug.h"
 #include "Core/Memory.h"

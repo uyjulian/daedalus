@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 
 #include "HLEGraphics/DaedalusVtx.h"
 #include "SysPSP/HLEGraphics/Combiner/BlendConstant.h"

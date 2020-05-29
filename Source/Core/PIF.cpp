@@ -87,7 +87,7 @@ area assignment does not change. After Tx/RxData assignment, this flag is reset 
 
 #include <time.h>
 
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 
 #include "Core/PIF.h"
 #include "Core/CPU.h"

@@ -17,7 +17,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#include "stdafx.h"
+#include "Base/Daedalus.h"
 #include "DynaRec/PSP/N64RegisterCachePSP.h"
 
 CN64RegisterCachePSP::CN64RegisterCachePSP()
