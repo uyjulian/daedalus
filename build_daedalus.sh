@@ -80,7 +80,7 @@ if [ "$1" = "PSP_RELEASE" ] || [ "$1" = "PSP_DEBUG" ]; then
   pre_prep
     mkdir "$PWD/daedbuild"
     cd "$PWD/daedbuild"
-cmake -DCMAKE_TOOLCHAIN_FILE="$PSPDEV/psp/share/cmake/PSP.cmake" -DCMAKE_BUILD_TYPE=Release -D"$1=1" ../Source
+cmake -DCMAKE_TOOLCHAIN_FILE="/usr/local/pspdev/psp/share/cmake/PSP.cmake" -DCMAKE_BUILD_TYPE=Release -D"$1=1" ../Source
 buildPSP
 
 elif [ "$1" = "LINUX_RELEASE" ] || [ "$1" = "MAC_RELEASE" ] || [ "$1" = "LINUX_DEBUG" ] || [ "$1" = "MAC_DEBUG" ]; then

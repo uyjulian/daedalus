@@ -108,7 +108,7 @@ if (PSP_RELEASE)
 	add_library(daedaluslib STATIC ${BUILD} ${PSP_BUILD})
 	add_executable(daedalus ${PSP_MAIN_FILES})
 	target_link_libraries(daedalus daedaluslib -lstdc++ -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lpsprtc -lpng -lz -lc -lg -lm -lpspfpu pspkubridge ${PSP_LIBRARIES})
-	create_pbp_file(TARGET daedalus TITLE DaedalusX64 ICON_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/icon0.png BACKGROUND_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/pic1.png) ## Bork
+	create_pbp_file(TARGET daedalus TITLE DaedalusX64 ICON_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/icon0.png BACKGROUND_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/pic1.png)
 endif (PSP_RELEASE)
 
 #Only difference between PSP Release and Debug is the definitions and Config Dev File - Try and merge
@@ -117,15 +117,17 @@ if (PSP_DEBUG)
 	message("PSP Debug Build..")
 	include_directories(${PROJECT_SOURCE_DIR})
 	add_definitions("-g -O2 -fno-omit-frame-pointer -G0 -D_DEBUG -MD -Wall")
-	add_definitions(${PSP_DEFINES} -DDAEDALUS_CONFIG_DEBUG)
+	add_definitions(${PSP_DEFINES} -DDAEDALUS_CONFIG_DEV)
 	add_library(pspkubridge STATIC IMPORTED)
-set_property(TARGET pspkubridge PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SysPSP/Include/lib/libpspkubridge.a)
+	set_property(TARGET pspkubridge PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/SysPSP/Include/lib/libpspkubridge.a)
 	include_directories(BEFORE ${PROJECT_SOURCE_DIR}/Main/PSP ${PROJECT_SOURCE_DIR}/SysPSP/Include/)
 	add_library(daedalus STATIC ${BUILD} ${PSP_BUILD} ${DEBUG_ONLY})
 	add_executable(daedalus.elf ${PSP_MAIN_FILES})
 	set_target_properties(daedalus.elf PROPERTIES LINK_FLAGS "-specs=${PSPSDK}/lib/prxspecs -Wl,-q,-T${PSPSDK}/lib/linkfile.prx ${PSPSDK}/lib/prxexports.o -L${PSPSDK}/lib")
 	target_include_directories(daedalus.elf PUBLIC /usr/local/pspdev/psp/sdk/include )
 	target_link_libraries(daedalus.elf daedalus -lstdc++ -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lpsprtc -lpng -lz -lc -lg -lm -lpspfpu pspkubridge ${PSPSDK_LIBS})
+	create_pbp_file(TARGET daedalus.elf TITLE DaedalusX64 ICON_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/icon0.png BACKGROUND_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/pic1.png)
+
 endif (PSP_DEBUG)
 
 if (MAC_RELEASE OR LINUX_RELEASE)
