@@ -23,7 +23,7 @@
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 
-#include "Combiner/RenderSettings.h"
+#include "SysPSP/HLEGraphics/Combiner/RenderSettings.h"
 
 #include "HLEGraphics/CachedTexture.h"
 #include "HLEGraphics/DLDebug.h"
