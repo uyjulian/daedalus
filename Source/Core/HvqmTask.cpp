@@ -36,7 +36,7 @@
 
 #include "Core/Memory.h"
 #include "Core/RDRam.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Ultra/ultra_sptask.h"
 
  /* Nest size  */

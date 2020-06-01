@@ -5,7 +5,7 @@
 #include <GL/glew.h>
 
 #include "Core/ROM.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Graphics/ColourValue.h"
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/NativeTexture.h"

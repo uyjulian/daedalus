@@ -26,7 +26,7 @@
 
 #include "Core/ROM.h"
 #include "Core/ROMImage.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Interface/RomDB.h"
 #include "Base/MathUtil.h"
 #include "System/Paths.h"

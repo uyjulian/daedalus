@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/Interrupt.h"
 #include "Core/Save.h"
 #include "Debug/DebugLog.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "OSHLE/OSTask.h"
 #include "OSHLE/patch.h"
 #include "Utility/FastMemcpy.h"

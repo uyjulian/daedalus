@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Ultra/ultra_R4300.h"
 #include "R4300.h"
 
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 
 inline void SET_EXCEPTION(u32 mask, u32 exception)
 {

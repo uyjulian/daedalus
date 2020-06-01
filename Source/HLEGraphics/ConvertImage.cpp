@@ -21,7 +21,7 @@ Copyright (C) 2001 StrmnNrmn
 
 #include "DLDebug.h"
 #include "Core/Memory.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Graphics/NativePixelFormat.h"
 #include "HLEGraphics/ConvertImage.h"
 #include "HLEGraphics/N64PixelFormat.h"

@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "DynaRec/DynaRecProfile.h"
 #include "DynaRec/Fragment.h"
 #include "DynaRec/FragmentCache.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Utility/Profiler.h"
 #include "System/IO.h"
 

@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/Memory.h"		// We access the memory buffers
 #include "Core/ROM.h"
 #include "Debug/Dump.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Graphics/NativeTexture.h"
 #include "Graphics/GraphicsContext.h"
 #include "HLEGraphics/BaseRenderer.h"

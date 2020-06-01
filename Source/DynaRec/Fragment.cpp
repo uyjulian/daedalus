@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/CPU.h"			// Try to remove this cyclic dependency
 #include "Core/R4300.h"
 #include "Core/Interrupt.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "DynaRec/CodeBufferManager.h"
 #include "DynaRec/CodeGenerator.h"
 #include "DynaRec/BranchType.h"

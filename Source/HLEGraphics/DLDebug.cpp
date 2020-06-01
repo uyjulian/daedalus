@@ -5,7 +5,7 @@
 #include <stdarg.h>
 
 #include "Core/ROM.h"
-#include "Debug/DBGConsole.h"
+#include "Debug/Console.h"
 #include "Debug/Dump.h"
 #include "HLEGraphics/RDP.h"
 #include "Ultra/ultra_gbi.h"

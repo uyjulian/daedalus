@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/CPU.h"
 #include "Core/ROM.h"				// ROM_Unload
 #include "Core/RomSettings.h"
-#include "Debug/DBGConsole.h"		// DBGConsole_Enable
+#include "Debug/Console.h"		// DBGConsole_Enable
 #include "Debug/DebugLog.h"
 #include "Interface/RomDB.h"
 #include "System/Paths.h"
