@@ -15,7 +15,7 @@
 #include "HLEGraphics/TextureCache.h"
 #include "Base/MathUtil.h"
 #include "SysPSP/HLEGraphics/RendererPSP.h"
-#include "OSHLE/ultra_gbi.h"
+#include "Ultra/ultra_gbi.h"
 #include "System/IO.h"
 #include "Utility/Profiler.h"
 

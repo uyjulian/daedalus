@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/DLDebug.h"
 #include "Math/Math.h"			// VFPU Math
 #include "Base/MathUtil.h"
-#include "OSHLE/ultra_gbi.h"
+#include "Ultra/ultra_gbi.h"
 #include "Utility/Profiler.h"
 
 #include <vector>

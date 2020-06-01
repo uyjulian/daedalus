@@ -11,7 +11,7 @@
 #include "Graphics/NativeTexture.h"
 #include "HLEGraphics/DLDebug.h"
 #include "HLEGraphics/RDPStateManager.h"
-#include "OSHLE/ultra_gbi.h"
+#include "Ultra/ultra_gbi.h"
 #include "SysGL/GL.h"
 #include "SysGL/HLEGraphics/RendererGL.h"
 
