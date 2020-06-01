@@ -17,36 +17,36 @@ enum PspModel
 
 
 // User Interface Variables
-const s16 SCREEN_WIDTH {480};
-const s16 SCREEN_HEIGHT {272};
+const s16 SCREEN_WIDTH  = 480;
+const s16 SCREEN_HEIGHT = 272;
 
 // to do adjust values to suit multiple screens
-const s16 MENU_TOP {5};
-const s16 TITLE_HEADER {10};
+const s16 MENU_TOP = 5;
+const s16 TITLE_HEADER  = 10;
 
-const s16 BELOW_MENU_MIN {33}; // Rename this as it's confusing
+const s16 BELOW_MENU_MIN = 33; // Rename this as it's confusing
 
-const s16 LIST_TEXT_LEFT {13};
-const s16 LIST_TEXT_WIDTH {SCREEN_WIDTH - LIST_TEXT_LEFT};
-const s16 LIST_TEXT_HEIGHT {216};
+const s16 LIST_TEXT_LEFT = 13;
+const s16 LIST_TEXT_WIDTH = SCREEN_WIDTH - LIST_TEXT_LEFT;
+const s16 LIST_TEXT_HEIGHT = 216;
 
-const s16 PREVIEW_IMAGE_LEFT {309};
-const s16 PREVIEW_IMAGE_BOTTOM {140};
-const s16 PREVIEW_IMAGE_RIGHT {464};
-const s16 PREVIEW_IMAGE_WIDTH {PREVIEW_IMAGE_RIGHT - PREVIEW_IMAGE_LEFT};
-const s16 PREVIEW_IMAGE_HEIGHT {PREVIEW_IMAGE_BOTTOM - BELOW_MENU_MIN};
+const s16 PREVIEW_IMAGE_LEFT = 309;
+const s16 PREVIEW_IMAGE_BOTTOM = 140;
+const s16 PREVIEW_IMAGE_RIGHT = 464;
+const s16 PREVIEW_IMAGE_WIDTH = PREVIEW_IMAGE_RIGHT - PREVIEW_IMAGE_LEFT;
+const s16 PREVIEW_IMAGE_HEIGHT = PREVIEW_IMAGE_BOTTOM - BELOW_MENU_MIN;
 
-const s16 DESCRIPTION_AREA_TOP {0};
-const s16 DESCRIPTION_AREA_LEFT {16};
-const s16 DESCRIPTION_AREA_RIGHT {SCREEN_WIDTH - 16};
-const s16 DESCRIPTION_AREA_BOTTOM {SCREEN_HEIGHT - 10};
+const s16 DESCRIPTION_AREA_TOP = 0;
+const s16 DESCRIPTION_AREA_LEFT = 16;
+const s16 DESCRIPTION_AREA_RIGHT = SCREEN_WIDTH - 16;
+const s16 DESCRIPTION_AREA_BOTTOM = SCREEN_HEIGHT - 10;
 
-const s16 ROM_INFO_TEXT_X {318};
-const s16 ROM_INFO_TEXT_Y {154};
-const s16 BATTERY_INFO {200};
+const s16 ROM_INFO_TEXT_X = 318;
+const s16 ROM_INFO_TEXT_Y = 154;
+const s16 BATTERY_INFO = 200;
 
-const s16 CATEGORY_TEXT_TOP {BELOW_MENU_MIN + LIST_TEXT_HEIGHT + 5};
-const s16 CATEGORY_TEXT_LEFT {LIST_TEXT_LEFT};
+const s16 CATEGORY_TEXT_TOP = BELOW_MENU_MIN + LIST_TEXT_HEIGHT + 5;
+const s16 CATEGORY_TEXT_LEFT = LIST_TEXT_LEFT;
 
 const char		gCategoryLetters[] = "#abcdefghijklmnopqrstuvwxyz?";
 
@@ -61,7 +61,7 @@ enum ECategory
 
 // Splash Screen
 
-const float	MAX_TIME  {0.8f}; // Rename to something more sane
+const float	MAX_TIME = 0.8f; // Rename to something more sane
 const char * const	LOGO_FILENAME {DAEDALUS_PSP_PATH( "Resources/logo.png" )};
 
 
@@ -114,15 +114,14 @@ const char * const		TITLE_TEXT = "Adjust Stick Deadzone"; // Make more sane
 
 const u32				TITLE_Y = 10;
 
-const u32				HALF_WIDTH( 480 / 2 );
-const u32				CENTRE_X( 480 / 2 );
-const u32				DISPLAY_WIDTH( 128 );
-const u32				DISPLAY_RADIUS( DISPLAY_WIDTH / 2 );
+const u32				HALF_WIDTH = SCREEN_WIDTH / 2;
+const u32				DISPLAY_WIDTH = 128;
+const u32				DISPLAY_RADIUS = DISPLAY_WIDTH / 2;
 
 const u32				PSP_CIRCLE_X = DISPLAY_RADIUS + ((HALF_WIDTH - DISPLAY_WIDTH) / 2);
 const u32				PSP_CIRCLE_Y = 120;
 
-const u32				N64_CIRCLE_X = CENTRE_X + DISPLAY_RADIUS + ((HALF_WIDTH - DISPLAY_WIDTH) / 2);
+const u32				N64_CIRCLE_X = HALF_WIDTH + DISPLAY_RADIUS + ((HALF_WIDTH - DISPLAY_WIDTH) / 2);
 const u32				N64_CIRCLE_Y = 120;
 
 const u32				PSP_TITLE_X = PSP_CIRCLE_X - DISPLAY_RADIUS;
