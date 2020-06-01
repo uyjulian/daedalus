@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Core/CPU.h"
 #include "Core/ROM.h"
 #include "Core/RomSettings.h"
-#include "Core/SaveState.h"
+#include "Interface/SaveState.h"
 #include "Graphics/ColourValue.h"
 #include "Graphics/GraphicsContext.h"
 #include "Base/MathUtil.h"
