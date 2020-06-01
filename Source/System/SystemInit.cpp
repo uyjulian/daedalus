@@ -56,8 +56,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Debug/DBGConsole.h"
 #include "Debug/DebugLog.h"
 
-#include "Plugins/GraphicsPlugin.h"
-#include "Plugins/AudioPlugin.h"
+#include "HLEGraphics/GraphicsPlugin.h"
+#include "HLEAudio/AudioPlugin.h"
 
 CGraphicsPlugin * gGraphicsPlugin   = NULL;
 CAudioPlugin	* gAudioPlugin		= NULL;

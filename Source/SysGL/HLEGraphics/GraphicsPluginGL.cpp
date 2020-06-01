@@ -13,7 +13,7 @@
 #include "HLEGraphics/DLParser.h"
 #include "HLEGraphics/DisplayListDebugger.h"
 
-#include "Plugins/GraphicsPlugin.h"
+#include "HLEGraphics/GraphicsPlugin.h"
 
 #include "System/Timing.h"
 

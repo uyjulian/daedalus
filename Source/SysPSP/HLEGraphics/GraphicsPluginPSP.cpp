@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "HLEGraphics/DisplayListDebugger.h"
 
 #include "Graphics/GraphicsContext.h"
-#include "Plugins/GraphicsPlugin.h"
+#include "HLEGraphics/GraphicsPlugin.h"
 
 #include "Utility/Profiler.h"
 #include "Core/FramerateLimiter.h"

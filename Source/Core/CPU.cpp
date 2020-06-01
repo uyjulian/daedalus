@@ -53,7 +53,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Mutex.h"
 
 #ifdef DAEDALUS_W32
-#include "Plugins/AudioPlugin.h"
+#include "HLEAudio/AudioPlugin.h"
 #endif
 
 extern void R4300_Init();
