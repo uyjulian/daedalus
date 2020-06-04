@@ -113,8 +113,7 @@ static std::vector<VblCallback>		gVblCallbacks;
 
 void CPU_RegisterVblCallback(VblCallbackFn fn, void * arg)
 {
-	VblCallback callback = { fn, arg };
-	gVblCallbacks.push_back(callback);
+	gVblCallbacks.push_back({ fn, arg });
 }
 
 void CPU_UnregisterVblCallback(VblCallbackFn fn, void * arg)

@@ -42,6 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "System/Thread.h"
 #include "System/Timing.h"
 
+CAudioPlugin* gAudioPlugin = nullptr;
 EAudioPluginMode gAudioPluginEnabled = APM_DISABLED;
 
 #define DEBUG_AUDIO  0
@@ -73,7 +74,6 @@ public:
 	AudioPluginOSX();
 	virtual ~AudioPluginOSX();
 
-	virtual bool			StartEmulation();
 	virtual void			StopEmulation();
 
 	virtual void			DacrateChanged(int system_type);
@@ -98,6 +98,28 @@ private:
 
 	volatile u32 			mBufferLenMs;
 };
+
+bool CreateAudioPlugin()
+{
+	DAEDALUS_ASSERT(gAudioPlugin == nullptr, "Why is there already an Audio plugin?");
+	gAudioPlugin = new AudioPluginOSX()
+	return true;
+}
+
+void DestroyAudioPlugin()
+{
+// Make a copy of the plugin, and set the global pointer to NULL;
+// This stops other threads from trying to access the plugin
+// while we're in the process of shutting it down.
+// TODO(strmnnrmn): Still looks racey.
+CAudioPlugin* plugin = gAudioPlugin;
+gAudioPlugin = nullptr;
+if (plugin != nullptr)
+{
+	plugin->StopEmulation();
+	delete plugin;
+}
+}
 
 AudioPluginOSX::AudioPluginOSX()
 :	mAudioBuffer( kAudioBufferSize )

@@ -57,6 +57,8 @@ static const u32	MAX_OUTPUT_FREQUENCY = kOutputFrequency * 4;
 
 static bool audio_open = false;
 
+CAudioPlugin* gAudioPlugin = nullptr;
+EAudioPluginMode gAudioPluginEnabled( APM_DISABLED );
 
 // Large kAudioBufferSize creates huge delay on sound //Corn
 static const u32	kAudioBufferSize = 1024 * 2; // OSX uses a circular buffer length, 1024 * 1024
@@ -68,7 +70,6 @@ public:
 
  AudioPluginPSP();
 	virtual ~AudioPluginPSP();
-	virtual bool			StartEmulation();
 	virtual void			StopEmulation();
 
 	virtual void			DacrateChanged( int system_type );
@@ -151,7 +152,7 @@ void AudioPluginPSP::FillBuffer(Sample * buffer, u32 num_samples)
 }
 
 
-EAudioPluginMode gAudioPluginEnabled( APM_DISABLED );
+
 
 
 AudioPluginPSP::AudioPluginPSP()
@@ -171,17 +172,35 @@ AudioPluginPSP::AudioPluginPSP()
 	dcache_wbinv_range_unaligned( mAudioBuffer, mAudioBuffer+sizeof( CAudioBuffer ) );
 }
 
+
+bool CreateAudioPlugin()
+{
+	DAEDALUS_ASSERT(gAudioPlugin == nullptr, "Why is there already an audio plugin?");
+	gAudioPlugin = new AudioPluginPSP();
+	return true;
+}
+
+void DestroyAudioPlugin()
+{
+	// Make a copy of the plugin, and set the global pointer to NULL;
+	// This stops other threads from trying to access the plugin
+	// while we're in the process of shutting it down.
+	// TODO(strmnnrmn): Still looks racey.
+	CAudioPlugin* plugin = gAudioPlugin;
+	gAudioPlugin = nullptr;
+	if (plugin != nullptr)
+	{
+		plugin->StopEmulation();
+		delete plugin;
+	}
+}
+
 AudioPluginPSP::~AudioPluginPSP( )
 {
 	mAudioBuffer->~CAudioBuffer();
   free(mAudioBuffer);
   sceKernelDeleteSema(mSemaphore);
   pspAudioEnd();
-}
-
-bool		AudioPluginPSP::StartEmulation()
-{
-	return true;
 }
 
 
@@ -288,7 +307,7 @@ EProcessResult	AudioPluginPSP::ProcessAList()
 			break;
 	}
 
-	return result;
+	return result
 }
 
 
@@ -365,9 +384,4 @@ void AudioPluginPSP::StopAudio()
 	mKeepRunning = false;
 
 	audio_open = false;
-}
-
-CAudioPlugin *		CreateAudioPlugin()
-{
-	return new AudioPluginPSP();
 }

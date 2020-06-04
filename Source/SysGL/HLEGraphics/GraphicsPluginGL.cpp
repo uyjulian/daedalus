@@ -19,6 +19,8 @@
 
 #include "SysGL/GL.h"
 
+CGraphicsPlugin* gGraphicsPlugin = NULL;
+
 extern SDL_Window * gWindow;
 
 EFrameskipValue     gFrameskipValue = FV_DISABLED;
@@ -187,7 +189,7 @@ void CGraphicsPluginImpl::RomClosed()
 	DestroyRenderer();
 }
 
-class CGraphicsPlugin *	CreateGraphicsPlugin()
+bool CreateGraphicsPlugin()
 {
 	DBGConsole_Msg( 0, "Initialising Graphics Plugin [CGL]" );
 
@@ -195,8 +197,17 @@ class CGraphicsPlugin *	CreateGraphicsPlugin()
 	if (!plugin->Initialise())
 	{
 		delete plugin;
-		plugin = NULL;
+		plugin =  nullptr;
 	}
 
-	return plugin;
+}
+
+void DestroyGraphicsPlugin()
+{
+	if (gGraphicsPlugin != nullptr)
+	{
+		gGraphicsPlugin->Finalise();
+		delete gGraphicsPlugin;
+		gGraphicsPlugin = nullptr;
+	}
 }

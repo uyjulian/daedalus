@@ -42,7 +42,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //#define DAEDALUS_FRAMERATE_ANALYSIS
 extern void battery_warning();
 extern void HandleEndOfFrame();
-
+CGraphicsPlugin* 	gGraphicsPlugin = NULL;
 extern bool gFrameskipActive;
 
 u32		gSoundSync = 44100;
@@ -277,11 +277,11 @@ void CGraphicsPluginImpl::RomClosed()
 	DestroyRenderer();
 }
 
-CGraphicsPlugin * CreateGraphicsPlugin()
+bool CreateGraphicsPlugin()
 {
-	#ifdef DAEDALUS_DEBUG_CONSOLE
+	DAEDALUS_ASSERT(gGraphicsPlugin == nullptr, "The graphics plugin should not be initialised at this point");
 	DBGConsole_Msg( 0, "Initialising Graphics Plugin [CPSP]" );
-#endif
+
 
 	CGraphicsPluginImpl * plugin = new CGraphicsPluginImpl;
 	if( !plugin->Initialise() )
@@ -290,5 +290,16 @@ CGraphicsPlugin * CreateGraphicsPlugin()
 		plugin = nullptr;
 	}
 
-	return plugin;
+gGraphicsPlugin = plugin;
+return plugin != nullptr;
+}
+
+void DestroyGraphicsPlugin()
+{
+	if (gGraphicsPlugin != nullptr)
+	{
+		gGraphicsPlugin->RomClosed();
+		delete gGraphicsPlugin;
+		gGraphicsPlugin = nullptr;
+	}
 }

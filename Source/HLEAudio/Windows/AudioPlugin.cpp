@@ -57,11 +57,12 @@ class CAudioPluginW32 : public CAudioPlugin
 private:
 	CAudioPluginW32();
 public:
-	static CAudioPluginW32 *		Create();
+
+	bool Initialise();
 
 
 	virtual ~CAudioPluginW32();
-	virtual bool			StartEmulation();
+
 	virtual void			StopEmulation();
 
 	virtual void			DacrateChanged( int SystemType );
@@ -88,14 +89,31 @@ private:
 	void FillSectionWithSilence( int buffer );
 	void FillBuffer            ( int buffer );
 };
-//*****************************************************************************
-//
-//*****************************************************************************
+
+CAudioPlugin* gAudioPlugin = nullptr;
 EAudioPluginMode gAudioPluginEnabled( APM_ENABLED_SYNC );
 
-//*****************************************************************************
-//
-//*****************************************************************************
+bool CreateAudioPlugin()
+{
+	gAudioPlugin = new CAudioPluginW32();
+	return gAudioPlugin->Initialise();
+}
+
+void DestroyAudioPlugin()
+{
+	// Make a copy of the plugin, and set the global pointer to null;
+	// This stops other threads from trying to access the plugin
+	// while we're in the process of shutting it down.
+	// TODO(strmnnrmn): Still looks racey.
+	CAudioPlugin* plugin = gAudioPlugin;
+	gAudioPlugin = nullptr;
+	if (plugin != nullptr)
+	{
+		plugin->StopEmulation();
+		delete plugin;
+	}
+}
+
 CAudioPluginW32::CAudioPluginW32()
 :	Dacrate(0)
 ,	AIReady(false)
@@ -105,28 +123,14 @@ CAudioPluginW32::CAudioPluginW32()
 {
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 CAudioPluginW32::~CAudioPluginW32()
 {
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-CAudioPluginW32 *	CAudioPluginW32::Create()
-{
-	return new CAudioPluginW32();
-}
-
-//*****************************************************************************
-//
-//*****************************************************************************
-bool		CAudioPluginW32::StartEmulation()
+bool CAudioPluginW32::Initialise()
 {
 	HRESULT hr;
-	int count;
 
 	if ( FAILED( hr = DirectSoundCreate( NULL, &lpds, NULL ) ) ) {
 		return false;
@@ -135,7 +139,7 @@ bool		CAudioPluginW32::StartEmulation()
 	if ( FAILED( hr = IDirectSound8_SetCooperativeLevel(lpds, GetConsoleWindow(), DSSCL_PRIORITY   ))) {
 		return false;
 	}
-	for ( count = 0; count < NUMCAPTUREEVENTS; count++ ) {
+	for ( int count = 0; count < NUMCAPTUREEVENTS; count++ ) {
 		rghEvent[count] = CreateEvent( NULL, false, false, NULL );
 		if (rghEvent[count] == NULL ) { return false; }
 	}
@@ -156,10 +160,8 @@ bool		CAudioPluginW32::StartEmulation()
 
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-void	CAudioPluginW32::StopEmulation()
+
+void CAudioPluginW32::StopEmulation()
 {
 	Audio_Reset();
 
@@ -193,9 +195,7 @@ u32	DAEDALUS_THREAD_CALL_TYPE CAudioPluginW32::AudioThread(void * arg)
 }
 #endif
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void	CAudioPluginW32::DacrateChanged( int SystemType )
 {
 	if (Dacrate != Memory_AI_GetRegister(AI_DACRATE_REG))
@@ -207,9 +207,7 @@ void	CAudioPluginW32::DacrateChanged( int SystemType )
 	}
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void	CAudioPluginW32::LenChanged()
 {
 	if( gAudioPluginEnabled == APM_DISABLED )
@@ -258,18 +256,14 @@ void	CAudioPluginW32::LenChanged()
 #endif
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 u32		CAudioPluginW32::ReadLength()
 {
 	return Snd1Len;
 }
 
 
-//*****************************************************************************
-//
-//*****************************************************************************
+
 void	CAudioPluginW32::Update( bool Wait )
 {
 	u32 status, count, dwEvt;
@@ -365,13 +359,7 @@ EProcessResult	CAudioPluginW32::ProcessAList()
 	return result;
 }
 
-//*****************************************************************************
-//
-//*****************************************************************************
-CAudioPlugin *		CreateAudioPlugin()
-{
-	return CAudioPluginW32::Create();
-}
+
 
 void CAudioPluginW32::SetupDSoundBuffers(void) {
 	LPDIRECTSOUNDBUFFER lpdsb;

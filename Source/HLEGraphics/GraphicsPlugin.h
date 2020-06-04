@@ -41,7 +41,8 @@ class CGraphicsPlugin
 //
 //	This needs to be defined for all targets.
 //
-CGraphicsPlugin *		CreateGraphicsPlugin();
+bool CreateGraphicsPlugin();
+void DestroyGraphicsPlugin();
 extern CGraphicsPlugin * gGraphicsPlugin;
 
 #endif // PLUGINS_GRAPHICSPLUGIN_H_
