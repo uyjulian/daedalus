@@ -1,96 +1,64 @@
 #!/bin/bash
 
-
-function usage() {
-    echo "Usage ./build_daedalus.sh BUILD_TYPE"
-    echo "Build Types:"
-    echo "PSP Release = PSP_RELEASE"
-    echo "PSP Debug = PSP_DEBUG"
-    echo "Linux Release = LINUX_RELEASE"
-    echo "Mac Release = MAC_RELEASE"
-    echo "Linux Release = LINUX_DEBUG"
-    echo "Mac Release = MAC_DEBUG"
-    exit
-}
-
-function pre_prep(){
+function prepare_build(){
 
     if [ -d $PWD/daedbuild ]; then
-        echo "Removing previous build attempt"
+        echo "Removing previous build"
         rm -r "$PWD/daedbuild"
-        mkdir "$PWD/daedbuild"
+        rm -r $PWD/DaedalusX64/EBOOT.PBP > /dev/null 2>&1
+        rm -r $PWD/DaedalusX64/daedalus > /dev/null 2>&1
     fi
-
-    if [ -d $PWD/DaedalusX64 ]; then
-        rm -r $PWD/DaedalusX64/EBOOT.PBP
-    else
-        mkdir $PWD/DaedalusX64
-        mkdir ../DaedalusX64/SaveStates
-        mkdir ../DaedalusX64/SaveGames
-        mkdir ../DaedalusX64/Roms
+    if [ ! -d "$PWD/DaedalusX64" ]; then
+    mkdir DaedalusX64
+    cp -R $PWD/Data/* $PWD/DaedalusX64
     fi
-
+    mkdir "daedbuild" && cd "daedbuild"
 }
 
-function finalPrep() {
-
-    if [ ! -d ../DaedalusX64 ]; then
-        mkdir ../DaedalusX64/SaveStates
-        mkdir ../DaedalusX64/SaveGames
-        mkdir ../DaedalusX64/Roms
-    fi
-
-    if [ -f "$PWD/EBOOT.PBP" ]; then
-        mv "$PWD/EBOOT.PBP" ../DaedalusX64/
-        cp -r ../Data/* ../DaedalusX64/
-    else
-        cp -r ../Data/* ../DaedalusX64/
-        cp ../Source/SysGL/HLEGraphics/n64.psh ../DaedalusX64
-    fi
+function build(){
+    cmake $1=1 $CMAKEFLAGS ../Source
+    make -j8
 }
 
-function buildPSP() {
+function buildPSPlibs() {
 
-  make -C "$PWD/../Source/SysPSP/PRX/DveMgr"
-  make -C "$PWD/../Source/SysPSP/PRX/ExceptionHandler"
-  make -C "$PWD/../Source/SysPSP/PRX/KernelButtons"
-  make -C "$PWD/../Source/SysPSP/PRX/MediaEngine"
+  make -C "../Source/SysPSP/PRX/DveMgr" 
+  make -C "../Source/SysPSP/PRX/ExceptionHandler" 
+  make -C "../Source/SysPSP/PRX/KernelButtons"
+  make -C "../Source/SysPSP/PRX/MediaEngine"
+}
 
-  make -j8
-  #No point continuing if the elf file doesn't exist
-#  if [ -f "$PWD/daedalus.elf" ]; then
-    #Pack PBP
-# # psp-strip daedalus.elf -O daedalus.prx
-#mksfoex -d MEMSIZE=1 DaedalusX64 PARAM.SFO
-# psp-prxgen daedalus.elf daedalus.prx
-#   psp-fixup-imports daedalus.prx
+if [ "$2" == "DEBUG" ]; then #Always assume release build, unless DEBUG is parsed.
+    CMAKEFLAGS=-D"$1=1 DEBUG=1"
+else
+    CMAKEFLAGS=-D"$1=1"
+fi
 
-#  cp ../Source/SysPSP/Resources/eboot_icons/* "$PWD"
-  #pack-pbp EBOOT.PBP PARAM.SFO icon0.png NULL NULL pic1.png NULL daedalus.prx NULL
-  finalPrep
-
-
-#fi
-    }
+prepare_build
 
 ## Main loop
-
-
-if [ "$1" = "PSP_RELEASE" ] || [ "$1" = "PSP_DEBUG" ]; then
-  pre_prep
-    mkdir "$PWD/daedbuild"
-    cd "$PWD/daedbuild"
-cmake -DCMAKE_TOOLCHAIN_FILE="/usr/local/pspdev/psp/share/cmake/PSP.cmake" -DCMAKE_BUILD_TYPE=Release -D"$1=1" ../Source
-buildPSP
-
-elif [ "$1" = "LINUX_RELEASE" ] || [ "$1" = "MAC_RELEASE" ] || [ "$1" = "LINUX_DEBUG" ] || [ "$1" = "MAC_DEBUG" ]; then
-  pre_prep
-  mkdir "$PWD/daedbuild"
-  cd "$PWD/daedbuild"
-  cmake -D"$1=1" ../Source
-make -j9
-finalPrep
-cp "$PWD/daedalus" ../DaedalusX64
-else
-usage
-fi
+case $1 in 
+    PSP)
+    echo "PSP $2 Build"
+    buildPSPlibs
+    build
+    cp "$PWD/EBOOT.PBP" ../DaedalusX64/ 
+    ;;
+    MAC | LINUX)
+    echo "Posix Build"
+    build
+    cp ../Source/SysGL/HLEGraphics/n64.psh ../DaedalusX64
+    ;;
+    VITA)
+    echo "Vita Build"
+    build
+    ;;
+    3DS)
+    echo "3DS Build"
+    build
+    ;;
+    *)
+    echo "No build type specified, specify PSP, MAC, LINUX, VITA, 3DS"
+    exit
+    ;;
+esac

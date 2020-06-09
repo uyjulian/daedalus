@@ -307,7 +307,7 @@ EProcessResult	AudioPluginPSP::ProcessAList()
 			break;
 	}
 
-	return result
+	return result;
 }
 
 
