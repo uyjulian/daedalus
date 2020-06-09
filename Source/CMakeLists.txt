@@ -1,11 +1,13 @@
 #CMake Toolchain File for DaedalusX64
 if (PSP)
 set (CMAKE_TOOLCHAIN_FILE /usr/local/pspdev/psp/share/cmake/PSP.cmake)
+enable_language(ASM)
 endif (PSP)
 
 cmake_minimum_required(VERSION 3.7)
 set(CMAKE_CXX_STANDARD 14)
 project (DaedalusX64)
+
 
 	#Base Files  
 		set (CONFIG Config/ConfigOptions.cpp)
@@ -44,20 +46,8 @@ project (DaedalusX64)
 		set (PSP_MAIN_FILES Main/PSP/main.cpp)
 
 		set (PSP_BUILD ${PSP_DEBUG_FILES} ${PSP_DVEMGR_FILES} ${PSP_DYNAREC_FILES} ${PSP_GRAPHICS_FILES} ${PSP_HLEAUDIO_FILES} ${PSP_HLEGRAPHICS_FILES} ${PSP_INPUTMANAGER_FILES} ${PSP_KERNELBUTTON_FILES} ${PSP_MEDIAENGINEFILES} ${PSP_SYSTEM} ${PSP_UI_FILES} ${PSP_UTILITY_FILES})
-		set(PSPSDK_LIBS -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpsplibc -lpsputility -lpspuser -lpspkernel -lpspaudiolib)
+		set (PSPSDK_LIBS -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lpsplibc -lpsputility -lpspuser -lpspkernel -lpspaudiolib)
 		set (PSP_DEFINES ${BASE_DEFINES} -DDAEDALUS_PSP -DDAEDALUS_PSP_USE_ME -DDAEDALUS_PSP_USE_VFPU -DDAEDALUS_ENDIAN_MODE=DAEDALUS_ENDIAN_LITTLE)
-
-	#Handle .S files - Probably a better way to do this
-		set_property(SOURCE SysPSP/HLEGraphics/ConvertVertices.S PROPERTY LANGUAGE C)
-		set_property(SOURCE DynaRec/PSP/DynaRecStubs.S PROPERTY LANGUAGE C)
-		set_property(SOURCE SysPSP/HLEGraphics/TnLVFPU.S PROPERTY LANGUAGE C)
-		set_property(SOURCE SysPSP/HLEGraphics/VectorClipping.S PROPERTY LANGUAGE C)
-		set_property(SOURCE SysPSP/Utility/AtomicPrimitives.S PROPERTY LANGUAGE C)
-		set_property(SOURCE SysPSP/Utility/DisableFPUExceptions.S PROPERTY LANGUAGE C)
-		set_property(SOURCE SysPSP/Debug/mcount.S PROPERTY LANGUAGE C)
-		set_property(SOURCE SysPSP/PRX/DveMgr/pspDveManager.S PROPERTY LANGUAGE C)
-		set_property(SOURCE SysPSP/PRX/KernelButtons/imposectrl.S PROPERTY LANGUAGE C)
-		set_property(SOURCE SysPSP/PRX/MediaEngine/MediaEngine.S PROPERTY LANGUAGE C)
 
 	#SysGL
 		set (SYSGL_GRAPHICS SysGL/Graphics/GraphicsContextGL.cpp SysGL/Graphics/NativeTextureGL.cpp)
@@ -101,7 +91,6 @@ project (DaedalusX64)
 		set (CMAKE_BUILD_TYPE "Release")
 		add_definitions("-O2 -W -DNDEBUG -DDAEDALUS_CONFIG_RELEASE ")
 	endif (DEBUG)
-
 
 
 	if (PSP)
