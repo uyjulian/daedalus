@@ -6,7 +6,7 @@ CFLAGS = -O2 -G0 -Wall
 
 
 CXXFLAGS = $(CFLAGS)
-ASFLAGS = $(CFLAGS)
+#ASFLAGS = $(CFLAGS)
 
 BUILD_PRX = 1
 PRX_EXPORTS = exports.exp

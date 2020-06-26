@@ -1,6 +1,6 @@
 #CMake Toolchain File for DaedalusX64
 if (PSP)
-set (CMAKE_TOOLCHAIN_FILE /usr/local/pspdev/psp/share/cmake/PSP.cmake)
+set (CMAKE_TOOLCHAIN_FILE /usr/mipsel-sony-psp/psp/share/cmake/PSP.cmake)
 enable_language(ASM)
 endif (PSP)
 
@@ -102,7 +102,7 @@ project (DaedalusX64)
 		add_library(daedaluslib STATIC ${BUILD} ${PSP_BUILD})
 		add_executable(daedalus ${PSP_MAIN_FILES})
 		target_link_libraries(daedalus daedaluslib -lstdc++ -lpsppower -lpspgu -lpspaudiolib -lpspaudio -lpsprtc -lpng -lz -lc -lg -lm -lpspfpu pspkubridge ${PSP_LIBRARIES})
-		create_pbp_file(TARGET daedalus TITLE DaedalusX64 ICON_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/icon0.png BACKGROUND_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/pic1.png)
+	#	create_pbp_file(TARGET daedalus TITLE DaedalusX64 ICON_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/icon0.png BACKGROUND_PATH ${PROJECT_SOURCE_DIR}/SysPSP/Resources/eboot_icons/pic1.png)
 	endif (PSP)
 
  

@@ -32,10 +32,10 @@ prepare_build
 case $1 in 
     PSP)
     echo "PSP $2 Build"
-     make -C "../Source/SysPSP/PRX/DveMgr" 
-     make -C "../Source/SysPSP/PRX/ExceptionHandler" 
-     make -C "../Source/SysPSP/PRX/KernelButtons"
-     make -C "../Source/SysPSP/PRX/MediaEngine"
+#     make -C "../Source/SysPSP/PRX/DveMgr" 
+ ###    make -C "../Source/SysPSP/PRX/ExceptionHandler" 
+  #   make -C "../Source/SysPSP/PRX/KernelButtons"
+  #   make -C "../Source/SysPSP/PRX/MediaEngine"
     build
     cp "$PWD/EBOOT.PBP" ../DaedalusX64/ 
     ;;

@@ -2,8 +2,8 @@ TARGET = dvemgr
 OBJS = main.o exports.o sceGe_driver.o
 
 CFLAGS = -Os -G0 -Wall -fshort-wchar -fno-pic -mno-check-zero-division -DF_sceGe_driver_0013
-CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
-ASFLAGS = $(CFLAGS)
+CXXFLAGS = -fno-exceptions -fno-rtti
+#ASFLAGS = $(CFLAGS)
 
 INCDIR = ../../../Projects/PSP/SDK/include
 LIBDIR = ../../../Projects/PSP/SDK/lib
