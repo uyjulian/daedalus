@@ -475,6 +475,12 @@ inline bool IsNaN_Double(double x)
 //Note that we pass s32 even if it is a f32! The check for <= 0.0f is valid also with signed integers(bit31 in f32 is sign bit)
 //(((Bx - Ax)*(Cy - Ay) - (Cx - Ax)*(By - Ay)) * Aw * Bw * C.w)
 
+#if __GNUC__ > 3
+#define VUR "$"
+#else
+#define VUR ""
+#endif
+
 inline s32 vu0_TriNormSign(u8* Base, u32 v0, u32 v1, u32 v2)
 {
 	u8* A = Base + (v0 << 6);	//Base + v0 * sizeof( DaedalusVtx4 )
@@ -483,23 +489,23 @@ inline s32 vu0_TriNormSign(u8* Base, u32 v0, u32 v1, u32 v2)
 	s32 result;
 
 	__asm__ volatile (
-		"lqc2		vf1, 16+%1		\n"		//load projected V0 (A)
-		"lqc2		vf2, 16+%2		\n"		//load projected V1 (B)
-		"lqc2		vf3, 16+%3		\n"		//load projected V2 (C)
-		"vmul.w		vf4, vf2, vf3	\n"		//BCw
-		"vmul.w		vf5, vf1, vf3	\n"		//ACw
-		"vmul.w		vf6, vf1, vf2	\n"		//ABw
-		"vmulw.xy	vf1, vf1, vf4w	\n"		//scale Ax and Ay with BCw to avoid divide with Aw
-		"vmulw.xy	vf2, vf2, vf5w	\n"		//scale Bx and By with ACw to avoid divide with Bw
-		"vmulw.xy	vf3, vf3, vf6w	\n"		//scale Cx and Cy with ABw to avoid divide with Cw
-		"vsub.xy	vf7, vf1, vf2	\n"		//Make 2D vector with A-B
-		"vsub.xy	vf8, vf2, vf3	\n"		//Make 2D vector with B-C
-		"vopmula.xyz ACC, vf7, vf8	\n"		//Calc 2x2 determinant with the two 2D vectors
-		"vopmsub.xyz vf8, vf8, vf7	\n"
-		"vmul.w		vf7, vf4, vf1	\n"		//create ABCw (BCw * Aw)
-		"vmr32.xyzw	vf7, vf7		\n"	
-		"vmul.z		vf1, vf7, vf8	\n"		//determinant * ABCw
-		"qmfc2		%0, vf1			\n"		//Sign determins FRONT or BACK face triangle(Note we pass a float as s32 here since -0+ check works regardless!)
+		"lqc2		" VUR "vf1, 16+%1		\n"		//load projected V0 (A)
+		"lqc2		" VUR "vf2, 16+%2		\n"		//load projected V1 (B)
+		"lqc2		" VUR "vf3, 16+%3		\n"		//load projected V2 (C)
+		"vmul.w		" VUR "vf4, " VUR "vf2, " VUR "vf3	\n"		//BCw
+		"vmul.w		" VUR "vf5, " VUR "vf1, " VUR "vf3	\n"		//ACw
+		"vmul.w		" VUR "vf6, " VUR "vf1, " VUR "vf2	\n"		//ABw
+		"vmulw.xy	" VUR "vf1, " VUR "vf1, " VUR "vf4w	\n"		//scale Ax and Ay with BCw to avoid divide with Aw
+		"vmulw.xy	" VUR "vf2, " VUR "vf2, " VUR "vf5w	\n"		//scale Bx and By with ACw to avoid divide with Bw
+		"vmulw.xy	" VUR "vf3, " VUR "vf3, " VUR "vf6w	\n"		//scale Cx and Cy with ABw to avoid divide with Cw
+		"vsub.xy	" VUR "vf7, " VUR "vf1, " VUR "vf2	\n"		//Make 2D vector with A-B
+		"vsub.xy	" VUR "vf8, " VUR "vf2, " VUR "vf3	\n"		//Make 2D vector with B-C
+		"vopmula.xyz " VUR "ACC, " VUR "vf7, " VUR "vf8	\n"		//Calc 2x2 determinant with the two 2D vectors
+		"vopmsub.xyz " VUR "vf8, " VUR "vf8, " VUR "vf7	\n"
+		"vmul.w		" VUR "vf7, " VUR "vf4, " VUR "vf1	\n"		//create ABCw (BCw * Aw)
+		"vmr32.xyzw	" VUR "vf7, " VUR "vf7		\n"	
+		"vmul.z		" VUR "vf1, " VUR "vf7, " VUR "vf8	\n"		//determinant * ABCw
+		"qmfc2		%0, " VUR "vf1			\n"		//Sign determins FRONT or BACK face triangle(Note we pass a float as s32 here since -0+ check works regardless!)
 		"pcpyud		%0, %0, %0		\n"
 		"pextlw		%0, %0, %0		\n"
 		: "=r"(result) : "m"(*A), "m"(*B), "m"(*C));
@@ -511,19 +517,21 @@ inline void vu0_norm_3Dvec(float* x, float* y, float* z)
 	__asm__ volatile (
 		"pextlw		$t0, %2, %0		\n"
 		"pextlw		$t0, %1, $t0	\n"
-		"qmtc2		$t0, vf1		\n"
-		"vmul.xyz	vf2, vf1, vf1	\n"
-		"vaddy.x	vf2, vf2, vf2y	\n"
-		"vaddz.x	vf2, vf2, vf2z	\n"
-		"vrsqrt		Q, vf0w, vf2x	\n"
+		"qmtc2		$t0, " VUR "vf1		\n"
+		"vmul.xyz	" VUR "vf2, " VUR "vf1, " VUR "vf1	\n"
+		"vaddy.x	" VUR "vf2, " VUR "vf2, " VUR "vf2y	\n"
+		"vaddz.x	" VUR "vf2, " VUR "vf2, " VUR "vf2z	\n"
+		"vrsqrt		" VUR "Q, " VUR "vf0w, " VUR "vf2x	\n"
 		"vwaitq						\n"
-		"vmulq.xyz	vf1, vf1, Q		\n"
-		"qmfc2		$t0, vf1		\n"
+		"vmulq.xyz	" VUR "vf1, " VUR "vf1, " VUR "Q		\n"
+		"qmfc2		$t0, " VUR "vf1		\n"
 		"pextlw		%0, $t0, $t0	\n"
 		"pcpyud		%1, %0, $zero	\n"
 		"pextuw		%2, $t0, $t0	\n"
 		: "+r"(*x), "+r"(*y), "+r"(*z));
 }
+
+#undef VUR
 
 inline f64 trunc(f64 x) { return (x > 0) ? floor(x) : ceil(x); }
 inline f32 truncf(f32 x) { return (x > 0) ? floorf(x) : ceilf(x); }
