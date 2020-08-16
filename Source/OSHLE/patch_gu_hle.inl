@@ -120,6 +120,12 @@ inline void vfpu_matrix_Ortho(u8 *m, float left, float right, float bottom, floa
 }
 #elif defined( DAEDALUS_PS2_USE_VU0 )
 
+#if __GNUC__ > 3
+#define VUR "$"
+#else
+#define VUR ""
+#endif
+
 inline void vu0_matrix_IdentF(u8* m) {
 	__asm__ volatile (
 		/* 1 0 0 0 */
@@ -127,12 +133,12 @@ inline void vu0_matrix_IdentF(u8* m) {
 		/* 0 0 1 0 */
 		/* 0 0 0 1 */
 
-		"vmr32.xyzw		vf3, vf0			\n"
-		"vmr32.xyzw		vf2, vf3			\n" /* 0 1 0 0 */
-		"vmr32.xyzw		vf1, vf2			\n" /* 1 0 0 0 */
-		"qmfc2			$t0, vf1			\n"
+		"vmr32.xyzw		" VUR "vf3, " VUR "vf0			\n"
+		"vmr32.xyzw		" VUR "vf2, " VUR "vf3			\n" /* 0 1 0 0 */
+		"vmr32.xyzw		" VUR "vf1, " VUR "vf2			\n" /* 1 0 0 0 */
+		"qmfc2			$t0, " VUR "vf1			\n"
 		"sd				$t0, 0 + %0			\n"
-		"qmfc2			$t1, vf2			\n"
+		"qmfc2			$t1, " VUR "vf2			\n"
 		"sd				$zero, 8 + %0		\n"
 		"sd				$t1, 16 + %0		\n"
 		"sd				$zero, 24 + %0		\n"
@@ -150,12 +156,12 @@ inline void vu0_matrix_TranslateF(u8* m, float X, float Y, float Z) {
 		/* 0 0 1 0 */
 		/* x y z 1 */
 		
-		"vmr32.xyzw		vf3, vf0			\n"
-		"vmr32.xyzw		vf2, vf3			\n" /* 0 1 0 0 */
-		"vmr32.xyzw		vf1, vf2			\n" /* 1 0 0 0 */
-		"qmfc2			$t0, vf1			\n"
+		"vmr32.xyzw		" VUR "vf3, " VUR "vf0			\n"
+		"vmr32.xyzw		" VUR "vf2, " VUR "vf3			\n" /* 0 1 0 0 */
+		"vmr32.xyzw		" VUR "vf1, " VUR "vf2			\n" /* 1 0 0 0 */
+		"qmfc2			$t0, " VUR "vf1			\n"
 		"sd				$t0, 0 + %0			\n"
-		"qmfc2			$t1, vf2			\n"
+		"qmfc2			$t1, " VUR "vf2			\n"
 		"sd				$zero, 8 + %0		\n"
 		"sd				$t1, 16 + %0		\n"
 		"sd				$zero, 24 + %0		\n"
@@ -184,7 +190,7 @@ inline void vu0_matrix_ScaleF(u8* m, float X, float Y, float Z) {
 		"sd				$zero, 32 + %0		\n"
 		"sw				%3, 40 + %0			\n"
 		"sw				$zero, 44 + %0		\n"
-		"qmfc2			$t0, vf0			\n"
+		"qmfc2			$t0, " VUR "vf0			\n"
 		"sd				$zero, 48 + %0		\n"
 		"pcpyud			$t0, $t0, $t0		\n"
 		"sd				$t0, 56 + %0		\n"
@@ -195,42 +201,42 @@ inline void vu0_matrix_OrthoF(u8* m, float left, float right, float bottom, floa
 {
 	__asm__ volatile (
 
-		"vmove.xyzw		vf4, vf0			\n" /* 0 0 0 1 */
-		"vmr32.xyzw		vf3, vf0			\n" /* 0 0 1 0 */
-		"vmr32.xyzw		vf2, vf3			\n" /* 0 1 0 0 */
-		"vmr32.xyzw		vf1, vf2			\n" /* 1 0 0 0 */
+		"vmove.xyzw		" VUR "vf4, " VUR "vf0			\n" /* 0 0 0 1 */
+		"vmr32.xyzw		" VUR "vf3, " VUR "vf0			\n" /* 0 0 1 0 */
+		"vmr32.xyzw		" VUR "vf2, " VUR "vf3			\n" /* 0 1 0 0 */
+		"vmr32.xyzw		" VUR "vf1, " VUR "vf2			\n" /* 1 0 0 0 */
 
 		"pextlw			%2, %6, %2			\n"
 		"pextlw			%2, %4, %2			\n"
-		"qmtc2			%2, vf5				\n" // [right, top,    far ]
+		"qmtc2			%2, " VUR "vf5				\n" // [right, top,    far ]
 		"pextlw			%1, %5, %1			\n"
 		"pextlw			%1, %3, %1			\n"
-		"qmtc2			%1, vf6				\n" // [left,  bottom, near]
+		"qmtc2			%1, " VUR "vf6				\n" // [left,  bottom, near]
 		"dsll32			%7, %7, 0			\n"
 		"pcpyld			%7, %7, $zero		\n"
-		"qmtc2			%7, vf4				\n" // [0, 0, 0, scale]
-		"vsub.xyz		vf7, vf5, vf6		\n"	// [  dx,   dy,   dz]
-		"vdiv			Q, vf4w, vf7x		\n"
+		"qmtc2			%7, " VUR "vf4				\n" // [0, 0, 0, scale]
+		"vsub.xyz		" VUR "vf7, " VUR "vf5, " VUR "vf6		\n"	// [  dx,   dy,   dz]
+		"vdiv			" VUR "Q, " VUR "vf4w, " VUR "vf7x		\n"
 		"vwaitq								\n"
-		"vaddq.x		vf7, vf0, Q			\n"
-		"vdiv			Q, vf4w, vf7y		\n"
+		"vaddq.x		" VUR "vf7, " VUR "vf0, " VUR "Q			\n"
+		"vdiv			" VUR "Q, " VUR "vf4w, " VUR "vf7y		\n"
 		"vwaitq								\n"
-		"vaddq.y		vf7, vf0, Q			\n"
-		"vdiv			Q, vf4w, vf7z		\n"
+		"vaddq.y		" VUR "vf7, " VUR "vf0, " VUR "Q			\n"
+		"vdiv			" VUR "Q, " VUR "vf4w, " VUR "vf7z		\n"
 		"vwaitq								\n"
-		"vaddq.z		vf7, vf0, Q			\n" // [scale / dx, scale / dy, scale / dz]
-		"vadd.w			vf8, vf0, vf0		\n" // 2.0
-		"vmulw.x		vf1, vf7, vf8w		\n" // m->x.x = 2.0 / dx
-		"vmulw.y		vf2, vf7, vf8w		\n" // m->y.y = 2.0 / dy
-		"vmulw.z		vf3, vf7, vf8w		\n" // m->z.z = -2.0 / dz
-		"vsub.z			vf3, vf0, vf3		\n"
-		"vadd.xyz		vf4, vf5, vf6		\n"
-		"vsub.xyz		vf4, vf0, vf4		\n" // m->w[x, y, z] = [-(right+left), -(top+bottom), -(far+near)]
-		"vmul.xyz		vf4, vf4, vf7		\n"	// [-(right+left)/dx, -(top+bottom)/dy, -(far+near)/dz]
-		"qmfc2			%1, vf1				\n"
-		"qmfc2			%2, vf2				\n"
-		"qmfc2			%3, vf3				\n"
-		"qmfc2			%4, vf4				\n"
+		"vaddq.z		" VUR "vf7, " VUR "vf0, " VUR "Q			\n" // [scale / dx, scale / dy, scale / dz]
+		"vadd.w			" VUR "vf8, " VUR "vf0, " VUR "vf0		\n" // 2.0
+		"vmulw.x		" VUR "vf1, " VUR "vf7, " VUR "vf8w		\n" // m->x.x = 2.0 / dx
+		"vmulw.y		" VUR "vf2, " VUR "vf7, " VUR "vf8w		\n" // m->y.y = 2.0 / dy
+		"vmulw.z		" VUR "vf3, " VUR "vf7, " VUR "vf8w		\n" // m->z.z = -2.0 / dz
+		"vsub.z			" VUR "vf3, " VUR "vf0, " VUR "vf3		\n"
+		"vadd.xyz		" VUR "vf4, " VUR "vf5, " VUR "vf6		\n"
+		"vsub.xyz		" VUR "vf4, " VUR "vf0, " VUR "vf4		\n" // m->w[x, y, z] = [-(right+left), -(top+bottom), -(far+near)]
+		"vmul.xyz		" VUR "vf4, " VUR "vf4, " VUR "vf7		\n"	// [-(right+left)/dx, -(top+bottom)/dy, -(far+near)/dz]
+		"qmfc2			%1, " VUR "vf1				\n"
+		"qmfc2			%2, " VUR "vf2				\n"
+		"qmfc2			%3, " VUR "vf3				\n"
+		"qmfc2			%4, " VUR "vf4				\n"
 		"sd				%1, 0 + %0			\n"
 		"pcpyud			%1, %1, %1			\n"
 		"sd				%1, 8 + %0			\n"
@@ -249,64 +255,64 @@ inline void vu0_matrix_OrthoF(u8* m, float left, float right, float bottom, floa
 inline void vu0_matrix_Ortho(u8* m, float left, float right, float bottom, float top, float near, float far, float scale)
 {
 	__asm__ volatile (
-		"vmove.xyzw		vf4, vf0			\n" /* 0 0 0 1 */
-		"vmr32.xyzw		vf3, vf0			\n" /* 0 0 1 0 */
-		"vmr32.xyzw		vf2, vf3			\n" /* 0 1 0 0 */
-		"vmr32.xyzw		vf1, vf2			\n" /* 1 0 0 0 */
+		"vmove.xyzw		" VUR "vf4, " VUR "vf0			\n" /* 0 0 0 1 */
+		"vmr32.xyzw		" VUR "vf3, " VUR "vf0			\n" /* 0 0 1 0 */
+		"vmr32.xyzw		" VUR "vf2, " VUR "vf3			\n" /* 0 1 0 0 */
+		"vmr32.xyzw		" VUR "vf1, " VUR "vf2			\n" /* 1 0 0 0 */
 
 		"pextlw			%2, %6, %2			\n"
 		"pextlw			%2, %4, %2			\n"
-		"qmtc2			%2, vf5				\n" // [right, top,    far ]
+		"qmtc2			%2, " VUR "vf5				\n" // [right, top,    far ]
 		"pextlw			%1, %5, %1			\n"
 		"pextlw			%1, %3, %1			\n"
-		"qmtc2			%1, vf6				\n" // [left,  bottom, near]
+		"qmtc2			%1, " VUR "vf6				\n" // [left,  bottom, near]
 		"dsll32			%7, %7, 0			\n"
 		"pcpyld			%7, %7, $zero		\n"
-		"qmtc2			%7, vf4				\n" // [0, 0, 0, scale]
-		"vsub.xyz		vf7, vf5, vf6		\n"	// [  dx,   dy,   dz]
-		"vdiv			Q, vf4w, vf7x		\n"
+		"qmtc2			%7, " VUR "vf4				\n" // [0, 0, 0, scale]
+		"vsub.xyz		" VUR "vf7, " VUR "vf5, " VUR "vf6		\n"	// [  dx,   dy,   dz]
+		"vdiv			" VUR "Q, " VUR "vf4w, " VUR "vf7x		\n"
 		"vwaitq								\n"
-		"vaddq.x		vf7, vf0, Q			\n"
-		"vdiv			Q, vf4w, vf7y		\n"
+		"vaddq.x		" VUR "vf7, " VUR "vf0, " VUR "Q			\n"
+		"vdiv			" VUR "Q, " VUR "vf4w, " VUR "vf7y		\n"
 		"vwaitq								\n"
-		"vaddq.y		vf7, vf0, Q			\n"
-		"vdiv			Q, vf4w, vf7z		\n"
+		"vaddq.y		" VUR "vf7, " VUR "vf0, " VUR "Q			\n"
+		"vdiv			" VUR "Q, " VUR "vf4w, " VUR "vf7z		\n"
 		"vwaitq								\n"
-		"vaddq.z		vf7, vf0, Q			\n" // [scale / dx, scale / dy, scale / dz]
-		"vadd.w			vf8, vf0, vf0		\n" // 2.0
-		"vmulw.x		vf1, vf7, vf8w		\n" // m->x.x = 2.0 / dx
-		"vmulw.y		vf2, vf7, vf8w		\n" // m->y.y = 2.0 / dy
-		"vmulw.z		vf3, vf7, vf8w		\n" // m->z.z = -2.0 / dz
-		"vsub.z			vf3, vf0, vf3		\n"
-		"vadd.xyz		vf4, vf5, vf6		\n"
-		"vsub.xyz		vf4, vf0, vf4		\n" // m->w[x, y, z] = [-(right+left), -(top+bottom), -(far+near)]
-		"vmul.xyz		vf4, vf4, vf7		\n"	// [-(right+left)/dx, -(top+bottom)/dy, -(far+near)/dz]
+		"vaddq.z		" VUR "vf7, " VUR "vf0, " VUR "Q			\n" // [scale / dx, scale / dy, scale / dz]
+		"vadd.w			" VUR "vf8, " VUR "vf0, " VUR "vf0		\n" // 2.0
+		"vmulw.x		" VUR "vf1, " VUR "vf7, " VUR "vf8w		\n" // m->x.x = 2.0 / dx
+		"vmulw.y		" VUR "vf2, " VUR "vf7, " VUR "vf8w		\n" // m->y.y = 2.0 / dy
+		"vmulw.z		" VUR "vf3, " VUR "vf7, " VUR "vf8w		\n" // m->z.z = -2.0 / dz
+		"vsub.z			" VUR "vf3, " VUR "vf0, " VUR "vf3		\n"
+		"vadd.xyz		" VUR "vf4, " VUR "vf5, " VUR "vf6		\n"
+		"vsub.xyz		" VUR "vf4, " VUR "vf0, " VUR "vf4		\n" // m->w[x, y, z] = [-(right+left), -(top+bottom), -(far+near)]
+		"vmul.xyz		" VUR "vf4, " VUR "vf4, " VUR "vf7		\n"	// [-(right+left)/dx, -(top+bottom)/dy, -(far+near)/dz]
 
-		"vadd.w			vf9, vf0, vf0		\n"
-		"vmulw.xyzw		vf1, vf1, vf9w		\n"
-		"vftoi15.xyzw	vf1, vf1 \n"
-		"qmfc2			%1, vf1				\n"
+		"vadd.w			" VUR "vf9, " VUR "vf0, " VUR "vf0		\n"
+		"vmulw.xyzw		" VUR "vf1, " VUR "vf1, " VUR "vf9w		\n"
+		"vftoi15.xyzw	" VUR "vf1, " VUR "vf1 \n"
+		"qmfc2			%1, $vf1				\n"
 		"sd				%1, 0 + %0			\n"
 		"pcpyud			%1, %1, %1			\n"
 		"sd				%1, 8 + %0			\n"
 
-		"vmulw.xyzw		vf2, vf2, vf9w		\n"
-		"vftoi15.xyzw	vf2, vf2			\n"
-		"qmfc2			%2, vf2				\n"
+		"vmulw.xyzw		" VUR "vf2, " VUR "vf2, " VUR "vf9w		\n"
+		"vftoi15.xyzw	" VUR "vf2, " VUR "vf2			\n"
+		"qmfc2			%2, $vf2				\n"
 		"sd				%2, 16 + %0			\n"
 		"pcpyud			%2, %2, %2			\n"
 		"sd				%2, 24 + %0			\n"
 
-		"vmulw.xyzw		vf3, vf3, vf9w		\n"
-		"vftoi15.xyzw	vf3, vf3			\n"
-		"qmfc2			%3, vf3				\n"
+		"vmulw.xyzw		" VUR "vf3, " VUR "vf3, " VUR "vf9w		\n"
+		"vftoi15.xyzw	" VUR "vf3, " VUR "vf3			\n"
+		"qmfc2			%3, $vf3				\n"
 		"sd				%3, 32 + %0			\n"
 		"pcpyud			%3, %3, %3			\n"
 		"sd				%3, 40 + %0			\n"
 
-		"vmulw.xyzw		vf4, vf4, vf9w		\n"
-		"vftoi15.xyzw	vf4, vf4			\n"
-		"qmfc2			%4, vf4				\n"
+		"vmulw.xyzw		" VUR "vf4, " VUR "vf4, " VUR "vf9w		\n"
+		"vftoi15.xyzw	" VUR "vf4, " VUR "vf4			\n"
+		"qmfc2			%4, $vf4				\n"
 		"sd				%4, 48 + %0			\n"
 		"pcpyud			%4, %4, %4			\n"
 		"sd				%4, 56 + %0			\n"
@@ -314,6 +320,8 @@ inline void vu0_matrix_Ortho(u8* m, float left, float right, float bottom, float
 		:"=m"(*m) : "r"(left), "r"(right), "r"(bottom), "r"(top), "r"(near), "r"(far), "r"(scale));
 	printf("5\n");
 }
+
+#undef VUR
 
 #endif
 
