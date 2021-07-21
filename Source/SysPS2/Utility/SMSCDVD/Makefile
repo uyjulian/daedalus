@@ -1,5 +1,5 @@
 IOP_SRC_DIR  = ./
-IOP_OBJS_DIR = ./
+# IOP_OBJS_DIR = ./
 
 IOP_BIN  = smscdvd.irx
 IOP_OBJS = SMSCDVD.o imports.o
