@@ -1,3 +1,4 @@
+#define ABI_EABI64
 #include "as_reg_compat.h"
 
 //The top two defines needs to be adjusted depending on how gCPUState struct is formated in CPU.h!! //Corn
