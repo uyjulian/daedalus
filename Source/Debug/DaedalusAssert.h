@@ -18,6 +18,8 @@
 
 */
 
+#pragma once
+
 #ifndef DEBUG_DAEDALUSASSERT_H_
 #define DEBUG_DAEDALUSASSERT_H_
 

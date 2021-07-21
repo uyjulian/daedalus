@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef UTILITY_MACROS_H_
 #define UTILITY_MACROS_H_

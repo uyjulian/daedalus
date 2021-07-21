@@ -62,9 +62,9 @@ struct SChunkInfo
 //
 //*****************************************************************************
 ROMFileCache::ROMFileCache()
-:	mpROMFile((ROMFile*)NULL )
+:	mpROMFile( NULL )
 ,	mChunkMapEntries( 0 )
-,	mpChunkMap( (u16*)NULL )
+,	mpChunkMap( NULL )
 ,	mMRUIdx( 0 )
 {
 #ifdef DAEDALUS_PSP
@@ -139,10 +139,10 @@ bool	ROMFileCache::Open( ROMFile * p_rom_file )
 void	ROMFileCache::Close()
 {
 	delete [] mpChunkMap;
-	mpChunkMap = (u16*)NULL;
+	mpChunkMap = NULL;
 	mChunkMapEntries = 0;
 	delete mpROMFile;
-	mpROMFile = (ROMFile *)NULL;
+	mpROMFile = NULL;
 }
 
 //*****************************************************************************

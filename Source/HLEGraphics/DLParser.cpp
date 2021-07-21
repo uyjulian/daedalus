@@ -170,28 +170,28 @@ void RDP_MoveMemLight(u32 light_idx, const N64Light *light);
 // Used to keep track of when we're processing the first display list
 static bool gFirstCall = true;
 
-static u32				gSegments[16];
-static RDP_Scissor		scissors;
-static RDP_GeometryMode gGeometryMode;
-static DList			gDlistStack;
-static s32				gDlistStackPointer = -1;
-static u32				gVertexStride	 = 0;
-static u32				gRDPHalf1		 = 0;
-static u32				gLastUcodeBase   = 0;
+static u32				gSegments[16] {};
+static RDP_Scissor		scissors {};
+static RDP_GeometryMode gGeometryMode {};
+static DList			gDlistStack {};
+static s32				gDlistStackPointer {-1};
+static u32				gVertexStride	 {};
+static u32				gRDPHalf1		 {};
+static u32				gLastUcodeBase   {};
 
        SImageDescriptor g_TI = { G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, 0 };
 static SImageDescriptor g_CI = { G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, 0 };
 static SImageDescriptor g_DI = { G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, 0 };
 
 const MicroCodeInstruction *gUcodeFunc = nullptr;
-MicroCodeInstruction gCustomInstruction[256];
+MicroCodeInstruction gCustomInstruction[256] {};
 
 #if defined(DAEDALUS_DEBUG_DISPLAYLIST) || defined(DAEDALUS_ENABLE_PROFILING)
 static const char ** gUcodeName = gNormalInstructionName[ 0 ];
 static const char * gCustomInstructionName[256];
 #endif
 
-bool					gFrameskipActive = false;
+bool					gFrameskipActive {false};
 
 //*****************************************************************************
 //
@@ -245,7 +245,7 @@ u32			gNumInstructionsExecuted = 0;
 //*****************************************************************************
 //
 //*****************************************************************************
-u32 gRDPFrame = 0, gAuxAddr = 0;
+u32 gRDPFrame {}, gAuxAddr {};
 
 extern u32 uViWidth, uViHeight;
 
@@ -425,7 +425,7 @@ static void DLParser_SetCustom( u32 ucode, u32 offset )
 //*****************************************************************************
 void DLParser_InitMicrocode( u32 code_base, u32 code_size, u32 data_base, u32 data_size )
 {
-	u32 ucode = GBIMicrocode_DetectVersion( code_base, code_size, data_base, data_size, &DLParser_SetCustom );
+	u32 ucode {GBIMicrocode_DetectVersion( code_base, code_size, data_base, data_size, &DLParser_SetCustom )};
 
 	gVertexStride  = ucode_stride[ucode];
 	gLastUcodeBase = code_base;
@@ -464,7 +464,7 @@ static u32 DLParser_ProcessDList(u32 instruction_limit)
 {
 	MicroCodeCommand command;
 
-	u32 current_instruction_count = 0;
+	u32 current_instruction_count {};
 
 	while(gDlistStackPointer >= 0)
 	{
@@ -533,12 +533,12 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	// Update Screen only when something is drawn, otherwise several games ex Army Men will flash or shake.
 	if( g_ROM.GameHacks != CHAMELEON_TWIST_2 ) gGraphicsPlugin->UpdateScreen();
 
-	OSTask * pTask = (OSTask *)(g_pu8SpMemBase + 0x0FC0);
-	u32 code_base = (u32)pTask->t.ucode & 0x1fffffff;
-	u32 code_size = pTask->t.ucode_size;
-	u32 data_base = (u32)pTask->t.ucode_data & 0x1fffffff;
-	u32 data_size = pTask->t.ucode_data_size;
-	u32 stack_size = pTask->t.dram_stack_size >> 6;
+	OSTask * pTask {(OSTask *)(g_pu8SpMemBase + 0x0FC0)};
+	u32 code_base {(u32)pTask->t.ucode & 0x1fffffff};
+	u32 code_size {pTask->t.ucode_size};
+	u32 data_base {(u32)pTask->t.ucode_data & 0x1fffffff};
+	u32 data_size {pTask->t.ucode_data_size};
+	u32 stack_size {pTask->t.dram_stack_size >> 6};
 
 	if ( gLastUcodeBase != code_base )
 	{
@@ -573,7 +573,7 @@ u32 DLParser_Process(u32 instruction_limit, DLDebugOutput * debug_output)
 	DL_PF("DP: Firing up RDP!");
 	#endif
 
-	u32 count = 0;
+	u32 count {};
 
 	if(!gFrameskipActive)
 	{
@@ -618,12 +618,12 @@ void MatrixFromN64FixedPoint( Matrix4x4 & mat, u32 address )
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT( address+64 < MAX_RAM_ADDRESS, "Mtx: Address invalid (0x%08x)", address);
 	#endif
-	const f32 fRecip = 1.0f / 65536.0f;
-	const N64mat *Imat = (N64mat *)( g_pu8RamBase + address );
+	const f32 fRecip {1.0f / 65536.0f};
+	const N64mat *Imat {(N64mat *)( g_pu8RamBase + address )};
 
-	s16 hi = 0;
-	s32 tmp = 0;
-	for (u32 i = 0; i < 4; i++)
+	s16 hi {};
+	s32 tmp {};
+	for (u32 i {}; i < 4; i++)
 	{
 #if 1	// Crappy compiler.. reordering is to optimize the ASM // Corn
 		tmp = ((Imat->h[i].x << 16) | Imat->l[i].x);
@@ -657,13 +657,13 @@ void RDP_MoveMemLight(u32 light_idx, const N64Light *light)
 	#ifdef DAEDALUS_ENABLE_ASSERTS
 	DAEDALUS_ASSERT( light_idx < 12, "Warning: invalid light # = %d", light_idx );
 	#endif
-	u8 r = light->r;
-	u8 g = light->g;
-	u8 b = light->b;
+	u8 r {light->r};
+	u8 g {light->g};
+	u8 b {light->b};
 
-	s8 dir_x = light->dir_x;
-	s8 dir_y = light->dir_y;
-	s8 dir_z = light->dir_z;
+	s8 dir_x {light->dir_x};
+	s8 dir_y {light->dir_y};
+	s8 dir_z {light->dir_z};
 
 	bool valid = (dir_x | dir_y | dir_z) != 0;
 		#ifdef DAEDALUS_ENABLE_ASSERTS
@@ -971,17 +971,17 @@ void DLParser_TexRect( MicroCodeCommand command )
 		return;
 	};
 
-	s16 rect_s0 = (s16)tex_rect.s;
-	s16 rect_t0 = (s16)tex_rect.t;
+	s16 rect_s0 {(s16)tex_rect.s};
+	s16 rect_t0 {(s16)tex_rect.t};
 
-	s32 rect_dsdx = tex_rect.dsdx;
-	s32 rect_dtdy = tex_rect.dtdy;
+	s32 rect_dsdx {tex_rect.dsdx};
+	s32 rect_dtdy {tex_rect.dtdy};
 
 	rect_s0 += (((u32)rect_dsdx >> 31) << 5);	//Fixes California Speed, if(rect_dsdx<0) rect_s0 += 32;
 	rect_t0 += (((u32)rect_dtdy >> 31) << 5);
 
 	// In Fill/Copy mode the coordinates are inclusive (i.e. add 1<<2 to the w/h)
-	u32 cycle_mode = gRDPOtherMode.cycle_type;
+	u32 cycle_mode {gRDPOtherMode.cycle_type};
 	if ( cycle_mode >= CYCLE_COPY )
 	{
 		// In copy mode 4 pixels are copied at once.
@@ -992,8 +992,8 @@ void DLParser_TexRect( MicroCodeCommand command )
 		tex_rect.y1 += 4;
 	}
 
-	s16 rect_s1 = (s16)(rect_s0 + (rect_dsdx * ( tex_rect.x1 - tex_rect.x0 ) >> 7));	// 7 = (>>10)=1/1024, (>>2)=1/4 and (<<5)=32
-	s16 rect_t1 = (s16)(rect_t0 + (rect_dtdy * ( tex_rect.y1 - tex_rect.y0 ) >> 7));
+	s16 rect_s1 {(s16)(rect_s0 + (rect_dsdx * ( tex_rect.x1 - tex_rect.x0 ) >> 7))};	// 7 = (>>10)=1/1024, (>>2)=1/4 and (<<5)=32
+	s16 rect_t1 {(s16)(rect_t0 + (rect_dtdy * ( tex_rect.y1 - tex_rect.y0 ) >> 7))};
 
 	TexCoord st0( rect_s0, rect_t0 );
 	TexCoord st1( rect_s1, rect_t1 );
@@ -1030,17 +1030,17 @@ void DLParser_TexRectFlip( MicroCodeCommand command )
 #endif
 	//Keep integers for as long as possible //Corn
 
-	s16 rect_s0 = (s16)tex_rect.s;
-	s16 rect_t0 = (s16)tex_rect.t;
+	s16 rect_s0 {(s16)tex_rect.s};
+	s16 rect_t0 {(s16)tex_rect.t};
 
-	s32 rect_dsdx = tex_rect.dsdx;
-	s32 rect_dtdy = tex_rect.dtdy;
+	s32 rect_dsdx {tex_rect.dsdx};
+	s32 rect_dtdy {tex_rect.dtdy};
 
 	rect_s0 += (((u32)rect_dsdx >> 31) << 5);	// For Wetrix
 	rect_t0 += (((u32)rect_dtdy >> 31) << 5);
 
 	// In Fill/Copy mode the coordinates are inclusive (i.e. add 1<<2 to the w/h)
-	u32 cycle_mode = gRDPOtherMode.cycle_type;
+	u32 cycle_mode {gRDPOtherMode.cycle_type};
 	if ( cycle_mode >= CYCLE_COPY )
 	{
 		// In copy mode 4 pixels are copied at once.
@@ -1051,8 +1051,8 @@ void DLParser_TexRectFlip( MicroCodeCommand command )
 		tex_rect.y1 += 4;
 	}
 
-	s16 rect_s1 = (s16)(rect_s0 + (rect_dsdx * ( tex_rect.y1 - tex_rect.y0 ) >> 7));	// Flip - use y
-	s16 rect_t1 = (s16)(rect_t0 + (rect_dtdy * ( tex_rect.x1 - tex_rect.x0 ) >> 7));	// Flip - use x
+	s16 rect_s1 {(s16)(rect_s0 + (rect_dsdx * ( tex_rect.y1 - tex_rect.y0 ) >> 7))};	// Flip - use y
+	s16 rect_t1 {(s16)(rect_t0 + (rect_dtdy * ( tex_rect.x1 - tex_rect.x0 ) >> 7))};	// Flip - use x
 
 	TexCoord st0( rect_s0, rect_t0 );
 	TexCoord st1( rect_s1, rect_t1 );
@@ -1072,10 +1072,10 @@ void DLParser_TexRectFlip( MicroCodeCommand command )
 //This fixes the jumpy camera in DK64, also the sun and flames glare in Zelda
 void Clear_N64DepthBuffer( MicroCodeCommand command )
 {
-	u32 x0 = (u32)(command.fillrect.x0 + 1);
-	u32 x1 = (u32)(command.fillrect.x1 + 1);
-	u32 y1 = command.fillrect.y1;
-	u32 y0 = command.fillrect.y0;
+	u32 x0 {(u32)(command.fillrect.x0 + 1)};
+	u32 x1 {(u32)(command.fillrect.x1 + 1)};
+	u32 y1 {command.fillrect.y1};
+	u32 y0 {command.fillrect.y0};
 
 	// Using s32 to force min/max to be done in a single op code for the PSP
 	x0 = Min<s32>(Max<s32>(x0, scissors.left), scissors.right);
@@ -1084,9 +1084,9 @@ void Clear_N64DepthBuffer( MicroCodeCommand command )
 	y0 = Min<s32>(Max<s32>(y0, scissors.top), scissors.bottom);
 	x0 >>= 1;
 	x1 >>= 1;
-	u32 zi_width_in_dwords = g_CI.Width >> 1;
-	u32 fill_colour = gRenderer->GetFillColour();
-	u32 * dst = (u32*)(g_pu8RamBase + g_CI.Address) + y0 * zi_width_in_dwords;
+	u32 zi_width_in_dwords {g_CI.Width >> 1};
+	u32 fill_colour {gRenderer->GetFillColour()};
+	u32 * dst {(u32*)(g_pu8RamBase + g_CI.Address) + y0 * zi_width_in_dwords};
 
 	for( u32 y = y0; y <y1; y++ )
 	{
@@ -1136,9 +1136,9 @@ void DLParser_FillRect( MicroCodeCommand command )
 
 	// TODO - Check colour image format to work out how this should be decoded!
 	// Should we init with Prim or Blend colour? Doesn't work well see Mk64 transition before a race
-	c32		colour;
+	c32		colour {};
 
-	u32 cycle_mode = gRDPOtherMode.cycle_type;
+	u32 cycle_mode {gRDPOtherMode.cycle_type};
 	//
 	// In Fill/Copy mode the coordinates are inclusive (i.e. add 1.0f to the w/h)
 	//
@@ -1221,7 +1221,7 @@ void DLParser_SetCImg( MicroCodeCommand command )
 void DLParser_SetCombine( MicroCodeCommand command )
 {
 	//Swap the endian
-	REG64 Mux;
+	REG64 Mux {};
 	Mux._u32_0 = command.inst.cmd1;
 	Mux._u32_1 = command.inst.arg0;
 
@@ -1240,7 +1240,7 @@ void DLParser_SetCombine( MicroCodeCommand command )
 //*****************************************************************************
 void DLParser_SetFillColor( MicroCodeCommand command )
 {
-	u32 fill_colour = command.inst.cmd1;
+	u32 fill_colour {command.inst.cmd1};
 
 #ifdef DAEDALUS_DEBUG_DISPLAYLIST
 	N64Pf5551	n64col( (u16)fill_colour );

@@ -17,6 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#pragma once
+
 #ifndef CORE_MEMORY_H_
 #define CORE_MEMORY_H_
 

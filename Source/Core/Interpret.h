@@ -17,10 +17,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef CORE_INTERPRET_H_
-#define CORE_INTERPRET_H_
+#pragma once
 
 void Inter_Reset();
 void Inter_SelectCore();
-
-#endif // CORE_INTERPRET_H_

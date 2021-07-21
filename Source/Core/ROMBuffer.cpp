@@ -223,22 +223,22 @@ bool RomBuffer::Open()
 		u8 *	p_bytes( (u8*)CROMFileMemory::Get()->Alloc( size_aligned ) );
 
 #if !defined(DAEDALUS_PSP) && !defined(DAEDALUS_PS2)
-		if (!p_rom_file->LoadData(sRomSize, p_bytes, messages))
+		if( !p_rom_file->LoadData( sRomSize, p_bytes, messages ) )
 		{
-#ifdef DAEDALUS_DEBUG_CONSOLE
+			#ifdef DAEDALUS_DEBUG_CONSOLE
 			DBGConsole_Msg(0, "Failed to load [C%s]\n", filename);
-#endif
-			CROMFileMemory::Get()->Free(p_bytes);
+			#endif
+			CROMFileMemory::Get()->Free( p_bytes );
 			delete p_rom_file;
 			return false;
 		}
 #else
-		u32 offset(0);
-		u32 length_remaining(sRomSize);
-		const u32 TEMP_BUFFER_SIZE = 128 * 1024;
+		u32 offset( 0 );
+		u32 length_remaining( sRomSize );
+		const u32 TEMP_BUFFER_SIZE {128 * 1024};
 #ifdef DAEDALUS_PSP
-		intraFont* ltn8 = intraFontLoad("flash0:/font/ltn8.pgf", INTRAFONT_CACHE_ASCII);
-		intraFontSetStyle(ltn8, 1.5f, 0xFF000000, 0, 0.f, INTRAFONT_ALIGN_CENTER);
+		intraFont* ltn8  = intraFontLoad( "flash0:/font/ltn8.pgf", INTRAFONT_CACHE_ASCII );
+		intraFontSetStyle( ltn8, 1.5f, 0xFF000000, 0, 0.f, INTRAFONT_ALIGN_CENTER );
 #else
 		gsFontM->Align = GSKIT_FALIGN_CENTER;
 		gsFontM->Spacing = 0.7f;
@@ -246,28 +246,26 @@ bool RomBuffer::Open()
 		char str_buf[255];
 #endif
 
-		while (offset < sRomSize)
+		while( offset < sRomSize )
 		{
-			u32 length_to_process(Min(length_remaining, TEMP_BUFFER_SIZE));
+			u32 length_to_process( Min( length_remaining, TEMP_BUFFER_SIZE ) );
 
-			if (!p_rom_file->ReadChunk(offset, p_bytes + offset, length_to_process))
+			if( !p_rom_file->ReadChunk( offset, p_bytes + offset, length_to_process ) )
 			{
 				break;
 			}
 
 			offset += length_to_process;
 			length_remaining -= length_to_process;
+
 #ifdef DAEDALUS_PSP
 			CGraphicsContext::Get()->BeginFrame();
 			CGraphicsContext::Get()->ClearToBlack();
-			intraFontPrintf(ltn8, 480 / 2, (272 >> 1), "Buffering ROM %d%%...", offset * 100 / sRomSize);
+			intraFontPrintf( ltn8, 480/2, (272>>1), "Buffering ROM %d%%...", offset * 100 / sRomSize );
 			printf("Buffering ROM %d%%...", offset * 100 / sRomSize);
 			CGraphicsContext::Get()->EndFrame();
-			CGraphicsContext::Get()->UpdateFrame(false);
-	}
-
-		intraFontUnload(ltn8);
-#else		
+			CGraphicsContext::Get()->UpdateFrame( false );
+#else
 			CGraphicsContext::Get()->BeginFrame();
 			CGraphicsContext::Get()->ClearToBlack();
 			sprintf(str_buf, "Buffering ROM %d%%...", offset * 100 / sRomSize);
@@ -275,7 +273,11 @@ bool RomBuffer::Open()
 			printf("Buffering ROM %d%%...", offset * 100 / sRomSize);
 			CGraphicsContext::Get()->EndFrame();
 			CGraphicsContext::Get()->UpdateFrame(false);
-	}
+#endif
+		}
+
+#ifdef DAEDALUS_PSP
+		intraFontUnload( ltn8 );
 #endif
 #endif
 		spRomData = p_bytes;
@@ -382,9 +384,9 @@ namespace
 		// Similar algorithm to below - we don't care about byte swapping though
 		while(length > 0)
 		{
-			u8 *	p_chunk_base;
-			u32		chunk_offset = 0;
-			u32		chunk_size = 0;
+			u8 *	p_chunk_base {};
+			u32		chunk_offset {};
+			u32		chunk_size {};
 
 			if( !p_cache->GetChunk( src_offset, &p_chunk_base, &chunk_offset, &chunk_size ) )
 			{
@@ -484,9 +486,9 @@ void RomBuffer::CopyToRam( u8 * p_dst, u32 dst_offset, u32 dst_size, u32 src_off
 	{
 		while(length > 0)
 		{
-			u8 *	p_chunk_base;
-			u32		chunk_offset = 0;
-			u32		chunk_size = 0;
+			u8 *	p_chunk_base {};
+			u32		chunk_offset {};
+			u32		chunk_size {};
 
 			if( !spRomFileCache->GetChunk( src_offset, &p_chunk_base, &chunk_offset, &chunk_size ) )
 			{

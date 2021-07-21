@@ -718,8 +718,10 @@ TEST_DISABLE_GU_FUNCS
 
 #ifdef DAEDALUS_PSP_USE_VFPU //Corn
 	vfpu_matrix_OrthoF(pMtxBase, l._f32, r._f32, b._f32, t._f32, n._f32, f._f32, s._f32);
+
 #elif defined( DAEDALUS_PS2_USE_VU0 )
 	vu0_matrix_OrthoF(pMtxBase, l._f32, r._f32, b._f32, t._f32, n._f32, f._f32, s._f32);
+
 #else
 	f32 fRmL = r._f32 - l._f32;
 	f32 fTmB = t._f32 - b._f32;

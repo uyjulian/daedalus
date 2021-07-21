@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef UTILITY_COND_H_
 #define UTILITY_COND_H_

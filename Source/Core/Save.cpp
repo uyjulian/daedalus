@@ -78,14 +78,14 @@ bool Save_Reset()
 			DBGConsole_Msg(0, "Loading save from [C%s]", gSaveFileName);
 			#endif
 
-			u8 buffer[2048];
+			u8 buffer[2048] {};
 			u8 * dst = (u8*)g_pMemoryBuffers[MEM_SAVE];
 
-			for (u32 d = 0; d < gSaveSize; d += sizeof(buffer))
+			for (u32 d {}; d < gSaveSize; d += sizeof(buffer))
 			{
 				fread(buffer, sizeof(buffer), 1, fp);
 
-				for (u32 i = 0; i < sizeof(buffer); i++)
+				for (u32 i {}; i < sizeof(buffer); i++)
 				{
 					dst[d+i] = buffer[i^U8_TWIDDLE];
 				}
@@ -215,7 +215,7 @@ static void InitMempackContent()
 {
 	for (size_t dst_off = 0; dst_off < MemoryRegionSizes[MEM_MEMPACK]; dst_off += 32 * 1024)
 	{
-		u8 * mempack = (u8*)g_pMemoryBuffers[MEM_MEMPACK] + dst_off;
+		u8 * mempack {(u8*)g_pMemoryBuffers[MEM_MEMPACK] + dst_off};
 		for (u32 i = 0; i < 0x8000; i += 2)
 		{
 			mempack[i + 0] = 0x00;

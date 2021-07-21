@@ -604,7 +604,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 #ifndef DAEDALUS_SILENT
 			printf("Speedhack complex %08x\n", trace[0].Address );
 #endif
-			p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( (void *)CPU_SkipToNextEvent ) ) );
+			p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
 		}
 	}
 
@@ -615,7 +615,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 	std::vector< SBranchHandlerInfo >	branch_handler_info( branch_details.size() );
 //	bool								checked_cop1_usable( false );
 
-	for( u32 i = 0; i < trace.size(); ++i )
+	for( u32 i {}; i < trace.size(); ++i )
 	{
 		const STraceEntry & ti( trace[ i ] );
 		u32	branch_idx( ti.BranchIdx );
@@ -654,14 +654,14 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 						#ifdef DAEDALUS_DEBUG_CONSOLE
 					printf("Speedhack event (skip busy loop)\n");
 
-					char opinfo[128];
+					char opinfo[128] {};
 					SprintOpCodeInfo( opinfo, trace[i].Address, trace[i].OpCode );
 					printf("\t%p: <0x%08x> %s\n", (u32*)trace[i].Address, trace[i].OpCode._u32, opinfo);
 
 					SprintOpCodeInfo( opinfo, trace[i+1].Address, trace[i+1].OpCode );
 					printf("\t%p: <0x%08x> %s\n", (u32*)trace[i+1].Address, trace[i+1].OpCode._u32, opinfo);
 					#endif
-					p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( (void *)CPU_SkipToNextEvent ) ) );
+					p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
 					}
 					break;
 
@@ -699,7 +699,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 #else
 			if(p_branch->SpeedHack == SHACK_SKIPTOEVENT)
 			{
-				p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >((void*)CPU_SkipToNextEvent ) ) );
+				p_generator->ExecuteNativeFunction( CCodeLabel( reinterpret_cast< const void * >( CPU_SkipToNextEvent ) ) );
 			}
 #endif
 		}
@@ -737,7 +737,7 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 	//
 	//	Generate handlers for each exit branch
 	//
-	for( u32 i = 0; i < branch_details.size(); ++i )
+	for( u32 i {}; i < branch_details.size(); ++i )
 	{
 		const SBranchDetails &	details( branch_details[ i ] );
 		u32						instruction_idx( branch_handler_info[ i ].Index );
@@ -795,8 +795,8 @@ void CFragment::Assemble( CCodeBufferManager * p_manager,
 
 		if( details.Likely )
 		{
-			u32				exit_address = 0;
-			CJumpLocation	jump_location;
+			u32				exit_address {};
+			CJumpLocation	jump_location {};
 
 			if( details.ConditionalBranchTaken )
 			{
@@ -945,7 +945,7 @@ void DisassembleBuffer( const u8 * buf, int buf_size, FILE * fh )
 
 void DisassembleBuffer( const u8 * buf, int buf_size, FILE * fh )
 {
-	const int	STRBUF_LEN = 1024;
+	const int	STRBUF_LEN {1024};
 	char		strbuf[STRBUF_LEN+1];
 
 	const OpCode *	p_op( reinterpret_cast< const OpCode * >( buf ) );

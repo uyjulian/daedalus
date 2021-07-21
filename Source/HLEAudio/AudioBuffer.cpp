@@ -131,7 +131,8 @@ void CAudioBuffer::AddSamples( const Sample * samples, u32 num_samples, u32 freq
 #ifdef DAEDALUS_PS2
 		int timeout = 1000;
 #endif
-		while (write_ptr == read_ptr)
+
+		while( write_ptr == read_ptr )
 		{
 			// The buffer is full - spin until the read pointer advances.
 			//    Note - spends a lot of time here if program is running

@@ -76,6 +76,6 @@ include $(PS2SDK)/samples/Makefile.eeglobal_cpp
 EE_CC_VERSION := $(shell $(EE_CC) -dumpversion)
 ifneq ($(EE_CC_VERSION),3.2.2)
 ifneq ($(EE_CC_VERSION),3.2.3)
-EE_CXXFLAGS += -std=gnu++03
+EE_CXXFLAGS += -std=gnu++14
 endif
 endif

@@ -17,8 +17,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#ifndef CORE_SAVE_H_
-#define CORE_SAVE_H_
+#pragma once
 
 bool Save_Reset();
 void Save_Fini();
@@ -27,5 +26,3 @@ void Save_MarkSaveDirty();
 void Save_MarkMempackDirty();
 
 void Save_Flush(bool force = false);
-
-#endif // CORE_SAVE_H_
