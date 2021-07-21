@@ -21,3 +21,5 @@ preferences.ini
 rom.db
 .svn/
 Source/tmp
+*_irx.s
+*.irx
